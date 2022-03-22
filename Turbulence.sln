@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Turbulence.API", "API\Turbulence.API.csproj", "{27FB15FA-BF35-4357-88CE-121E5130D49A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbulence.CLI", "Turbulence.CLI\Turbulence.CLI.csproj", "{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{27FB15FA-BF35-4357-88CE-121E5130D49A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27FB15FA-BF35-4357-88CE-121E5130D49A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27FB15FA-BF35-4357-88CE-121E5130D49A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27FB15FA-BF35-4357-88CE-121E5130D49A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {80B3CED7-2126-4425-A0E4-833CCC5F9649}
+	EndGlobalSection
+EndGlobal

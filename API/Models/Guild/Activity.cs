@@ -62,19 +62,19 @@ public class Activity
     /// Information for the current party of the player
     /// </summary>
     [JsonProperty("party", Required = Required.DisallowNull)]
-    public party object Party { get; internal set; }
+    public /*party*/ object Party { get; internal set; }
 
     /// <summary>
     /// Images for the presence and their hover texts
     /// </summary>
     [JsonProperty("assets", Required = Required.DisallowNull)]
-    public assets object Assets { get; internal set; }
+    public /*assets*/ object Assets { get; internal set; }
 
     /// <summary>
     /// Secrets for rich presence joining and spectating
     /// </summary>
     [JsonProperty("secrets", Required = Required.DisallowNull)]
-    public secrets object Secrets { get; internal set; }
+    public /*secrets*/ object Secrets { get; internal set; }
 
     /// <summary>
     /// Whether or not the activity is an instanced game session
@@ -92,7 +92,7 @@ public class Activity
     /// The custom buttons shown in the rich presence (max 2)
     /// </summary>
     [JsonProperty("buttons", Required = Required.DisallowNull)]
-    public array of buttons Buttons { get; internal set; }
+    public /*buttons*/ object[] Buttons { get; internal set; }
 
     public class TimestampsObject
     {

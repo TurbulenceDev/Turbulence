@@ -80,10 +80,7 @@ def parse_structure(sourcefile: str, xpath: str) -> List[DataStructureField]:
             field_name = recursive_find_text(row[0])
             if field_name == "video_quality_mode?":
                 print("")
-            if field_name.endswith("*"):
-                while field_name.endswith("*"):
-                    field_name = field_name[:-1]
-                field_name = field_name[:-1]
+            field_name = field_name.rstrip("*")
             if field_type.startswith("?"):
                 nullable = True
                 field_type = field_type[1:]

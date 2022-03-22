@@ -26,7 +26,7 @@ public class PresenceUpdateEvent
     /// User's current activities
     /// </summary>
     [JsonProperty("activities", Required = Required.Always)]
-    public array of activity objects Activities { get; internal set; }
+    public /*array of activity objects*/ object[] Activities { get; internal set; }
 
 /// <summary>
 /// User's platform-dependent status

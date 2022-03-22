@@ -203,7 +203,7 @@ public class Guild : Snowflake
     /// Presences of the members in the guild, will only include non-offline members if the size is greater than large threshold
     /// </summary>
     [JsonProperty("presences", Required = Required.DisallowNull)]
-    public array of partial presence update objects Presences { get; internal set; }
+    public /*partial presence update objects*/ object[] Presences { get; internal set; }
 
     /// <summary>
     /// The maximum number of presences for the guild (null is always returned, apart from the largest of guilds)
@@ -281,7 +281,7 @@ public class Guild : Snowflake
     /// The welcome screen of a community guild, shown to new members, returned in an invite's guild object
     /// </summary>
     [JsonProperty("welcome_screen", Required = Required.DisallowNull)]
-    public welcome screen object WelcomeScreen { get; internal set; }
+    public /*welcome screen*/ object WelcomeScreen { get; internal set; }
 
     /// <summary>
     /// Guild nsfw level
@@ -293,19 +293,19 @@ public class Guild : Snowflake
     /// Stage instances in the guild
     /// </summary>
     [JsonProperty("stage_instances", Required = Required.DisallowNull)]
-    public array of stage instance objects StageInstances { get; internal set; }
+    public /*stage instance objects*/ object[] StageInstances { get; internal set; }
 
     /// <summary>
     /// Custom guild stickers
     /// </summary>
     [JsonProperty("stickers", Required = Required.DisallowNull)]
-    public array of sticker objects Stickers { get; internal set; }
+    public /*array of sticker objects*/ object[] Stickers { get; internal set; }
 
     /// <summary>
     /// The scheduled events in the guild
     /// </summary>
     [JsonProperty("guild_scheduled_events", Required = Required.DisallowNull)]
-    public array of guild scheduled event objects GuildScheduledEvents { get; internal set; }
+    public /*guild scheduled event objects*/ object[] GuildScheduledEvents { get; internal set; }
 
     /// <summary>
     /// Whether the guild has the boost progress bar enabled
