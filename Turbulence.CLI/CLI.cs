@@ -1,4 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SpanJson;
+using System.Net.WebSockets;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace Turbulence.CLI
 {
@@ -32,6 +36,104 @@ namespace Turbulence.CLI
             Console.WriteLine(token);
             var user = getCurrentUser().Result;
             Console.WriteLine(user.ReadAsStringAsync().Result);
+
+            var ws = new ClientWebSocket();
+            //TODO: correct headers?
+            ws.ConnectAsync(new Uri("wss://gateway.discord.gg/?encoding=json&v=9"), CancellationToken.None).Wait();
+            // send identify //TODO: transform into class
+            var ident = $@"{{""op"":2,""d"":{{""token"":""{token}"",""capabilities"":253,""properties"":{{""os"":""Windows"",""browser"":""Firefox"",""device"":"""",""system_locale"":""de"",""browser_user_agent"":""{userAgent}"",""browser_version"":""96.0"",""os_version"":""10"",""referrer"":"""",""referring_domain"":"""",""referrer_current"":"""",""referring_domain_current"":"""",""release_channel"":""stable"",""client_build_number"":111699,""client_event_source"":null}},""presence"":{{""status"":""online"",""since"":0,""activities"":[],""afk"":false}},""compress"":false,""client_state"":{{""guild_hashes"":{{}},""highest_last_message_id"":""0"",""read_state_version"":0,""user_guild_settings_version"":-1,""user_settings_version"":-1}}}}}}";
+            ws.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(ident)), WebSocketMessageType.Text, true, CancellationToken.None);
+            Console.WriteLine("WS Send: Identify");
+            Task.WhenAll(Receive(ws), Send(ws)).Wait();
         }
+
+        private static async Task Send(ClientWebSocket webSocket)
+        {
+            var random = new Random();
+
+            while (webSocket.State == WebSocketState.Open)
+            {
+
+
+                //await webSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Binary, false, CancellationToken.None);
+
+                await Task.Delay(1000);
+            }
+        }
+
+        public class GatewayPayload
+        {
+            [DataMember(Name = "op")]
+            public int Opcode { get; set; } // opcode
+            [DataMember(Name = "d")]
+            public object? Data { get; set; } //event data
+            // From docs: s and t are null when op is not 0
+            [DataMember(Name = "s")]
+            public int? Sequence { get; set; } // sequence number
+            [DataMember(Name = "t")]
+            public string? Name { get; set; } // event name
+        }
+
+        private static async Task Receive(ClientWebSocket webSocket)
+        {
+            var bufferSize = 1024 * 4;
+            //TODO: fix buffer size conundrum
+            try
+            {
+                byte[] buffer = new byte[bufferSize];
+                GatewayPayload? msg = null;
+                while (webSocket.State == WebSocketState.Open)
+                {
+                    var arraySegment = new ArraySegment<byte>(buffer);
+                    var result = await webSocket.ReceiveAsync(arraySegment, CancellationToken.None);
+                    if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                        continue;
+                    }
+
+                    if (result.EndOfMessage)
+                    {
+                        //var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                        msg = JsonSerializer.Generic.Utf8.Deserialize<GatewayPayload>(buffer);
+                    }
+                    else // handle longer messages
+                    {
+                        MemoryStream byteBuffer = new MemoryStream(bufferSize);
+                        byteBuffer.Write(buffer, 0, buffer.Length);
+                        while (!result.EndOfMessage)
+                        {
+                            result = await webSocket.ReceiveAsync(arraySegment, CancellationToken.None);
+                            if (result.MessageType == WebSocketMessageType.Close)
+                                continue;
+
+                            byteBuffer.Write(buffer, 0, buffer.Length);
+                            if (result.EndOfMessage)
+                            {
+                                msg = JsonSerializer.Generic.Utf8.Deserialize<GatewayPayload>(byteBuffer.ToArray());
+                                break;
+                            }
+                        }
+                    }
+
+                    if (msg != null)
+                    {
+                        Console.WriteLine($"WS Receive: {msg.Opcode}");
+                        if (msg.Opcode == 0)
+                        {
+                            Console.WriteLine($"Name: {msg.Name}, Sequence: {msg.Sequence}");
+                        }
+                        if (msg.Data != null && msg.Data.ToString().Length < bufferSize)
+                        {
+                            Console.WriteLine($"Data: {msg.Data}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception during Receive: {ex.ToString()}");
+            }
+}
     }
 }
