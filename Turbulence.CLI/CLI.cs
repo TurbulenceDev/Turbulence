@@ -66,7 +66,7 @@ namespace Turbulence.CLI
             [DataMember(Name = "op")]
             public int Opcode { get; set; } // opcode
             [DataMember(Name = "d")]
-            public object? Data { get; set; } //event data
+            public dynamic? Data { get; set; } //event data
             // From docs: s and t are null when op is not 0
             [DataMember(Name = "s")]
             public int? Sequence { get; set; } // sequence number
@@ -122,8 +122,33 @@ namespace Turbulence.CLI
                         if (msg.Opcode == 0)
                         {
                             Console.WriteLine($"Name: {msg.Name}, Sequence: {msg.Sequence}");
+                            if (msg.Data == null)
+                                continue;
+
+                            //TODO: move this into a custom resolver of the GatewayPayload class
+                            //      by dynamically assigning subclasses to the data according to the event name
+                            //      then we wouldnt need to do this shit. also needs the exported models
+                            var data = msg.Data;
+                            switch (msg.Name)
+                            {
+                                case "MESSAGE_CREATE":
+                                    Console.ForegroundColor = ConsoleColor.Green;
+                                    Console.WriteLine($"{data.author.username}: {data.content}");
+                                    Console.ForegroundColor = ConsoleColor.White;
+                                    break;
+                                case "READY":
+                                    Console.WriteLine("READY");
+                                    Console.WriteLine($"Current User: {data.user.username}#{data.user.discriminator}");
+                                    Console.WriteLine("Servers:");
+                                    foreach (var guild in data.guilds)
+                                        Console.WriteLine($"-{guild.name} (ID: {guild.id})");
+                                    break;
+                                default:
+                                    Console.WriteLine($"Data: {data}");
+                                    break;
+                            }
                         }
-                        if (msg.Data != null && msg.Data.ToString().Length < bufferSize)
+                        else
                         {
                             Console.WriteLine($"Data: {msg.Data}");
                         }
