@@ -5,6 +5,9 @@ riderModule.iml
 /_ReSharper.Caches/
 .idea
 Tools/*.txt
+Tools/*.md
+Tools/*.html
+Tools/out/
 
 # VS Stuff
 .vs

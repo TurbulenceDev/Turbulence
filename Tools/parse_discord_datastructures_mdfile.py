@@ -51,6 +51,7 @@ class DataStructureField:
             else:
                 required_str = ", Required = Required.Always"
 
+        # TODO: adjust "JsonProperty" to the used json parsing lib
         return f"""    /// <summary>
     /// {self.description.capitalize()}
     /// </summary>

@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 import os
 import subprocess
 
+# usage: point to a folder with the markdown docs (like https://github.com/discord/discord-api-docs/tree/main/docs/resources)
 if __name__ == "__main__":
     argsparser = ArgumentParser()
     argsparser.add_argument("infolder", type=str)

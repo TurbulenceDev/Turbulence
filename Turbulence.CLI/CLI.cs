@@ -40,7 +40,7 @@ namespace Turbulence.CLI
             var ws = new ClientWebSocket();
             //TODO: correct headers?
             ws.ConnectAsync(new Uri("wss://gateway.discord.gg/?encoding=json&v=9"), CancellationToken.None).Wait();
-            // send identify //TODO: transform into class
+            // send identify //TODO: transform into GatewayPayload class
             var ident = $@"{{""op"":2,""d"":{{""token"":""{token}"",""capabilities"":253,""properties"":{{""os"":""Windows"",""browser"":""Firefox"",""device"":"""",""system_locale"":""de"",""browser_user_agent"":""{userAgent}"",""browser_version"":""96.0"",""os_version"":""10"",""referrer"":"""",""referring_domain"":"""",""referrer_current"":"""",""referring_domain_current"":"""",""release_channel"":""stable"",""client_build_number"":111699,""client_event_source"":null}},""presence"":{{""status"":""online"",""since"":0,""activities"":[],""afk"":false}},""compress"":false,""client_state"":{{""guild_hashes"":{{}},""highest_last_message_id"":""0"",""read_state_version"":0,""user_guild_settings_version"":-1,""user_settings_version"":-1}}}}}}";
             ws.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(ident)), WebSocketMessageType.Text, true, CancellationToken.None);
             Console.WriteLine("WS Send: Identify");
@@ -76,14 +76,15 @@ namespace Turbulence.CLI
 
         private static async Task Receive(ClientWebSocket webSocket)
         {
+            //TODO: something here takes up a lot of ram. may be the json stuff not being gc'ed
             var bufferSize = 1024 * 4;
-            //TODO: fix buffer size conundrum
             try
             {
                 byte[] buffer = new byte[bufferSize];
                 GatewayPayload? msg = null;
                 while (webSocket.State == WebSocketState.Open)
                 {
+                    // Read the message
                     var arraySegment = new ArraySegment<byte>(buffer);
                     var result = await webSocket.ReceiveAsync(arraySegment, CancellationToken.None);
                     if (result.MessageType == WebSocketMessageType.Close)
@@ -94,11 +95,11 @@ namespace Turbulence.CLI
 
                     if (result.EndOfMessage)
                     {
-                        //var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
                         msg = JsonSerializer.Generic.Utf8.Deserialize<GatewayPayload>(buffer);
                     }
                     else // handle longer messages
                     {
+                        // create a stream and append the messages till we reach the end of the messages
                         MemoryStream byteBuffer = new MemoryStream(bufferSize);
                         byteBuffer.Write(buffer, 0, buffer.Length);
                         while (!result.EndOfMessage)
@@ -110,12 +111,14 @@ namespace Turbulence.CLI
                             byteBuffer.Write(buffer, 0, buffer.Length);
                             if (result.EndOfMessage)
                             {
+                                // parse the whole message from the stream
                                 msg = JsonSerializer.Generic.Utf8.Deserialize<GatewayPayload>(byteBuffer.ToArray());
                                 break;
                             }
                         }
                     }
 
+                    // We should now have a valid gateway message
                     if (msg != null)
                     {
                         Console.WriteLine($"WS Receive: {msg.Opcode}");
@@ -127,7 +130,7 @@ namespace Turbulence.CLI
 
                             //TODO: move this into a custom resolver of the GatewayPayload class
                             //      by dynamically assigning subclasses to the data according to the event name
-                            //      then we wouldnt need to do this shit. also needs the exported models
+                            //      then we wouldnt need to do this (dynamic) shit. also needs the exported models
                             var data = msg.Data;
                             switch (msg.Name)
                             {
