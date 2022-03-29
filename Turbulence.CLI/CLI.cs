@@ -18,8 +18,14 @@ namespace Turbulence.CLI
 
             // this uses dotnet user-secrets, saved in a secrets.json; can be configured through vs or cli
             var config = new ConfigurationManager().AddUserSecrets<CLI>().Build();
-            var token = config["token"];
+            string? token = config["token"];
 
+            if (token == null)
+            {
+                Console.Out.WriteLine("No token set. Use 'dotnet user-secrets set token [your token]' to set a token.");
+                return;
+            }
+            
             // set up http client
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("Authorization", token);
@@ -27,14 +33,14 @@ namespace Turbulence.CLI
 
             var userApi = $"{apiRoot}users/";
             // gets the current user
-            async Task<HttpContent> getCurrentUser()
+            async Task<HttpContent> GetCurrentUser()
             {
                 var req = new HttpRequestMessage(HttpMethod.Get, $"{userApi}/@me");
                 var msg = await client.SendAsync(req);
                 return msg.Content;
             }
             Console.WriteLine(token);
-            var user = getCurrentUser().Result;
+            var user = GetCurrentUser().Result;
             Console.WriteLine(user.ReadAsStringAsync().Result);
 
             var ws = new ClientWebSocket();
