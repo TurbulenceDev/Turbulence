@@ -28,11 +28,9 @@ public class PresenceUpdateEvent
     [JsonProperty("activities", Required = Required.Always)]
     public /*array of activity objects*/ object[] Activities { get; internal set; }
 
-/// <summary>
-/// User's platform-dependent status
-/// </summary>
-[JsonProperty("client_status", Required = Required.Always)]
-public client_status object ClientStatus { get; internal set; }
-
-
+    /// <summary>
+    /// User's platform-dependent status
+    /// </summary>
+    [JsonProperty("client_status", Required = Required.Always)]
+    public /*client_status*/ object ClientStatus { get; internal set; }
 }
