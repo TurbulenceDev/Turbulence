@@ -35,10 +35,10 @@ class Cli
             string gateway = await Api.GetGateway(client);
 
             ClientWebSocket ws = new();
-            //TODO: correct headers?
-            await ws.ConnectAsync(new Uri(gateway), default);
+            //TODO: correct headers? //TODO: implement zlib (de)compression
+            await ws.ConnectAsync(new Uri($"{gateway}/?encoding=json&v=9"), default);
             
-            Console.WriteLine(token);
+            //Console.WriteLine(token);
             
             client.DefaultRequestHeaders.Add("Authorization", token);
             client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
@@ -54,18 +54,45 @@ class Cli
                 Data = new Identify
                 {
                     Token = token,
+                    Capabilities = 253,
                     Properties = new IdentifyConnectionProperties
                     {
-                        Os = "Windows",
+                        OS = "Windows",
                         Browser = "Firefox",
                         Device = "",
+                        Locale = "de",
+                        UserAgent = UserAgent,
+                        BrowserVersion = "96.0",
+                        OSVersion = "10",
+                        Referrer = "",
+                        ReferringDomain = "",
+                        ReferrerCurrent = "",
+                        ReferringDomainCurrent = "",
+                        ReleaseChannel = "stable",
+                        ClientBuildNumber = 111699,
+                        ClientEventSource = null,
                     },
-                    Intents = Convert.ToInt16("1000000011", 2), // GUILD_MESSAGES + GUILD_MEMBERS + GUILDS // TODO: Improve this
+                    Presence = new GatewayPresenceUpdate()
+                    {
+                        Status = "online",
+                        Since = 0,
+                        Activities = Array.Empty<Activity>(),
+                        Afk = false,
+                    },
+                    Compress = false,
+                    ClientState = new GatewayClientState()
+                    {
+                        GuildHashes = new object(),
+                        highestLastMessageID = "0",
+                        ReadStateVersion = 0,
+                        UserGuildSettingsVersion = -1,
+                        UserSettingsVersion = -1
+                    }
                 },
             };
-            
-            Console.WriteLine("WS Send: Identify");
+            var a = JsonConvert.SerializeObject(payload);
             await ws.SendAsync(payload.ToBytes(), default, true, default);
+            Console.WriteLine("WS Send: Identify");
             await Task.WhenAll(Receive(ws), Heartbeat(ws));
         }
         catch (Exception ex)
@@ -79,15 +106,30 @@ class Cli
 
     private static async Task Heartbeat(ClientWebSocket webSocket)
     {
+        while (_heartbeatInterval == null)
+        {
+            await Task.Delay(1000);
+            if (webSocket.State != WebSocketState.Open)
+                return;
+        }
+
+        // first wait heartbeat interval + jitter (ignoring jitter here)
+        await Task.Delay(_heartbeatInterval.Value, HeartbeatToken.Token);
+
         while (webSocket.State == WebSocketState.Open)
         {
-            if (_heartbeatInterval == null)
+            //TODO: probably check if we got a ack (op 11) after the last heartbeat we sent. if not we "should" reconnect
+            GatewayPayload heartBeat = new()
             {
-                await Task.Delay(1000);
-                continue;
-            }
+                Opcode = 1,
+                Data = _lastSequence
+            };
+            await webSocket.SendAsync(heartBeat.ToBytes(), WebSocketMessageType.Text, true, CancellationToken.None);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("WS Send: Heartbeat");
+            Console.ForegroundColor = ConsoleColor.White;
 
-            // we need to send the first heartbeat after interval + jitter (ignore jitter here), then repeat until we die
+            // wait the interval
             try
             {
                 await Task.Delay(_heartbeatInterval.Value, HeartbeatToken.Token);
@@ -96,13 +138,6 @@ class Cli
             {
                 // keep on sending i guess
             }
-
-            //TODO: probably check if we got a ack (op 11) after the last heartbeat we sent. if not we "should" reconnect
-            var ident = $@"{{""op"":1,""d"":{_lastSequence}}}";
-            await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(ident)), WebSocketMessageType.Text, true, CancellationToken.None);
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("WS Send: Heartbeat");
-            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 
@@ -115,12 +150,13 @@ class Cli
         {
             var buffer = new byte[bufferSize];
             var arraySegment = new ArraySegment<byte>(buffer);
+
             GatewayPayload? msg = null;
             while (webSocket.State == WebSocketState.Open)
             {
                 // Clear buffer
                 Array.Clear(buffer);
-                
+
                 // Read the message
                 var result = await webSocket.ReceiveAsync(arraySegment, CancellationToken.None);
                 if (result.MessageType == WebSocketMessageType.Close)
@@ -139,6 +175,7 @@ class Cli
                     // create a stream and append the messages till we reach the end of the messages
                     MemoryStream byteBuffer = new MemoryStream(bufferSize);
                     byteBuffer.Write(buffer, 0, buffer.Length);
+                    var count = result.Count;
                     while (!result.EndOfMessage)
                     {
                         result = await webSocket.ReceiveAsync(arraySegment, CancellationToken.None);
@@ -146,10 +183,12 @@ class Cli
                             continue;
 
                         byteBuffer.Write(buffer, 0, buffer.Length);
+                        count += result.Count;
                         if (result.EndOfMessage)
                         {
                             // parse the whole message from the stream
-                            msg = JsonConvert.DeserializeObject<GatewayPayload>(byteBuffer.ToString());
+                            var stream = Encoding.UTF8.GetString(byteBuffer.ToArray(), 0, count);
+                            msg = JsonConvert.DeserializeObject<GatewayPayload>(stream);
                             break;
                         }
                     }

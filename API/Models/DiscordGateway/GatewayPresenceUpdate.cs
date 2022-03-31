@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace Turbulence.API.Models.DiscordGateway;
 
@@ -8,26 +8,26 @@ namespace Turbulence.API.Models.DiscordGateway;
 public class GatewayPresenceUpdate
 {
     /// <summary>
+    /// The user's new status.
+    /// </summary>
+    [JsonProperty("status", Required = Required.Always)]
+    public string Status { get; set; } = null!;
+
+    /// <summary>
     /// Unix time (in milliseconds) of when the client went idle, or null if the client is not idle.
     /// </summary>
-    [DataMember(Name = "since")]
+    [JsonProperty("since")]
     public int? Since { get; set; }
 
     /// <summary>
     /// The user's activities.
     /// </summary>
-    [DataMember(Name = "activities", IsRequired = true)]
+    [JsonProperty("activities", Required = Required.Always)]
     public Activity[] Activities { get; set; }
-
-    /// <summary>
-    /// The user's new status.
-    /// </summary>
-    [DataMember(Name = "status", IsRequired = true)]
-    public string Status { get; set; } = null!;
 
     /// <summary>
     /// Whether or not the client is afk.
     /// </summary>
-    [DataMember(Name = "afk", IsRequired = true)]
+    [JsonProperty("afk", Required = Required.Always)]
     public bool Afk { get; set; }
 }

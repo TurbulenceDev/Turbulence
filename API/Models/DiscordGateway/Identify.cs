@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace Turbulence.API.Models.DiscordGateway;
 
@@ -10,42 +10,33 @@ public class Identify
     /// <summary>
     /// Authentication token
     /// </summary>
-    [DataMember(Name = "token", IsRequired = true)]
+    [JsonProperty("token", Required = Required.Always)]
     public string Token { get; set; }
+
+    /// <summary>
+    /// Capabilities
+    /// </summary>
+    [JsonProperty("capabilities", Required = Required.Always)]
+    public int Capabilities { get; set; }
 
     /// <summary>
     /// Connection properties
     /// </summary>
-    [DataMember(Name = "properties", IsRequired = true)]
-    public object Properties { get; set; }
-
-    /// <summary>
-    /// Whether this connection supports compression of packets
-    /// </summary>
-    [DataMember(Name = "compress", IsRequired = true)]
-    public bool Compress { get; set; } = false;
-
-    /// <summary>
-    /// Value between 50 and 250, total number of members where the gateway will stop sending offline members in the guild member list
-    /// </summary>
-    [DataMember(Name = "large_threshold", IsRequired = true)]
-    public int LargeThreshold { get; set; } = 50;
-
-    /// <summary>
-    /// Used for guild sharding
-    /// </summary>
-    [DataMember(Name = "shard", IsRequired = true)]
-    public /*two integers (shard_id, num_shards)[]*/ object Shard { get; set; }
+    [JsonProperty("properties", Required = Required.Always)]
+    public IdentifyConnectionProperties Properties { get; set; }
 
     /// <summary>
     /// Presence structure for initial presence information
     /// </summary>
-    [DataMember(Name = "presence", IsRequired = true)]
+    [JsonProperty("presence", Required = Required.Always)]
     public GatewayPresenceUpdate Presence { get; set; }
 
     /// <summary>
-    /// The gateway intents you wish to receive
+    /// Whether this connection supports compression of packets
     /// </summary>
-    [DataMember(Name = "intents", IsRequired = true)]
-    public int Intents { get; set; }
+    [JsonProperty("compress", Required = Required.Always)]
+    public bool Compress { get; set; } = false;
+
+    [JsonProperty("client_state", Required = Required.Always)]
+    public GatewayClientState ClientState { get; set; }
 }
