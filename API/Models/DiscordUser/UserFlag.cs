@@ -1,4 +1,4 @@
-﻿namespace Accord.API.Models.User;
+﻿namespace Turbulence.API.Models.DiscordUser;
 
 /// <summary>
 /// Taken from https://discord.com/developers/docs/resources/user#user-object-user-flags

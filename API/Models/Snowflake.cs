@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Accord.API.Models;
+namespace Turbulence.API.Models;
 
 /// <summary>
 /// Represents an object in Discord API.
@@ -11,7 +11,7 @@ public abstract class Snowflake
     /// Gets the ID of this object.
     /// </summary>
     [JsonProperty("id", Required = Required.Always)]
-    public ulong Id { get; internal set; }
+    public ulong Id { get; set; }
 
     internal Snowflake() { }
 }
