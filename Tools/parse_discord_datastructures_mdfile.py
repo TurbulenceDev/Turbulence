@@ -27,6 +27,7 @@ def pretty(name: str) -> str:
         case _:
             return name
 
+
 def find_tables(tree):
     tables = tree.findall(".//table")
     # return the table + the table name (which we just get from the header before, no guarantee that it is indeed a header)
