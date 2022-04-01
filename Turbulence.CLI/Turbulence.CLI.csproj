@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\API\Turbulence.API.csproj" />
+    <ProjectReference Include="..\Turbulence.API\Turbulence.API.csproj" />
   </ItemGroup>
 
 </Project>
