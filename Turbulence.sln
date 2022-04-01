@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Turbulence.API", "API\Turbulence.API.csproj", "{27FB15FA-BF35-4357-88CE-121E5130D49A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbulence.CLI", "Turbulence.CLI\Turbulence.CLI.csproj", "{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbulence.ModelGenerator", "Turbulence.ModelGenerator\Turbulence.ModelGenerator.csproj", "{615DD5FC-B1EE-4132-BA29-02EE988C59BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbulence.API", "Turbulence.API\Turbulence.API.csproj", "{03A741E6-770F-4013-A26D-1CC2FB7BF9CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{27FB15FA-BF35-4357-88CE-121E5130D49A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27FB15FA-BF35-4357-88CE-121E5130D49A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27FB15FA-BF35-4357-88CE-121E5130D49A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27FB15FA-BF35-4357-88CE-121E5130D49A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{615DD5FC-B1EE-4132-BA29-02EE988C59BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{615DD5FC-B1EE-4132-BA29-02EE988C59BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{615DD5FC-B1EE-4132-BA29-02EE988C59BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{615DD5FC-B1EE-4132-BA29-02EE988C59BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03A741E6-770F-4013-A26D-1CC2FB7BF9CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03A741E6-770F-4013-A26D-1CC2FB7BF9CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03A741E6-770F-4013-A26D-1CC2FB7BF9CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03A741E6-770F-4013-A26D-1CC2FB7BF9CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

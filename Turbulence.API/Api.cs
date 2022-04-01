@@ -25,6 +25,9 @@ public static class Api
     public static async Task<string> GetGateway(HttpClient client)
     {
         var response = await ApiCall<Gateway>(client, "/gateway");
+        
+        Console.WriteLine(response.ToString());
+        
         return response.Url;
     }
 
