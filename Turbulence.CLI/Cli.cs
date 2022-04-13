@@ -16,6 +16,8 @@ class Cli
     private const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) Gecko/20100101 Firefox/96.0";
 
     //TODO: move these cached objects into 1. their own classes (more efficient than keeping json stuff around) 2. into the api
+    public static dynamic User = null!;
+    public static List<dynamic> MemberInfos = new(); //TODO: should we like put the roles into a simple array?
     public static List<dynamic> Servers = new();
     public static List<dynamic> ServerSettings = new(); //TODO: listen to the guild settings update event
 
@@ -109,24 +111,59 @@ class Cli
         Console.WriteLine("Finished?");
     }
 
+    private static bool IsMentioned(dynamic msg)
+    {
+        // were we directly pinged (this also handles replies)?
+        foreach (var mention in msg.mentions)
+        {
+            if (mention.id == User.id)
+                return true;
+        }
+        // was our role pinged (mention_roles)
+        foreach (var mentionedRole in msg.mention_roles)
+        {
+            foreach (var info in MemberInfos)
+            {
+                // okay for some reason this shit contains list with objects. havent seen a list here having more than one object but idk what discord is planning
+                foreach (var obj in info)
+                {
+                    if (obj.user_id != User.id)
+                        continue;
+
+                    foreach (var ownedRole in obj.roles)
+                    {
+                        if (ownedRole == mentionedRole)
+                            return true;
+                    }
+                }
+            }
+        }
+        return msg.mention_everyone == true;
+    }
+
     // checks if a message should trigger a notification
-    private static bool ShouldNotify(dynamic msg)
+    private static bool ShouldNotify(dynamic msg, bool mentioned)
     {
         //flow:
         // msg comes in
-        // is server muted + no mention? no notif
+        // is user muted? no notif
+        // is server muted? notif depending on mention
         // if channelOverride exists
         //  is channel muted? no notif
         //  notif depending on channel message notification settings
         // notif depending on server message notification settings
 
+        if (msg.member.mute == true)
+            return false;
+
         // each setting can contain guild wide settings and specific channel overrides
-        //TODO: check message_notifications (0 = all, 1 = only mention, 2 = none, 3 = inherit server?, etc) properly
+        //TODO: make message_notifications (0 = all, 1 = only mention, 2 = none, 3 = inherit server) into a enum
+        //TODO: also check ignore @everyone/@here/roles if we disabled it; probably need a MentionType enum instead of a bool
         foreach (var setting in ServerSettings)
         {
             // is server muted? no ping if not mentioned
-            if (setting.guild_id == msg.guild_id && setting.muted == true) //TODO: check mention
-                return false;
+            if (setting.guild_id == msg.guild_id && setting.muted == true)
+                return mentioned; // mentions still go through mutes //TODO: can we set "ignore @everyone" here?
 
             // check channel specific
             foreach (var channelOverride in setting.channel_overrides)
@@ -137,19 +174,20 @@ class Cli
                     if (channelOverride.muted == true)
                         return false;
 
-                    if (channelOverride.message_notifications == 0 || // notify all
-                            (channelOverride.message_notifications == 3 && setting.message_notifications == 0)) // inherit server
-                        return true;
-                    else
-                        return false;
+                    var notification = channelOverride.message_notifications;
+                    if (notification == 3) //inherit from server
+                        notification = setting.message_notifications;
+
+                    return notification == 0 || // notify all
+                        (notification == 1 && mentioned); // only mention
                 }
             }
 
             // then check server wide mute/notif settings
             if (setting.guild_id == msg.guild_id)
             {
-                if (setting.message_notifications != 0) // not notify all //TODO: also check mentions
-                    return false;
+                return setting.message_notifications == 0 || // notify all
+                        (setting.message_notifications == 1 && mentioned); // only mention
             }
         }
 
@@ -270,18 +308,25 @@ class Cli
                                         // check if the author is muted
                                         if (data.member.mute == true)
                                         {
-                                            Console.ForegroundColor = ConsoleColor.Red;
+                                            Console.ForegroundColor = ConsoleColor.Gray;
                                             Console.Write("[MUTED] ");
                                             Console.ForegroundColor = ConsoleColor.White;
                                         }
+                                        var mentioned = IsMentioned(data);
+                                        if (mentioned)
+                                        {
+                                            Console.ForegroundColor = ConsoleColor.Red;
+                                            Console.Write("[PING] ");
+                                            Console.ForegroundColor = ConsoleColor.White;
+                                        }
                                         // check if we should get a notification
-                                        if (ShouldNotify(data))
+                                        if (ShouldNotify(data, mentioned))
                                         {
                                             Console.ForegroundColor = ConsoleColor.Yellow;
                                             Console.Write("[NOTIF] ");
                                             Console.ForegroundColor = ConsoleColor.White;
                                         }
-                                        // TODO: check if we/one of our roles got mentioned
+                                        // TODO: edit the msg content with mentioned role/user names as well as making it a reply
                                         Console.ForegroundColor = ConsoleColor.Green;
                                         Console.WriteLine($"{data.author.username}: {data.content}");
                                         Console.ForegroundColor = ConsoleColor.White;
@@ -292,9 +337,13 @@ class Cli
                                             Servers.Add(guild);
                                         foreach (var guildSetting in data.user_guild_settings.entries)
                                             ServerSettings.Add(guildSetting);
+                                        User = data.user;
+                                        foreach (var member in data.merged_members)
+                                            MemberInfos.Add(member);
+
 
                                         Console.WriteLine("READY");
-                                        Console.WriteLine($"Current User: {data.user.username}#{data.user.discriminator}");
+                                        Console.WriteLine($"Current User: {User.username}#{User.discriminator}");
                                         Console.WriteLine("Servers:");
                                         foreach (var guild in Servers)
                                             Console.WriteLine($"-{guild.name} (ID: {guild.id})");
