@@ -39,10 +39,21 @@ class Cli
             // Set up http client
             var client = new HttpClient();
 
+            //TODO: according to the docs this should be cached and only re-requested if the cached version doesnt exist/is not reachable
             string gateway = await Api.GetGateway(client);
 
             ClientWebSocket ws = new();
-            //TODO: correct headers? //TODO: implement zlib (de)compression
+            //TODO: implement zlib (de)compression //TODO: additional headers like Accept-Language etc? (also doesnt contain Connection: keep-alive); enable deflate extension (not used)?
+            ws.Options.SetRequestHeader("User-Agent", UserAgent);
+            ws.Options.SetRequestHeader("Origin", "https://discord.com");
+            ws.Options.SetRequestHeader("Accept", "*/*");
+            ws.Options.SetRequestHeader("Accept-Encoding", "gzip, deflate, br");
+            ws.Options.SetRequestHeader("Sec-Fetch-Dest", "websocket");
+            ws.Options.SetRequestHeader("Sec-Fetch-Mode", "websocket");
+            ws.Options.SetRequestHeader("Sec-Fetch-Site", "cross-site");
+            ws.Options.SetRequestHeader("Pragma", "no-cache");
+            ws.Options.SetRequestHeader("Cache-Control", "no-cache");
+
             await ws.ConnectAsync(new Uri($"{gateway}/?encoding=json&v=9"), default);
 
             //Console.WriteLine(token);
@@ -215,7 +226,7 @@ class Cli
                 Opcode = 1,
                 Data = _lastSequence
             };
-            await webSocket.SendAsync(heartBeat.ToBytes(), WebSocketMessageType.Text, true, CancellationToken.None);
+            await webSocket.SendAsync(heartBeat.ToBytes(), default, true, default);
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("WS Send: Heartbeat");
             Console.ForegroundColor = ConsoleColor.White;
@@ -264,7 +275,7 @@ class Cli
                 else // handle longer messages
                 {
                     // create a stream and append the messages till we reach the end of the messages
-                    MemoryStream byteBuffer = new MemoryStream(bufferSize);
+                    MemoryStream byteBuffer = new MemoryStream(bufferSize); //TODO: switch to smth other than MemoryStream? apparently has unnecessary overhead
                     byteBuffer.Write(buffer, 0, buffer.Length);
                     var count = result.Count;
                     while (!result.EndOfMessage)
@@ -332,7 +343,7 @@ class Cli
                                         Console.ForegroundColor = ConsoleColor.White;
                                         break;
                                     case "READY":
-                                        // Cache that shit //TODO: cache more/all. probably also need like private channels, user info etc
+                                        // Cache that shit //TODO: cache more/all. probably also need like private channels etc
                                         foreach (var guild in data.guilds)
                                             Servers.Add(guild);
                                         foreach (var guildSetting in data.user_guild_settings.entries)
