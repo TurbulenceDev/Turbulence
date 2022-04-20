@@ -9,7 +9,7 @@ public static class Config
     public static readonly Uri DocsRoot = new("https://raw.githubusercontent.com/discord/discord-api-docs/main/docs");
 
     /// <summary>
-    /// The path to temporarily store downloaded .md files at.
+    /// The path to temporarily store downloadded/generated files at.
     /// </summary>
     public static readonly Uri TempPath = new($"{Directory.GetCurrentDirectory()}/../../../Out/Temp");
     

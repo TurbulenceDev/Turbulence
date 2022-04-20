@@ -7,6 +7,11 @@ public static class Downloader
     /// </summary>
     public static async Task DownloadFiles(Uri root, List<string> files, Uri outPath)
     {
+        if (Directory.Exists(outPath.AbsolutePath))
+        {
+            throw new Exception($"{outPath.AbsolutePath} already exists.");
+        }
+        
         using var client = new HttpClient();
 
         foreach (string file in files)

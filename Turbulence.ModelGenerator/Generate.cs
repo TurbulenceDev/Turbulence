@@ -12,5 +12,6 @@ public static class Generate
         
         await DownloadFiles(Config.DocsRoot, Config.MdFiles, downloadPath);
         await ExtractTables(downloadPath, tablesPath);
+        Directory.Delete(downloadPath.AbsolutePath, true);
     }
 }
