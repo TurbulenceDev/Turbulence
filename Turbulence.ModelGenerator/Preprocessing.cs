@@ -96,7 +96,7 @@ public static class Preprocessing
                 writtenFiles.Add(filename);
 
                 // Write table to file
-                await File.WriteAllTextAsync(filename , table);
+                await File.WriteAllTextAsync(filename, table);
             }
         }
     }
