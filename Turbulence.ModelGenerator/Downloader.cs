@@ -7,9 +7,20 @@ public static class Downloader
     /// </summary>
     public static async Task DownloadFiles(Uri root, List<string> files, Uri outPath)
     {
+        // If downloads directory already exists, give the option to delete it or stop running
         if (Directory.Exists(outPath.AbsolutePath))
         {
-            throw new Exception($"{outPath.AbsolutePath} already exists.");
+            Console.WriteLine($"{outPath.AbsolutePath} already exists. Delete? (y/N)");
+
+            if (Console.ReadKey(true).KeyChar is 'y' or 'Y')
+            {
+                Directory.Delete(outPath.AbsolutePath, true);
+            }
+            else
+            {
+                Console.WriteLine("Aborting...");
+                Environment.Exit(0);
+            }
         }
         
         using var client = new HttpClient();
@@ -26,7 +37,7 @@ public static class Downloader
 
             // Create a directory for the file
             Directory.CreateDirectory(Path.GetDirectoryName(outputFile.AbsolutePath)
-                ?? throw new Exception("Can't get directory name, files or tempPath is most likely malformed"));
+                ?? throw new Exception("Can't get directory name, files or tempPath is most likely malformed."));
 
             // Write file
             await using var fs = new FileStream(outputFile.AbsolutePath, FileMode.Create);
