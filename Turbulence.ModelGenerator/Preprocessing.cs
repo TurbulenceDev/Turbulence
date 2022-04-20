@@ -76,11 +76,9 @@ public static class Preprocessing
                 // We assume there are no duplicates
                 string dir = Regex.Replace(file, ".md$", "")
                                   .Split(Path.DirectorySeparatorChar)[^1]
-                                  .Replace('_', ' ');
-                dir = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(dir).Replace(" ", "");
-                
-                // Special case for OAuth2
-                if (dir == "Oauth2") dir = "OAuth2";
+                                  .Split('_')
+                                  .Select(x => char.ToUpper(x[0]) + x[1..])
+                                  .Aggregate("", (s1, s2) => s1 + s2);
                 
                 dir = Path.Combine(outPath.AbsolutePath, dir);
 
