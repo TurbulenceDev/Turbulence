@@ -37,7 +37,7 @@ public static class Downloader
 
             // Create a directory for the file
             Directory.CreateDirectory(Path.GetDirectoryName(outputFile.AbsolutePath)
-                ?? throw new Exception("Can't get directory name, files or tempPath is most likely malformed."));
+                ?? throw new Exception("Can't get directory name. Files or tempPath are most likely malformed."));
 
             // Write file
             await using var fs = new FileStream(outputFile.AbsolutePath, FileMode.Create);
