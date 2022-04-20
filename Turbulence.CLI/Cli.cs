@@ -13,7 +13,7 @@ class Cli
     private static int? _lastSequence;
     private static readonly CancellationTokenSource HeartbeatToken = new();
 
-    private const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) Gecko/20100101 Firefox/96.0";
+    private const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0";
 
     //TODO: move these cached objects into 1. their own classes (more efficient than keeping json stuff around) 2. into the api
     public static dynamic User = null!;
@@ -72,7 +72,7 @@ class Cli
                 Data = new Identify
                 {
                     Token = token,
-                    Capabilities = 253,
+                    Capabilities = 509,
                     Properties = new IdentifyConnectionProperties
                     {
                         OS = "Windows",
@@ -80,14 +80,14 @@ class Cli
                         Device = "",
                         Locale = "de",
                         UserAgent = UserAgent,
-                        BrowserVersion = "96.0",
+                        BrowserVersion = "99.0",
                         OSVersion = "10",
                         Referrer = "",
                         ReferringDomain = "",
                         ReferrerCurrent = "",
                         ReferringDomainCurrent = "",
                         ReleaseChannel = "stable",
-                        ClientBuildNumber = 111699,
+                        ClientBuildNumber = 124823,
                         ClientEventSource = null,
                     },
                     Presence = new GatewayPresenceUpdate()

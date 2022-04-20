@@ -11,3 +11,7 @@ Tools/out/
 
 # VS Stuff
 .vs
+
+# python stuff
+*.pyc
+__pycache__
