@@ -8,6 +8,9 @@ Tools/*.txt
 Tools/*.md
 Tools/*.html
 Tools/out/
+Turbulence.ModelGenerator/Out
+
+model-generator
 
 # VS Stuff
 .vs
