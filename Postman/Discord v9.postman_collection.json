@@ -1,0 +1,834 @@
+{
+	"info": {
+		"_postman_id": "3a4a9477-5335-4812-9f19-961c4f77e322",
+		"name": "Discord v9",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Channel",
+			"item": [
+				{
+					"name": "Get Channel",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"description": "firefox",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/channels/{{ChannelID}}",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"channels",
+								"{{ChannelID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Channel Messages",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"description": "firefox",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/channels/{{ChannelID}}/messages?limit=50",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"channels",
+								"{{ChannelID}}",
+								"messages"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "50",
+									"description": "1-100"
+								},
+								{
+									"key": "around",
+									"value": "{{MessageID}}",
+									"disabled": true
+								},
+								{
+									"key": "before",
+									"value": "{{MessageID}}",
+									"disabled": true
+								},
+								{
+									"key": "after",
+									"value": "{{MessageID}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[BOT] Get Channel Message",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"description": "firefox",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/channels/{{ChannelID}}/messages/{{MessageID}}",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"channels",
+								"{{ChannelID}}",
+								"messages",
+								"{{MessageID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Message",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"description": "firefox",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"hello there\",\r\n    \"nonce\": \"934824676163584001\",\r\n    \"tts\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://discord.com/api/v9/channels/{{ChannelID}}/messages",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"channels",
+								"{{ChannelID}}",
+								"messages"
+							]
+						},
+						"description": "channel id sind unsere dms weil ich nicht #general zuspammen wollte\n\ntts: true if this is a TTS message  \n  \nnonce: used for validating a message was sent"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reactions",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"description": "firefox",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/channels/{{ChannelID}}/messages/{{MessageID}}/reactions/{{EmojiEncoded}}",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"channels",
+								"{{ChannelID}}",
+								"messages",
+								"{{MessageID}}",
+								"reactions",
+								"{{EmojiEncoded}}"
+							],
+							"query": [
+								{
+									"key": "after",
+									"value": "{{UserID}}",
+									"description": "get users after this user ID",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "max number of users to return (1-100)",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Guild",
+			"item": [
+				{
+					"name": "Get Guild",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/guilds/{{GuildID}}",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"guilds",
+								"{{GuildID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Guild Preview",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text",
+								"description": "firefox"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/guilds/{{GuildID}}/preview",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"guilds",
+								"{{GuildID}}",
+								"preview"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Guild Channels",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text",
+								"description": "firefox"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/guilds/{{GuildID}}/channels",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"guilds",
+								"{{GuildID}}",
+								"channels"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[BOT] List Active Threads",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text",
+								"description": "firefox"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/guilds/{{GuildID}}/threads/active",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"guilds",
+								"{{GuildID}}",
+								"threads",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[PROTECTED] List Guild Members",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text",
+								"description": "firefox"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/guilds/{{GuildID}}/members",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"guilds",
+								"{{GuildID}}",
+								"members"
+							]
+						},
+						"description": "Der endpoint fickt deinen acc und du musst deine mail verifieren. idk what happened here"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Resources",
+			"item": [
+				{
+					"name": "Avatar",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://cdn.discordapp.com/avatars/{{UserID}}/{{AvatarHash}}.png",
+							"protocol": "https",
+							"host": [
+								"cdn",
+								"discordapp",
+								"com"
+							],
+							"path": [
+								"avatars",
+								"{{UserID}}",
+								"{{AvatarHash}}.png"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DefaultAvatar",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://cdn.discordapp.com/embed/avatars/2.png",
+							"protocol": "https",
+							"host": [
+								"cdn",
+								"discordapp",
+								"com"
+							],
+							"path": [
+								"embed",
+								"avatars",
+								"2.png"
+							]
+						},
+						"description": "Aus den docs:\n\nIn the case of the Default User Avatar endpoint, the value for `user_discriminator` in the path should be the user's discriminator modulo 5—Test#1337 would be `1337 % 5`, which evaluates to 2."
+					},
+					"response": []
+				},
+				{
+					"name": "Guild Icon",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://cdn.discordapp.com/icons/{{GuildID}}/{{GuildIconHash}}.png",
+							"protocol": "https",
+							"host": [
+								"cdn",
+								"discordapp",
+								"com"
+							],
+							"path": [
+								"icons",
+								"{{GuildID}}",
+								"{{GuildIconHash}}.png"
+							]
+						},
+						"description": "Aus den docs:\n\nIn the case of the Default User Avatar endpoint, the value for `user_discriminator` in the path should be the user's discriminator modulo 5—Test#1337 would be `1337 % 5`, which evaluates to 2."
+					},
+					"response": []
+				},
+				{
+					"name": "Custom Emoji",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://cdn.discordapp.com/emojis/{{EmojiID}}.png",
+							"protocol": "https",
+							"host": [
+								"cdn",
+								"discordapp",
+								"com"
+							],
+							"path": [
+								"emojis",
+								"{{EmojiID}}.png"
+							]
+						},
+						"description": "Aus den docs:\n\nIn the case of the Default User Avatar endpoint, the value for `user_discriminator` in the path should be the user's discriminator modulo 5—Test#1337 would be `1337 % 5`, which evaluates to 2."
+					},
+					"response": []
+				},
+				{
+					"name": "Sticker",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://media.discordapp.net/stickers/{{StickerID}}.png",
+							"protocol": "https",
+							"host": [
+								"media",
+								"discordapp",
+								"net"
+							],
+							"path": [
+								"stickers",
+								"{{StickerID}}.png"
+							]
+						},
+						"description": "cdn.discordapp.com hat einen Auth required zurückgegeben, web client nutzt media.discordapp.net"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get Current User",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text",
+								"description": "firefox"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/users/@me",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"users",
+								"@me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User Guilds",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text",
+								"description": "firefox"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/users/@me/guilds",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"users",
+								"@me",
+								"guilds"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User Guild Member",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text",
+								"description": "firefox"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/users/@me/guilds/{{GuildID}}/member",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"users",
+								"@me",
+								"guilds",
+								"{{GuildID}}",
+								"member"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"user-agent": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{Authorization}}",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "{{UserAgent}}",
+								"type": "text",
+								"description": "firefox"
+							}
+						],
+						"url": {
+							"raw": "https://discord.com/api/v9/users/{{UserID}}",
+							"protocol": "https",
+							"host": [
+								"discord",
+								"com"
+							],
+							"path": [
+								"api",
+								"v9",
+								"users",
+								"{{UserID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "DMChannelID",
+			"value": "761209497460015105"
+		}
+	]
+}

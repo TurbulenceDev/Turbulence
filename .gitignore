@@ -10,5 +10,11 @@ Tools/*.html
 Tools/out/
 Turbulence.ModelGenerator/Out
 
+model-generator
+
 # VS Stuff
 .vs
+
+# python stuff
+*.pyc
+__pycache__

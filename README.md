@@ -11,7 +11,7 @@
 8. On the right side, under `Headers`, find an entry called `authorization` (it should be under `Request Headers`).
 9. Copy the value, this is your token.
 
-![How to get the token](token.png)
+![How to get the token](docs/img/token.png)
 
 #### Use token
 1. In a terminal, go to the `Turbulence.CLI` directory.
