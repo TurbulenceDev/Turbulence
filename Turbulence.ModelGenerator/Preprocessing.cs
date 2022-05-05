@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -17,6 +16,8 @@ public static class Preprocessing
         foreach (string file in Directory.EnumerateFiles(inPath.AbsolutePath, "*.*", SearchOption.AllDirectories))
         {
             using StreamReader reader = new(file);
+
+            string url = await reader.ReadLineAsync() ?? throw new Exception($"Downloaded file {file} is empty.");
 
             // Keep track of the last ## header found, because it will be used to name JSON Params, JSON/Form and Query String Params tables
             string? lastH2 = null;
@@ -67,7 +68,7 @@ public static class Preprocessing
                            .Replace("/", "")
                            .Replace("-", "");
 
-                string? table = await ExtractTable(reader);
+                string? table = await ExtractTable(reader, url);
 
                 // Not a valid table or not a table we are interested in, continue
                 if (table == null) continue;
@@ -82,8 +83,8 @@ public static class Preprocessing
                 
                 dir = Path.Combine(outPath.AbsolutePath, dir);
 
-                string filename = Path.Combine(dir, name) + ".md";
-                
+                string filename = Path.Combine(dir, name);
+
                 // Create directory recursively
                 Directory.CreateDirectory(dir);
 
@@ -101,7 +102,7 @@ public static class Preprocessing
         }
     }
 
-    private static async Task<string?> ExtractTable(TextReader reader)
+    private static async Task<string?> ExtractTable(TextReader reader, string url)
     {
         StringBuilder table = new();
         string? line;
@@ -122,6 +123,8 @@ public static class Preprocessing
         // Not an interesting table
         if (!Regex.Match(line, tablePattern).Success) return null;
 
+        table.AppendLine(url);
+        
         // Read table
         table.AppendLine(line);
         while ((line = await reader.ReadLineAsync()) != null && line.StartsWith('|'))
