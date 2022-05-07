@@ -12,9 +12,11 @@ public static class Generate
         Uri tablesPath = new(Path.Combine(Config.TempPath.AbsolutePath, "Tables"));
 
         await DownloadFiles(Config.DocsRoot, Config.MdFiles, downloadPath);
+        PreExtract(downloadPath);
         await ExtractTables(downloadPath, tablesPath);
         Directory.Delete(downloadPath.AbsolutePath, true);
 
         await Convert(tablesPath, Config.OutPath);
+        PostConvert(Config.OutPath);
     }
 }

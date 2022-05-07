@@ -1,4 +1,7 @@
+using System.Runtime.Serialization;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Turbulence.ModelGenerator;
 
@@ -43,12 +46,6 @@ public static class Downloader
 
             // Write file
             await using var fs = new FileStream(outputFile.AbsolutePath, FileMode.Create);
-            
-            // Change URL to make it more user friendly
-            string userUrl = toDownload.ToString().Replace("raw.githubusercontent.com/discord/discord-api-docs/",
-                                                           "github.com/discord/discord-api-docs/tree/");
-            await fs.WriteAsync(Encoding.UTF8.GetBytes($"{userUrl}\n"));
-
             await response.Content.CopyToAsync(fs);
 
             Console.WriteLine(" done");
