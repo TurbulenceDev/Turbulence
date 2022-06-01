@@ -137,7 +137,7 @@ public static class Preprocessing
         string? line;
         
         // Pattern that every table we are interested in starts with /* language=RegEx */
-        const string tablePattern = @"^\s*\|\s*[Ff]ield\s*\|\s*[Tt]ype\s*\|\s*[Dd]escription\s*\|.*$";
+        const string tablePattern = @"^\s*\|\s*([Ff]ield)\s*\|\s*[Tt]ype\s*\|\s*[Dd]escription\s*\|.*$";
         
         // Get rid of any non-table lines
         do
@@ -178,29 +178,9 @@ public static class Preprocessing
             string text = File.ReadAllText(file);
 
             text = text.Replace(@"#### Client Status Object", @"###### Client Status Object");
+            text = Regex.Replace(text, @"(|\s*)[Nn]ame(\s*\|\s*[Tt]ype\s*\|\s*[Dd]escription\s*\|)", "$1Field$2");
 
             File.WriteAllText(file, text);
         }
-    }
-
-    public static void PostConvert(Uri tablesPath)
-    {
-        const string code = @"using Newtonsoft.Json;
-
-namespace Turbulence.API.Models.DiscordMessageComponents;
-
-/// <summary>
-/// <b>Source:</b> <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/interactions/Message_Components.md"">GitHub</a>, <a href=""https://discord.com/developers/docs/interactions/message-components"">Discord API</a>
-/// </summary>
-/// <param name=""Type"">1: Action Row, 2: Button, 3: Select Menu, 4: Text Input</param>
-/// <param name=""Components"">Array of components.</param>
-public record MessageComponent (
-    [property: JsonProperty(""type"", Required = Required.Always)]
-    int Type,
-    [property: JsonProperty(""components"", Required = Required.Always)]
-    dynamic[] Components
-);";
-
-        File.WriteAllText(Path.Combine(tablesPath.AbsolutePath, "DiscordMessageComponents", "MessageComponent.cs"), code);
     }
 }

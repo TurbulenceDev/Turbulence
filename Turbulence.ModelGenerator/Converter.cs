@@ -267,9 +267,13 @@ public static class Converter
     // An "inner type" is a type that is explicitly not a collection type
     private static string? MapInnerType(string type, out string? nameSpace)
     {
-        // Manually overwritten cases
+        // Manually overwritten cases where a namespace has to be supplied
         switch (type)
         {
+            // https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure
+            case "application command permission":
+                nameSpace = "DiscordApplicationCommands";
+                return "ApplicationCommandPermissions";
             // https://discord.com/developers/docs/topics/gateway#update-presence
             case "update presence object":
                 nameSpace = "DiscordGateway";
@@ -278,42 +282,14 @@ public static class Converter
             case "entity metadata":
                 nameSpace = "DiscordGuildScheduledEvent";
                 return "GuildScheduledEventEntityMetadata";
-            // https://discord.com/developers/docs/reference#locales
-            case "dictionary with keys in available locales":
-                nameSpace = null;
-                return "string[]";
-            // https://discord.com/developers/docs/topics/gateway#request-guild-members-guild-request-members-structure
-            case "snowflake or array of snowflakes":
-                nameSpace = null;
-                return "ulong[]";
             // https://discord.com/developers/docs/topics/gateway#message-reaction-add-message-reaction-add-event-fields
             case "partial emoji":
                 nameSpace = "DiscordEmoji";
                 return "Emoji";
-            // https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
-            case "null":
-                nameSpace = null;
-                return "bool?";
-            // https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level
-            case "privacy level":
-                nameSpace = null;
-                return "/* 1: PUBLIC, 2: GUILD_ONLY */ int";
             // https://discord.com/developers/docs/resources/guild#unavailable-guild-object
             case "Unavailable Guild object":
                 nameSpace = "DiscordGuild";
                 return "Guild";
-            // https://discord.com/developers/docs/resources/channel#message-object-message-structure
-            case "integer or string":
-                nameSpace = null;
-                return "/* integer or string */ dynamic";
-            // https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
-            case "string, integer, or double":
-                nameSpace = null;
-                return "dynamic";
-            // https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
-            case "integer for `INTEGER` options, double for `NUMBER` options":
-                nameSpace = null;
-                return "dynamic";
             // https://discord.com/developers/docs/resources/channel#start-thread-in-forum-channel-jsonform-params
             case "a forum thread message params object":
                 nameSpace = "DiscordChannel";
@@ -376,6 +352,7 @@ public static class Converter
             return "dynamic";
         }
 
+        // For overrides that don't need a special namespace
         nameSpace = null;
         return type switch
         {
@@ -397,6 +374,21 @@ public static class Converter
             "guild feature string" => "string",
             "file contents" => "string",
             "audit log event" => "string",
+            "channel type" => "/* TODO: Make enum */ int",
+            "one of application command type" => "/* TODO: Make enum */ int",
+            "event status" => "/* TODO: Make enum */ int",
+            "entity type" => "/* TODO: Make enum */ int",
+            "event entity type" => "/* TODO: Make enum */ int",
+            "scheduled entity type" => "/* TODO: Make enum */ int",
+            "application command permission type" => "/* TODO: Make enum */ int",
+            "allowed mention type" => "/* TODO: Make enum */ string",
+            "privacy level" => "/* 1: PUBLIC, 2: GUILD_ONLY */ int",
+            "integer for `INTEGER` options, double for `NUMBER` options" => "dynamic",
+            "integer or string" => "/* integer or string */ dynamic",
+            "string, integer, or double" => "dynamic",
+            "dictionary with keys in available locales" => "string[]",
+            "snowflake or array of snowflakes" => "ulong[]",
+            "null" => "bool?",
             _ => null,
         };
     }
@@ -483,5 +475,26 @@ public static class Converter
                            .Replace("#DOCS_RESOURCES_WEBHOOK/", $"{baseUrl}/resources/webhook#");
 
         return description;
+    }
+    
+    public static void PostConvert(Uri tablesPath)
+    {
+        const string code = @"using Newtonsoft.Json;
+
+namespace Turbulence.API.Models.DiscordMessageComponents;
+
+/// <summary>
+/// <b>Source:</b> <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/interactions/Message_Components.md"">GitHub</a>, <a href=""https://discord.com/developers/docs/interactions/message-components"">Discord API</a>
+/// </summary>
+/// <param name=""Type"">1: Action Row, 2: Button, 3: Select Menu, 4: Text Input</param>
+/// <param name=""Components"">Array of components.</param>
+public record MessageComponent (
+    [property: JsonProperty(""type"", Required = Required.Always)]
+    int Type,
+    [property: JsonProperty(""components"", Required = Required.Always)]
+    dynamic[] Components
+);";
+
+        File.WriteAllText(Path.Combine(tablesPath.AbsolutePath, "DiscordMessageComponents", "MessageComponent.cs"), code);
     }
 }
