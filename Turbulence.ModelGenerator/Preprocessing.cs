@@ -177,7 +177,10 @@ public static class Preprocessing
         {
             string text = File.ReadAllText(file);
 
+            // Fix inconsistent header
             text = text.Replace(@"#### Client Status Object", @"###### Client Status Object");
+            
+            // Replace "Name" with "Field" wherever "Name" is used
             text = Regex.Replace(text, @"(|\s*)[Nn]ame(\s*\|\s*[Tt]ype\s*\|\s*[Dd]escription\s*\|)", "$1Field$2");
 
             File.WriteAllText(file, text);

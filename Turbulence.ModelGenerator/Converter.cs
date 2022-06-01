@@ -477,9 +477,12 @@ public static class Converter
         return description;
     }
     
+    // Ran after conversion is done, for example to add missing classes
     public static void PostConvert(Uri tablesPath)
     {
-        const string code = @"using Newtonsoft.Json;
+        // Message components are not documented in a table, add it manually
+        File.WriteAllText(Path.Combine(tablesPath.AbsolutePath, "DiscordMessageComponents", "MessageComponent.cs"), 
+@"using Newtonsoft.Json;
 
 namespace Turbulence.API.Models.DiscordMessageComponents;
 
@@ -493,8 +496,7 @@ public record MessageComponent (
     int Type,
     [property: JsonProperty(""components"", Required = Required.Always)]
     dynamic[] Components
-);";
-
-        File.WriteAllText(Path.Combine(tablesPath.AbsolutePath, "DiscordMessageComponents", "MessageComponent.cs"), code);
+);"
+        );
     }
 }
