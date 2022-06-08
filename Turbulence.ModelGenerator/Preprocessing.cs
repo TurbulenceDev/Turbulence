@@ -126,7 +126,7 @@ public static class Preprocessing
         }
         catch (Exception)
         {
-            Console.WriteLine("Discord API docs have such that this code is now invalid, manual investigation required");
+            Console.WriteLine("Discord API docs have changed causing this code to now be invalid, manual investigation required");
             throw;
         }
     }
