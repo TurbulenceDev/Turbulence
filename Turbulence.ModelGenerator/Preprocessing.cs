@@ -173,17 +173,42 @@ public static class Preprocessing
     // Fix inconsistencies in downloaded files
     public static void PreExtract(Uri path)
     {
+        Console.WriteLine("Running pre-extract phase...");
+        
+        var inconsistentHeaderCount = 0;
+        var nameFieldCount = 0;
+        
         foreach (string file in Directory.EnumerateFiles(path.AbsolutePath, "*.*", SearchOption.AllDirectories))
         {
             string text = File.ReadAllText(file);
 
             // Fix inconsistent header
-            text = text.Replace(@"#### Client Status Object", @"###### Client Status Object");
+            if (text.Contains(@"#### Client Status Object"))
+            {
+                inconsistentHeaderCount += 1;
+                text = text.Replace(@"#### Client Status Object", @"###### Client Status Object");
+            }
             
             // Replace "Name" with "Field" wherever "Name" is used
-            text = Regex.Replace(text, @"(|\s*)[Nn]ame(\s*\|\s*[Tt]ype\s*\|\s*[Dd]escription\s*\|)", "$1Field$2");
+            if (Regex.Match(text, @"(|\s*)[Nn]ame(\s*\|\s*[Tt]ype\s*\|\s*[Dd]escription\s*\|)").Success)
+            {
+                nameFieldCount += 1;
+                text = Regex.Replace(text, @"(|\s*)[Nn]ame(\s*\|\s*[Tt]ype\s*\|\s*[Dd]escription\s*\|)", "$1Field$2");
+            }
 
             File.WriteAllText(file, text);
         }
+
+        if (inconsistentHeaderCount == 0)
+        {
+            Console.WriteLine("'Fix inconsistent header' fix in pre-extract phase has become obsolete.");
+        }
+        
+        if (nameFieldCount == 0)
+        {
+            Console.WriteLine(@"""Replace 'Name' with 'Field'"" fix in pre-extract phase has become obsolete.");
+        }
+        
+        Console.WriteLine("Pre-extract phase complete.");
     }
 }
