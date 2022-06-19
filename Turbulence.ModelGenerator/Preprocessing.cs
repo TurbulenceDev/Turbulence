@@ -175,8 +175,8 @@ public static class Preprocessing
     {
         Console.WriteLine("Running pre-extract phase...");
         
-        var inconsistentHeaderCount = 0;
-        var nameFieldCount = 0;
+        var inconsistentHeaderCount = false;
+        var nameFieldCount = false;
         
         foreach (string file in Directory.EnumerateFiles(path.AbsolutePath, "*.*", SearchOption.AllDirectories))
         {
@@ -185,26 +185,26 @@ public static class Preprocessing
             // Fix inconsistent header
             if (text.Contains(@"#### Client Status Object"))
             {
-                inconsistentHeaderCount += 1;
+                inconsistentHeaderCount = true;
                 text = text.Replace(@"#### Client Status Object", @"###### Client Status Object");
             }
             
             // Replace "Name" with "Field" wherever "Name" is used
             if (Regex.Match(text, @"(|\s*)[Nn]ame(\s*\|\s*[Tt]ype\s*\|\s*[Dd]escription\s*\|)").Success)
             {
-                nameFieldCount += 1;
+                nameFieldCount = true;
                 text = Regex.Replace(text, @"(|\s*)[Nn]ame(\s*\|\s*[Tt]ype\s*\|\s*[Dd]escription\s*\|)", "$1Field$2");
             }
 
             File.WriteAllText(file, text);
         }
 
-        if (inconsistentHeaderCount == 0)
+        if (inconsistentHeaderCount)
         {
             Console.WriteLine("'Fix inconsistent header' fix in pre-extract phase has become obsolete.");
         }
         
-        if (nameFieldCount == 0)
+        if (nameFieldCount)
         {
             Console.WriteLine(@"""Replace 'Name' with 'Field'"" fix in pre-extract phase has become obsolete.");
         }
