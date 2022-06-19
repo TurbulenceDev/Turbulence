@@ -19,6 +19,11 @@ public static class Config
     public static readonly Uri OutPath = new($"{Directory.GetCurrentDirectory()}/../../../Out/Models");
     
     /// <summary>
+    /// The base of the namespace of the output files
+    /// </summary>
+    public const string NamespaceBase = "Turbulence.API.Models";
+    
+    /// <summary>
     /// Location of .md files to generate models for, appended to the root directory.
     /// </summary>
     public static readonly List<string> MdFiles = new()
@@ -43,10 +48,10 @@ public static class Config
         "interactions/Message_Components.md",
         "topics/Gateway.md",
         "topics/Rate_Limits.md",
-        "topics/RPC.md",
+        //"topics/RPC.md", Not usable by us anyways
         "topics/Teams.md",
         "topics/OAuth2.md",
-        "topics/Certified_Devices.md",
+        // "topics/Certified_Devices.md", Don't use Certified_Devices.md, it contains duplicate models!
         "topics/Permissions.md",
     };
 }
