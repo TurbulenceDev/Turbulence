@@ -199,12 +199,12 @@ public static class Preprocessing
             File.WriteAllText(file, text);
         }
 
-        if (inconsistentHeaderCount)
+        if (!inconsistentHeaderCount)
         {
             Console.WriteLine("'Fix inconsistent header' fix in pre-extract phase has become obsolete.");
         }
         
-        if (nameFieldCount)
+        if (!nameFieldCount)
         {
             Console.WriteLine(@"""Replace 'Name' with 'Field'"" fix in pre-extract phase has become obsolete.");
         }
