@@ -112,23 +112,6 @@ public static class Preprocessing
                 serializer.WriteObject(xml, table);
             }
         }
-        
-        // Post-processing
-        try
-        {
-            // ListActiveThreadsResponse is part of of two namespaces, delete the less-complete one
-            File.Delete($"{outPath.AbsolutePath}/DiscordGuild/ListActiveThreadsResponse");
-
-            // For the second one, make field `has_more` optional as it is missing from the Guild version
-            var path = $"{outPath.AbsolutePath}/DiscordChannel/ListActiveThreadsResponse";
-            string old = await File.ReadAllTextAsync(path);
-            await File.WriteAllTextAsync(path, old.Replace("has_more", "has_more?"));
-        }
-        catch (Exception)
-        {
-            Console.WriteLine("Discord API docs have changed causing this code to now be invalid, manual investigation required");
-            throw;
-        }
     }
 
     private static async Task<TableSource?> ExtractTable(TextReader reader, string path)

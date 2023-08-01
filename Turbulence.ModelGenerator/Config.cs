@@ -43,6 +43,8 @@ public static class Config
         "resources/Stage_Instance.md",
         "resources/Application.md",
         "resources/Channel.md",
+        "resources/Auto_Moderation.md",
+        //"resources/Application_Role_Connection_Metadata.md", Probably not useful
         "interactions/Application_Commands.md",
         "interactions/Receiving_and_Responding.md",
         "interactions/Message_Components.md",
@@ -51,7 +53,7 @@ public static class Config
         //"topics/RPC.md", Not usable by us anyways
         "topics/Teams.md",
         "topics/OAuth2.md",
-        // "topics/Certified_Devices.md", Don't use Certified_Devices.md, it contains duplicate models!
+        //"topics/Certified_Devices.md", Don't use Certified_Devices.md, it contains duplicate models!
         "topics/Permissions.md",
     };
 }
