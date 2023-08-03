@@ -21,7 +21,7 @@ public static class Config
     /// <summary>
     /// The base of the namespace of the output files
     /// </summary>
-    public const string NamespaceBase = "Turbulence.API.Models";
+    public const string NamespaceBase = "Turbulence.API.Discord.Models";
     
     /// <summary>
     /// Location of .md files to generate models for, appended to the root directory.
@@ -49,6 +49,7 @@ public static class Config
         "interactions/Receiving_and_Responding.md",
         "interactions/Message_Components.md",
         "topics/Gateway.md",
+        "topics/Gateway_Events.md",
         "topics/Rate_Limits.md",
         //"topics/RPC.md", Not usable by us anyways
         "topics/Teams.md",

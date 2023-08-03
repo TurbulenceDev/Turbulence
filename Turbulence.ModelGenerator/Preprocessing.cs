@@ -31,7 +31,8 @@ public static class Preprocessing
                 
                 // Based on the assumption that every table has H6 above it, which it should according to the README
                 // Sometimes violated however
-                if (!line.StartsWith("###### ")) continue;
+                if (!line.StartsWith("###### "))
+                    continue;
 
                 string? name;
                 
@@ -72,7 +73,8 @@ public static class Preprocessing
                 var table = await ExtractTable(reader, file);
 
                 // Not a valid table or not a table we are interested in, continue
-                if (table == null) continue;
+                if (table == null)
+                    continue;
 
                 // We use the name of the file for the directory name to store all the tables to
                 // We assume there are no duplicates
@@ -87,7 +89,7 @@ public static class Preprocessing
                 
                 dir = Path.Combine(outPath.AbsolutePath, dir);
 
-                string filename = Path.Combine(dir, name);
+                var filename = Path.Combine(dir, name);
 
                 // Create directory recursively
                 Directory.CreateDirectory(dir);
@@ -160,9 +162,9 @@ public static class Preprocessing
         var inconsistentHeaderCount = false;
         var nameFieldCount = false;
         
-        foreach (string file in Directory.EnumerateFiles(path.AbsolutePath, "*.*", SearchOption.AllDirectories))
+        foreach (var file in Directory.EnumerateFiles(path.AbsolutePath, "*.*", SearchOption.AllDirectories))
         {
-            string text = File.ReadAllText(file);
+            var text = File.ReadAllText(file);
 
             // Fix inconsistent header
             if (text.Contains(@"#### Client Status Object"))

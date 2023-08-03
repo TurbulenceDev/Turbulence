@@ -102,7 +102,7 @@ public static class Converter
         record.AppendLine( $"namespace {nameSpace};");
         record.AppendLine();
         record.AppendLine(  "/// <summary>");
-        record.AppendLine(@$"/// <b>Source:</b> <a href=""{tableSrc.GithubUrl}"">GitHub</a>, <a href=""{tableSrc.DiscordUrl}"">Discord API</a>");
+        record.AppendLine(@$"/// See the <a href=""{tableSrc.DiscordUrl}"">Discord API documentation</a> or <a href=""{tableSrc.GithubUrl}"">GitHub</a>.");
         record.AppendLine(  "/// </summary>");
         record.AppendLine($"public record {recordName} {{");
 
@@ -467,13 +467,12 @@ public static class Converter
     }
     
     // Ran after conversion is done, for example to add missing classes
-    public static void PostConvert(Uri tablesPath)
+    public static void PostConvert(Uri modelsPath)
     {
-        // Message components are not documented in a table, add it manually
-        File.WriteAllText(Path.Combine(tablesPath.AbsolutePath, "DiscordMessageComponents", "MessageComponent.cs"), 
-@"using Newtonsoft.Json;
+        File.WriteAllText(Path.Combine(modelsPath.AbsolutePath, "DiscordMessageComponents", "MessageComponent.cs"), 
+@"using System.Text.Json.Serialization;
 
-namespace Turbulence.API.Models.DiscordMessageComponents;
+namespace Turbulence.API.Discord.Models.DiscordMessageComponents;
 
 /// <summary>
 /// <b>Source:</b> <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/interactions/Message_Components.md"">GitHub</a>, <a href=""https://discord.com/developers/docs/interactions/message-components"">Discord API</a>
@@ -490,7 +489,92 @@ public record MessageComponent {
     /// </summary>
     [JsonPropertyName(""components"")]
     public required dynamic[] Components { get; init; }
-}"
-        );
+}");
+
+        File.WriteAllText(Path.Combine(modelsPath.AbsolutePath, "DiscordGateway", "Gateway.cs"), 
+            @"using System.Text.Json.Serialization;
+
+namespace Turbulence.API.Discord.Models.DiscordGateway;
+
+/// <summary>
+/// <b>Source:</b> <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/topics/Gateway.md#get-gateway--get-gateway"">GitHub</a>, <a href=""https://discord.com/developers/docs/topics/gateway#get-gateway"">Discord API</a>
+/// </summary>
+public record Gateway {
+    /// <summary>
+    /// An object with a valid WSS URL which the app can use when
+    /// <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/topics/Gateway.md#DOCS_TOPICS_GATEWAY/connecting"">Connecting</a>
+    /// to the Gateway. Apps should cache this value and only call this endpoint to retrieve a new URL when they are
+    /// unable to properly establish a connection using the cached one.
+    /// </summary>
+    [JsonPropertyName(""url"")]
+    public required Uri Url { get; init; }
+}");
+
+        File.WriteAllText(Path.Combine(modelsPath.AbsolutePath, "Error.cs"), 
+            @"using System.Text.Json.Serialization;
+
+namespace Turbulence.API.Discord.Models;
+
+/// <summary>
+/// <b>Source:</b> <a href=""https://discord.com/developers/docs/reference#error-messages"">GitHub</a>, <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/Reference.md#error-messages"">Discord API</a>
+/// </summary>
+public record Error {
+    /// <summary>
+    /// The <a href=""https://discord.com/developers/docs/topics/opcodes-and-status-codes#json"">JSON error code</a>.
+    /// </summary>
+    [JsonPropertyName(""code"")]
+    public required int Code { get; init; }
+
+    /// <summary>
+    /// The error message.
+    /// </summary>
+    [JsonPropertyName(""message"")]
+    public required string Message { get; init; }
+
+    /// <summary>
+    /// The errors. ""We will be frequently adding new error messages, so a complete list of errors is not feasible and
+    /// would be almost instantly out of date."" Thanks, Discord. Probably best to just JSON pretty print this if it
+    /// exists.
+    /// </summary>
+    [JsonPropertyName(""errors"")]
+    public dynamic? Errors { get; init; }
+}");
+        
+        File.WriteAllText(Path.Combine(modelsPath.AbsolutePath, "DiscordGatewayEvents", "GatewayPayload.cs"), 
+            @"using System.Text.Json.Serialization;
+
+namespace Turbulence.API.Discord.Models.DiscordGateway;
+
+/// <summary>
+/// <b>Source:</b> <a href=""https://discord.com/developers/docs/topics/gateway-events#payload-structure"">GitHub</a>, <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/topics/Gateway_Events.md#payload-structure"">Discord API</a>
+/// </summary>
+public record GatewayPayload {
+    /// <summary>
+    /// <a href=""https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-opcodes"">Gateway opcode</a>, which indicates the payload type.
+    /// </summary>
+    [JsonPropertyName(""op"")]
+    public required int Opcode { get; init; }
+
+    /// <summary>
+    /// Event data.
+    /// </summary>
+    [JsonPropertyName(""d"")]
+    public required dynamic? Data { get; init; }
+
+    /// <summary>
+    /// Sequence number of event used for
+    /// <a href=""https://discord.com/developers/docs/topics/gateway#resuming"">resuming sessions</a> and
+    /// <a href=""https://discord.com/developers/docs/topics/gateway#sending-heartbeats"">heartbeating</a>.
+    /// Null if <see cref=""Opcode"">Opcode</see> is not 0.
+    /// </summary>
+    [JsonPropertyName(""s"")]
+    public required int? SequenceNumber { get; init; }
+
+    /// <summary>
+    /// Event name. Null if <see cref=""Opcode"">Opcode</see> is not 0.
+    /// </summary>
+    [JsonPropertyName(""t"")]
+    public required string? EventName { get; init; }
+}");
     }
 }
