@@ -3,6 +3,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Turbulence.API.Discord;
 using Turbulence.API.Discord.Models.DiscordChannel;
 using Turbulence.API.Discord.Models.DiscordGateway;
@@ -74,7 +75,7 @@ public class Cli
                 Data = JsonSerializer.SerializeToNode(new Identify
                 {
                     Token = token,
-                    Intents = 509,
+                    Intents = 0b1111111111111111111111,
                     Properties = new IdentifyConnectionProperties
                     {
                         Os = "Windows",
@@ -92,11 +93,17 @@ public class Cli
                 SequenceNumber = null,
                 EventName = null,
             };
-    
-            await ws.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload)), default, true, default);
+
+            var seri = JsonSerializer.Serialize(payload, new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            });
+            
+            Console.WriteLine(seri);
+            await ws.SendAsync(Encoding.UTF8.GetBytes(seri), default, true, default);
             Console.WriteLine("WS Send: Identify");
 
-            await Task.WhenAll(Receive(ws), Heartbeat(ws)); //TODO: implement a send queue, to issue gateway commands async
+            await Task.WhenAll(Receive(ws), Heartbeat(ws)); // TODO: implement a send queue, to issue gateway commands async
         }
         catch (Exception ex)
         {
@@ -243,8 +250,11 @@ public class Cli
     
                 // Read the message
                 var result = await webSocket.ReceiveAsync(arraySegment, default);
+                
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
+                    Console.WriteLine($"Closing: {Encoding.UTF8.GetString(buffer)}");
+                    Console.WriteLine(result.CloseStatus);
                     await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
                     continue;
                 }
