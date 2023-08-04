@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordPermissions;
 
@@ -14,35 +15,44 @@ public record RoleTags {
 	/// The snowflake ID of the bot this role belongs to.
 	/// </summary>
 	[JsonPropertyName("bot_id")]
-	public ulong? BotId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? BotId { get; init; }
 
 	/// <summary>
 	/// The snowflake ID of the integration this role belongs to.
 	/// </summary>
 	[JsonPropertyName("integration_id")]
-	public ulong? IntegrationId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? IntegrationId { get; init; }
 
 	/// <summary>
 	/// Whether this is the guild's Booster role.
 	/// </summary>
 	[JsonPropertyName("premium_subscriber")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool PremiumSubscriber => throw new NotImplementedException();
 
 	/// <summary>
 	/// The snowflake ID of this role's subscription sku and listing.
 	/// </summary>
 	[JsonPropertyName("subscription_listing_id")]
-	public ulong? SubscriptionListingId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? SubscriptionListingId { get; init; }
 
 	/// <summary>
 	/// Whether this role is available for purchase.
 	/// </summary>
 	[JsonPropertyName("available_for_purchase")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool AvailableForPurchase => throw new NotImplementedException();
 
 	/// <summary>
 	/// Whether this role is a guild's linked role.
 	/// </summary>
 	[JsonPropertyName("guild_connections")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool GuildConnections => throw new NotImplementedException();
 }

@@ -5,9 +5,11 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Turbulence.API.Discord;
+using Turbulence.API.Discord.Models;
 using Turbulence.API.Discord.Models.DiscordChannel;
 using Turbulence.API.Discord.Models.DiscordGateway;
 using Turbulence.API.Discord.Models.DiscordGatewayEvents;
+using Turbulence.API.Discord.Models.DiscordUser;
 
 namespace Turbulence.CLI;
 
@@ -20,7 +22,7 @@ public class Cli
     private const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0";
 
     // TODO: move these cached objects into 1. their own classes (more efficient than keeping json stuff around) 2. into the api
-    public static dynamic User = null!;
+    public static User User = null!;
     public static List<dynamic> MemberInfos = new(); // TODO: should we like put the roles into a simple array?
     public static List<dynamic> Servers = new();
     public static List<dynamic> ServerSettings = new(); // TODO: listen to the guild settings update event
@@ -65,8 +67,8 @@ public class Cli
             client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
 
             // Print some crap about the user
-            var user = await Api.GetCurrentUser(client);
-            Console.WriteLine(user.Username);
+            User = await Api.GetCurrentUser(client);
+            Console.WriteLine(User.Username);
 
             // Send identify
             GatewayPayload payload = new()
@@ -89,15 +91,13 @@ public class Cli
                         Activities = Array.Empty<Activity>(),
                         Afk = false,
                     },
+                    Shard = null,
                 }),
                 SequenceNumber = null,
                 EventName = null,
             };
 
-            var seri = JsonSerializer.Serialize(payload, new JsonSerializerOptions
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            });
+            var seri = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true });
             
             Console.WriteLine(seri);
             await ws.SendAsync(Encoding.UTF8.GetBytes(seri), default, true, default);
@@ -116,8 +116,11 @@ public class Cli
 
     private static bool IsMentioned(Message message)
     {
+        Console.WriteLine(message.Author.Id.Timestamp);
+        Console.WriteLine(User.Id.Timestamp);
+
         // Were we directly pinged (this also handles replies)?
-        if (message.Mentions.Any(m => m.Id == User.id))
+        if (message.Mentions.Any(m => m.Id == User.Id))
             return true;
         
         // Was our role pinged?
@@ -128,7 +131,7 @@ public class Cli
                 // okay for some reason this shit contains list with objects. havent seen a list here having more than one object but idk what discord is planning
                 foreach (var obj in info)
                 {
-                    if (obj.user_id != User.id)
+                    if (obj.user_id != User.Id)
                         continue;
 
                     foreach (var ownedRole in obj.roles)
@@ -298,6 +301,7 @@ public class Cli
                         {
                             _lastSequence = msg.SequenceNumber; // save the sequence for the next heartbeat (only set if op 0)
                             Console.WriteLine($"Name: {msg.EventName}, Sequence: {msg.SequenceNumber}");
+                            Console.WriteLine(JsonSerializer.Serialize(msg));
                             if (msg.Data == null)
                                 continue;
 

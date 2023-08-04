@@ -13,17 +13,20 @@ public record ActivitySecrets {
 	/// Secret for joining a party.
 	/// </summary>
 	[JsonPropertyName("join")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Join { get; init; }
 
 	/// <summary>
 	/// Secret for spectating a game.
 	/// </summary>
 	[JsonPropertyName("spectate")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Spectate { get; init; }
 
 	/// <summary>
 	/// Secret for a specific instanced match.
 	/// </summary>
 	[JsonPropertyName("match")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Match { get; init; }
 }

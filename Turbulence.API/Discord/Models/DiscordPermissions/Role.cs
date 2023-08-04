@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordPermissions;
 
@@ -15,7 +16,8 @@ public record Role {
 	/// Role snowflake ID.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// Role name.
@@ -39,12 +41,14 @@ public record Role {
 	/// Role <a href="https://discord.com/developers/docs/reference#image-formatting">icon hash</a>.
 	/// </summary>
 	[JsonPropertyName("icon")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Icon { get; init; }
 
 	/// <summary>
 	/// Role unicode emoji.
 	/// </summary>
 	[JsonPropertyName("unicode_emoji")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? UnicodeEmoji { get; init; }
 
 	/// <summary>
@@ -76,6 +80,7 @@ public record Role {
 	/// The tags this role has.
 	/// </summary>
 	[JsonPropertyName("tags")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public RoleTags? Tags { get; init; }
 
 	// TODO: Enum

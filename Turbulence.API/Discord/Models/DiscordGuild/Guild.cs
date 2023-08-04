@@ -2,6 +2,7 @@ using Turbulence.API.Discord.Models.DiscordEmoji;
 using Turbulence.API.Discord.Models.DiscordPermissions;
 using Turbulence.API.Discord.Models.DiscordSticker;
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordGuild;
 
@@ -17,7 +18,8 @@ public record Guild {
 	/// Guild snowflake ID.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// Guild name (2-100 characters, excluding trailing and leading whitespace).
@@ -36,6 +38,7 @@ public record Guild {
 	/// template object.
 	/// </summary>
 	[JsonPropertyName("icon_hash")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? IconHash { get; init; }
 
 	/// <summary>
@@ -66,7 +69,8 @@ public record Guild {
 	/// Snowflake ID of owner.
 	/// </summary>
 	[JsonPropertyName("owner_id")]
-	public required ulong OwnerId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake OwnerId { get; init; }
 
 	/// <summary>
 	/// Total permissions for <a href="https://discord.com/developers/docs/resources/user#get-current-user-guilds">the
@@ -87,7 +91,8 @@ public record Guild {
 	/// Snowflake ID of AFK channel.
 	/// </summary>
 	[JsonPropertyName("afk_channel_id")]
-	public required ulong? AfkChannelId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? AfkChannelId { get; init; }
 
 	/// <summary>
 	/// AFK timeout in seconds.
@@ -99,13 +104,16 @@ public record Guild {
 	/// True if the server widget is enabled.
 	/// </summary>
 	[JsonPropertyName("widget_enabled")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? WidgetEnabled { get; init; }
 
 	/// <summary>
 	/// The channel snowflake ID that the widget will generate an invite to, or <c>null</c> if set to no invite.
 	/// </summary>
 	[JsonPropertyName("widget_channel_id")]
-	public ulong? WidgetChannelId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? WidgetChannelId { get; init; }
 
 	// TODO: Make enum
 	/// <summary>
@@ -163,13 +171,15 @@ public record Guild {
 	/// Application snowflake ID of the guild creator if it is bot-created.
 	/// </summary>
 	[JsonPropertyName("application_id")]
-	public required ulong? ApplicationId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? ApplicationId { get; init; }
 
 	/// <summary>
 	/// The snowflake ID of the channel where guild notices such as welcome messages and boost events are posted.
 	/// </summary>
 	[JsonPropertyName("system_channel_id")]
-	public required ulong? SystemChannelId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? SystemChannelId { get; init; }
 
 	// TODO: Make enum
 	/// <summary>
@@ -183,19 +193,22 @@ public record Guild {
 	/// The snowflake ID of the channel where Community guilds can display rules and/or guidelines.
 	/// </summary>
 	[JsonPropertyName("rules_channel_id")]
-	public required ulong? RulesChannelId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? RulesChannelId { get; init; }
 
 	/// <summary>
 	/// The maximum number of presences for the guild (<c>null</c> is always returned, apart from the largest of
 	/// guilds).
 	/// </summary>
 	[JsonPropertyName("max_presences")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? MaxPresences { get; init; }
 
 	/// <summary>
 	/// The maximum number of members for the guild.
 	/// </summary>
 	[JsonPropertyName("max_members")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? MaxMembers { get; init; }
 
 	/// <summary>
@@ -228,6 +241,7 @@ public record Guild {
 	/// The number of boosts this guild currently has.
 	/// </summary>
 	[JsonPropertyName("premium_subscription_count")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? PremiumSubscriptionCount { get; init; }
 
 	/// <summary>
@@ -241,18 +255,21 @@ public record Guild {
 	/// The snowflake ID of the channel where admins and moderators of Community guilds receive notices from Discord.
 	/// </summary>
 	[JsonPropertyName("public_updates_channel_id")]
-	public required ulong? PublicUpdatesChannelId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? PublicUpdatesChannelId { get; init; }
 
 	/// <summary>
 	/// The maximum amount of users in a video channel.
 	/// </summary>
 	[JsonPropertyName("max_video_channel_users")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? MaxVideoChannelUsers { get; init; }
 
 	/// <summary>
 	/// The maximum amount of users in a stage video channel.
 	/// </summary>
 	[JsonPropertyName("max_stage_video_channel_users")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? MaxStageVideoChannelUsers { get; init; }
 
 	/// <summary>
@@ -260,6 +277,7 @@ public record Guild {
 	/// <c>/users/@me/guilds</c> endpoints when <c>with_counts</c> is <c>true</c>.
 	/// </summary>
 	[JsonPropertyName("approximate_member_count")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? ApproximateMemberCount { get; init; }
 
 	/// <summary>
@@ -267,6 +285,7 @@ public record Guild {
 	/// <c>/users/@me/guilds</c>  endpoints when <c>with_counts</c> is <c>true</c>.
 	/// </summary>
 	[JsonPropertyName("approximate_presence_count")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? ApproximatePresenceCount { get; init; }
 
 	/// <summary>
@@ -274,6 +293,7 @@ public record Guild {
 	/// <a href="https://discord.com/developers/docs/resources/invite#invite-object">Invite</a>'s guild object.
 	/// </summary>
 	[JsonPropertyName("welcome_screen")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public WelcomeScreen? WelcomeScreen { get; init; }
 
 	// TODO: Make enum
@@ -287,6 +307,7 @@ public record Guild {
 	/// Custom guild stickers.
 	/// </summary>
 	[JsonPropertyName("stickers")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Sticker[]? Stickers { get; init; }
 
 	/// <summary>
@@ -300,5 +321,6 @@ public record Guild {
 	/// Discord.
 	/// </summary>
 	[JsonPropertyName("safety_alerts_channel_id")]
-	public required ulong? SafetyAlertsChannelId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? SafetyAlertsChannelId { get; init; }
 }

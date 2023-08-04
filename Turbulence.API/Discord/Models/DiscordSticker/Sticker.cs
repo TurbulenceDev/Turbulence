@@ -1,5 +1,6 @@
 using Turbulence.API.Discord.Models.DiscordUser;
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordSticker;
 
@@ -13,13 +14,16 @@ public record Sticker {
 	/// <a href="https://discord.com/developers/docs/reference#image-formatting">ID of the sticker</a>.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// For standard stickers, snowflake ID of the pack the sticker is from.
 	/// </summary>
 	[JsonPropertyName("pack_id")]
-	public ulong? PackId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? PackId { get; init; }
 
 	/// <summary>
 	/// Name of the sticker.
@@ -65,23 +69,28 @@ public record Sticker {
 	/// Whether this guild sticker can be used, may be false due to loss of Server Boosts.
 	/// </summary>
 	[JsonPropertyName("available")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Available { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of the guild that owns this sticker.
 	/// </summary>
 	[JsonPropertyName("guild_id")]
-	public ulong? GuildId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? GuildId { get; init; }
 
 	/// <summary>
 	/// The user that uploaded the guild sticker.
 	/// </summary>
 	[JsonPropertyName("user")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public User? User { get; init; }
 
 	/// <summary>
 	/// The standard sticker's sort order within its pack.
 	/// </summary>
 	[JsonPropertyName("sort_value")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? SortValue { get; init; }
 }

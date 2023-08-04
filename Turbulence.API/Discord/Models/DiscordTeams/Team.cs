@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordTeams;
 
@@ -17,7 +18,8 @@ public record Team {
 	/// The unique snowflake ID of the team.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// The members of the team.
@@ -35,5 +37,6 @@ public record Team {
 	/// The user snowflake ID of the current team owner.
 	/// </summary>
 	[JsonPropertyName("owner_user_id")]
-	public required ulong OwnerUserId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake OwnerUserId { get; init; }
 }

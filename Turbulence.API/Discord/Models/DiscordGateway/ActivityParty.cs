@@ -14,6 +14,7 @@ public record ActivityParty {
 	/// ID of the party.
 	/// </summary>
 	[JsonPropertyName("id")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Id { get; init; }
 
 	/// <summary>
@@ -21,5 +22,6 @@ public record ActivityParty {
 	/// <c>max_size</c>.
 	/// </summary>
 	[JsonPropertyName("size")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int[]? Size { get; init; } // TODO: Maybe this can be serialized from and deserialized into two properties
 }

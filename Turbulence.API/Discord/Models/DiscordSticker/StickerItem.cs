@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordSticker;
 
@@ -13,7 +14,8 @@ public record StickerItem {
 	/// Snowflake ID of the sticker.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// Name of the sticker.

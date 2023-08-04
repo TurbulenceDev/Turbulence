@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordGuild;
 
@@ -14,7 +15,8 @@ public record WelcomeScreenChannel {
 	/// The channel's snowflake ID.
 	/// </summary>
 	[JsonPropertyName("channel_id")]
-	public required ulong ChannelId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake ChannelId { get; init; }
 
 	/// <summary>
 	/// The description shown for the channel.
@@ -27,7 +29,8 @@ public record WelcomeScreenChannel {
 	/// custom.
 	/// </summary>
 	[JsonPropertyName("emoji_id")]
-	public required ulong? EmojiId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? EmojiId { get; init; }
 
 	/// <summary>
 	/// The emoji name if custom, the unicode character if standard, or <c>null</c> if no emoji is set.

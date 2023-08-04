@@ -1,5 +1,6 @@
 using Turbulence.API.Discord.Models.DiscordGuild;
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordChannel;
 
@@ -18,7 +19,8 @@ public record ThreadMember {
 	/// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of the user.
@@ -26,7 +28,8 @@ public record ThreadMember {
 	/// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
 	/// </summary>
 	[JsonPropertyName("user_id")]
-	public required ulong UserId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake UserId { get; init; }
 
 	// TODO: Deserialize ISO8601 into something usable
 	/// <summary>

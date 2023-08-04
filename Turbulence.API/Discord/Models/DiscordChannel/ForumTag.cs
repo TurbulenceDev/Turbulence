@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordChannel;
 
@@ -15,7 +16,8 @@ public record ForumTag {
 	/// The snowflake ID of the tag.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// The name of the tag (0-20 characters).
@@ -36,7 +38,8 @@ public record ForumTag {
 	/// Must be <c>null</c> if <see cref="EmojiName"/> is set.
 	/// </summary>
 	[JsonPropertyName("emoji_id")]
-	public required ulong? EmojiId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? EmojiId { get; init; }
 
 	/// <summary>
 	/// The Unicode character of the emoji.

@@ -19,17 +19,20 @@ public record EmbedThumbnail {
 	/// A proxied URL of the thumbnail.
 	/// </summary>
 	[JsonPropertyName("proxy_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? ProxyUrl { get; init; }
 
 	/// <summary>
 	/// Height of thumbnail.
 	/// </summary>
 	[JsonPropertyName("height")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Height { get; init; }
 
 	/// <summary>
 	/// Width of thumbnail.
 	/// </summary>
 	[JsonPropertyName("width")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Width { get; init; }
 }

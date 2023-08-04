@@ -25,5 +25,6 @@ public record EmbedField {
 	/// Whether or not this field should display inline.
 	/// </summary>
 	[JsonPropertyName("inline")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Inline { get; init; }
 }

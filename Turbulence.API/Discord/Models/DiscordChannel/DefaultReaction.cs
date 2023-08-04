@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordChannel;
 
@@ -10,7 +11,8 @@ public record DefaultReaction {
 	/// The ID of a guild's custom emoji.
 	/// </summary>
 	[JsonPropertyName("emoji_id")]
-	public required ulong? EmojiId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? EmojiId { get; init; }
 
 	/// <summary>
 	/// The unicode character of the emoji.

@@ -1,5 +1,6 @@
 using Turbulence.API.Discord.Models.DiscordUser;
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordChannel;
 
@@ -15,7 +16,8 @@ public record Channel {
 	/// The snowflake ID of this channel.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// The <a href="https://discord.com/developers/docs/resources/channel#channel-object-channel-types">type of channel
@@ -28,24 +30,29 @@ public record Channel {
 	/// The snowflake ID of the guild (may be missing for some channel objects received over gateway guild dispatches).
 	/// </summary>
 	[JsonPropertyName("guild_id")]
-	public ulong? GuildId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? GuildId { get; init; }
 
 	/// <summary>
 	/// Sorting position of the channel.
 	/// </summary>
 	[JsonPropertyName("position")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Position { get; init; }
 
 	/// <summary>
 	/// Explicit permission overwrites for members and roles.
 	/// </summary>
 	[JsonPropertyName("permission_overwrites")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Overwrite[]? PermissionOverwrites { get; init; }
 
 	/// <summary>
 	/// The name of the channel (1-100 characters).
 	/// </summary>
 	[JsonPropertyName("name")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Name { get; init; }
 
 	/// <summary>
@@ -53,12 +60,14 @@ public record Channel {
 	/// for all others).
 	/// </summary>
 	[JsonPropertyName("topic")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Topic { get; init; }
 
 	/// <summary>
 	/// Whether the channel is NSFW.
 	/// </summary>
 	[JsonPropertyName("nsfw")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Nsfw { get; init; }
 
 	/// <summary>
@@ -66,18 +75,22 @@ public record Channel {
 	/// </c> channels) (may not point to an existing or valid message or thread).
 	/// </summary>
 	[JsonPropertyName("last_message_id")]
-	public ulong? LastMessageId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? LastMessageId { get; init; }
 
 	/// <summary>
 	/// The bitrate (in bits) of the voice channel.
 	/// </summary>
 	[JsonPropertyName("bitrate")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Bitrate { get; init; }
 
 	/// <summary>
 	/// The user limit of the voice channel.
 	/// </summary>
 	[JsonPropertyName("user_limit")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? UserLimit { get; init; }
 
 	/// <summary>
@@ -91,30 +104,37 @@ public record Channel {
 	/// The recipients of the DM.
 	/// </summary>
 	[JsonPropertyName("recipients")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public User[]? Recipients { get; init; }
 
 	/// <summary>
 	/// Icon hash of the group DM.
 	/// </summary>
 	[JsonPropertyName("icon")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Icon { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of the creator of the group DM or thread.
 	/// </summary>
 	[JsonPropertyName("owner_id")]
-	public ulong? OwnerId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? OwnerId { get; init; }
 
 	/// <summary>
 	/// Application ID of the group DM creator if it is bot-created.
 	/// </summary>
 	[JsonPropertyName("application_id")]
-	public ulong? ApplicationId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? ApplicationId { get; init; }
 
 	/// <summary>
 	/// For group DM channels: whether the channel is managed by an application via the <c>gdm.join</c> OAuth2 scope.
 	/// </summary>
 	[JsonPropertyName("managed")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Managed { get; init; }
 
 	/// <summary>
@@ -122,13 +142,16 @@ public record Channel {
 	/// channels), for threads: snowflake ID of the text channel this thread was created.
 	/// </summary>
 	[JsonPropertyName("parent_id")]
-	public ulong? ParentId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? ParentId { get; init; }
 
 	/// <summary>
 	/// When the last pinned message was pinned. This may be <c>null</c> in events such as <c>GUILD_CREATE</c> when a
 	/// message is not pinned.
 	/// </summary>
 	[JsonPropertyName("last_pin_timestamp")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? LastPinTimestamp { get; init; }
 
 	/// <summary>
@@ -136,6 +159,7 @@ public record Channel {
 	/// voice channel, automatic when set to null.
 	/// </summary>
 	[JsonPropertyName("rtc_region")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? RtcRegion { get; init; }
 
 	// TODO: Make enum
@@ -144,6 +168,7 @@ public record Channel {
 	/// video quality mode</a> of the voice channel, 1 when not present.
 	/// </summary>
 	[JsonPropertyName("video_quality_mode")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? VideoQualityMode { get; init; }
 
 	/// <summary>
@@ -156,12 +181,14 @@ public record Channel {
 	/// An approximate count of users in a thread, stops counting at 50.
 	/// </summary>
 	[JsonPropertyName("member_count")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? MemberCount { get; init; }
 
 	/// <summary>
 	/// Thread-specific fields not needed by other channels.
 	/// </summary>
 	[JsonPropertyName("thread_metadata")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public ThreadMetadata? ThreadMetadata { get; init; }
 
 	/// <summary>
@@ -169,6 +196,7 @@ public record Channel {
 	/// endpoints.
 	/// </summary>
 	[JsonPropertyName("member")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public ThreadMember? Member { get; init; }
 
 	/// <summary>
@@ -176,6 +204,7 @@ public record Channel {
 	/// after the specified period of inactivity, can be set to: 60, 1440, 4320, 10080.
 	/// </summary>
 	[JsonPropertyName("default_auto_archive_duration")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? DefaultAutoArchiveDuration { get; init; }
 
 	/// <summary>
@@ -183,6 +212,7 @@ public record Channel {
 	/// <c>resolved</c> data received on a slash command interaction.
 	/// </summary>
 	[JsonPropertyName("permissions")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Permissions { get; init; }
 
 	// TODO: Make enum
@@ -191,6 +221,7 @@ public record Channel {
 	/// combined as a <a href="https://en.wikipedia.org/wiki/Bit_field">bitfield</a>.
 	/// </summary>
 	[JsonPropertyName("flags")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Flags { get; init; }
 
 	/// <summary>
@@ -198,12 +229,14 @@ public record Channel {
 	/// will not decrement the number when a message is deleted.
 	/// </summary>
 	[JsonPropertyName("total_message_sent")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? TotalMessageSent { get; init; }
 
 	/// <summary>
 	/// The set of tags that can be used in a <c>GUILD_FORUM</c> or a <c>GUILD_MEDIA</c> channel.
 	/// </summary>
 	[JsonPropertyName("available_tags")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public ForumTag[]? AvailableTags { get; init; }
 
 	/// <summary>
@@ -211,13 +244,16 @@ public record Channel {
 	/// <c>GUILD_MEDIA</c> channel.
 	/// </summary>
 	[JsonPropertyName("applied_tags")]
-	public ulong[]? AppliedTags { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake[]? AppliedTags { get; init; }
 
 	/// <summary>
 	/// The emoji to show in the add reaction button on a thread in a <c>GUILD_FORUM</c> or a <c>GUILD_MEDIA</c>
 	/// channel.
 	/// </summary>
 	[JsonPropertyName("default_reaction_emoji")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public DefaultReaction? DefaultReactionEmoji { get; init; }
 
 	// TODO: Make enum
@@ -226,6 +262,7 @@ public record Channel {
 	/// the thread at creation time and does not live update.
 	/// </summary>
 	[JsonPropertyName("default_thread_rate_limit_per_user")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? DefaultThreadRateLimitPerUser { get; init; }
 
 	// TODO: Make enum
@@ -235,6 +272,7 @@ public record Channel {
 	/// <c>null</c>, which indicates a preferred sort order hasn't been set by a channel admin.
 	/// </summary>
 	[JsonPropertyName("default_sort_order")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? DefaultSortOrder { get; init; }
 
 	// TODO: Make enum
@@ -244,5 +282,6 @@ public record Channel {
 	/// indicates a layout view has not been set by a channel admin.
 	/// </summary>
 	[JsonPropertyName("default_forum_layout")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? DefaultForumLayout { get; init; }
 }

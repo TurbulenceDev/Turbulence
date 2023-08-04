@@ -19,17 +19,20 @@ public record EmbedAuthor {
 	/// URL of author (only supports http(s)).
 	/// </summary>
 	[JsonPropertyName("url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? Url { get; init; }
 
 	/// <summary>
 	/// URL of author icon (only supports http(s) and attachments).
 	/// </summary>
 	[JsonPropertyName("icon_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? IconUrl { get; init; }
 
 	/// <summary>
 	/// A proxied URL of author icon.
 	/// </summary>
 	[JsonPropertyName("proxy_icon_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? ProxyIconUrl { get; init; }
 }

@@ -42,6 +42,7 @@ public record ThreadMetadata {
 	/// Whether non-moderators can add other non-moderators to a thread; only available on private threads.
 	/// </summary>
 	[JsonPropertyName("invitable")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Invitable { get; init; }
 
 	// TODO: Deserialize ISO8601 into something useful
@@ -49,5 +50,6 @@ public record ThreadMetadata {
 	/// Timestamp when the thread was created; only populated for threads created after 2022-01-09.
 	/// </summary>
 	[JsonPropertyName("create_timestamp")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? CreateTimestamp { get; init; }
 }

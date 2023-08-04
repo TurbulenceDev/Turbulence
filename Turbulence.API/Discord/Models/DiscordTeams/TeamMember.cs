@@ -1,5 +1,6 @@
 using Turbulence.API.Discord.Models.DiscordUser;
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordTeams;
 
@@ -27,7 +28,8 @@ public record TeamMember {
 	/// The snowflake ID of the parent team of which they are a member.
 	/// </summary>
 	[JsonPropertyName("team_id")]
-	public required ulong TeamId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake TeamId { get; init; }
 
 	/// <summary>
 	/// The avatar, discriminator, snowflake ID, and username of the user.

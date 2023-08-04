@@ -1,5 +1,6 @@
 using Turbulence.API.Discord.Models.DiscordUser;
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordGuild;
 
@@ -13,25 +14,29 @@ public record GuildMember {
 	/// The user this guild member represents.
 	/// </summary>
 	[JsonPropertyName("user")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public User? User { get; init; }
 
 	/// <summary>
 	/// This user's guild nickname.
 	/// </summary>
 	[JsonPropertyName("nick")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Nick { get; init; }
 
 	/// <summary>
 	/// The member's <a href="https://discord.com/developers/docs/reference#image-formatting">guild avatar hash</a>.
 	/// </summary>
 	[JsonPropertyName("avatar")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Avatar { get; init; }
 
 	/// <summary>
 	/// Array of <a href="https://discord.com/developers/docs/topics/permissions#role-object">role</a> object IDs.
 	/// </summary>
 	[JsonPropertyName("roles")]
-	public required ulong[] Roles { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake[] Roles { get; init; }
 
 	/// <summary>
 	/// When the user joined the guild.
@@ -44,6 +49,7 @@ public record GuildMember {
 	/// boosting</a> the guild.
 	/// </summary>
 	[JsonPropertyName("premium_since")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? PremiumSince { get; init; }
 
 	/// <summary>
@@ -72,12 +78,14 @@ public record GuildMember {
 	/// </a> requirements.
 	/// </summary>
 	[JsonPropertyName("pending")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Pending { get; init; }
 
 	/// <summary>
 	/// Total permissions of the member in the channel, including overwrites, returned when in the interaction object.
 	/// </summary>
 	[JsonPropertyName("permissions")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Permissions { get; init; }
 
 	// TODO: Deserialize this ISO8601 string to something usable
@@ -87,5 +95,6 @@ public record GuildMember {
 	/// is not timed out.
 	/// </summary>
 	[JsonPropertyName("communication_disabled_until")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? CommunicationDisabledUntil { get; init; }
 }

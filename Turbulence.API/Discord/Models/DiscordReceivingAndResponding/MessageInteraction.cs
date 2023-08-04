@@ -1,5 +1,6 @@
 using Turbulence.API.Discord.Models.DiscordUser;
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 using Turbulence.API.Discord.Models.DiscordGuild;
 
 namespace Turbulence.API.Discord.Models.DiscordReceivingAndResponding;
@@ -16,7 +17,8 @@ public record MessageInteraction {
 	/// Snowflake ID of the interaction.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	// TODO: Enum
 	/// <summary>
@@ -43,5 +45,6 @@ public record MessageInteraction {
 	/// Member who invoked the interaction in the guild.
 	/// </summary>
 	[JsonPropertyName("member")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public GuildMember? Member { get; init; }
 }

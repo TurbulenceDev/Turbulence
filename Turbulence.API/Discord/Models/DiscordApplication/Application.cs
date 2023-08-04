@@ -2,6 +2,7 @@ using Turbulence.API.Discord.Models.DiscordGuild;
 using Turbulence.API.Discord.Models.DiscordTeams;
 using Turbulence.API.Discord.Models.DiscordUser;
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordApplication;
 
@@ -16,7 +17,8 @@ public record Application {
 	/// The snowflake ID of the app.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// The name of the app.
@@ -40,6 +42,7 @@ public record Application {
 	/// An array of RPC origin URLs, if RPC is enabled.
 	/// </summary>
 	[JsonPropertyName("rpc_origins")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string[]? RpcOrigins { get; init; }
 
 	/// <summary>
@@ -58,18 +61,21 @@ public record Application {
 	/// The URL of the app's terms of service.
 	/// </summary>
 	[JsonPropertyName("terms_of_service_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? TermsOfServiceUrl { get; init; }
 
 	/// <summary>
 	/// The URL of the app's privacy policy.
 	/// </summary>
 	[JsonPropertyName("privacy_policy_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? PrivacyPolicyUrl { get; init; }
 
 	/// <summary>
 	/// Partial user object containing info on the owner of the application.
 	/// </summary>
 	[JsonPropertyName("owner")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public User? Owner { get; init; }
 
 	/// <summary>
@@ -77,6 +83,7 @@ public record Application {
 	/// </summary>
 	[Obsolete("Will be removed in API v11")]
 	[JsonPropertyName("summary")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Summary { get; init; }
 
 	/// <summary>
@@ -96,12 +103,15 @@ public record Application {
 	/// Guild associated with the app. For example, a developer support server.
 	/// </summary>
 	[JsonPropertyName("guild_id")]
-	public ulong? GuildId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? GuildId { get; init; }
 
 	/// <summary>
 	/// A partial object of the associated guild.
 	/// </summary>
 	[JsonPropertyName("guild")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Guild? Guild { get; init; }
 
 	/// <summary>
@@ -109,12 +119,15 @@ public record Application {
 	/// created, if exists.
 	/// </summary>
 	[JsonPropertyName("primary_sku_id")]
-	public ulong? PrimarySkuId { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? PrimarySkuId { get; init; }
 
 	/// <summary>
 	/// If this application is a game sold on Discord, this field will be the URL slug that links to the store page.
 	/// </summary>
 	[JsonPropertyName("slug")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? Slug { get; init; }
 
 	/// <summary>
@@ -122,6 +135,7 @@ public record Application {
 	/// <a href="https://discord.com/developers/docs/reference#image-formatting">cover image hash</a>.
 	/// </summary>
 	[JsonPropertyName("cover_image")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? CoverImage { get; init; }
 
 	// TODO: Make enum
@@ -130,30 +144,35 @@ public record Application {
 	/// <a href="https://discord.com/developers/docs/resources/application#application-object-application-flags">flags</a>.
 	/// </summary>
 	[JsonPropertyName("flags")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Flags { get; init; }
 
 	/// <summary>
 	/// An approximate count of the app's guild membership.
 	/// </summary>
 	[JsonPropertyName("approximate_guild_count")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? ApproximateGuildCount { get; init; }
 
 	/// <summary>
 	/// Up to 5 tags describing the content and functionality of the application.
 	/// </summary>
 	[JsonPropertyName("tags")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string[]? Tags { get; init; }
 
 	/// <summary>
 	/// Settings for the application's default in-app authorization link, if enabled.
 	/// </summary>
 	[JsonPropertyName("install_params")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public InstallParams? InstallParams { get; init; }
 
 	/// <summary>
 	/// The application's default custom authorization link, if enabled.
 	/// </summary>
 	[JsonPropertyName("custom_install_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? CustomInstallUrl { get; init; }
 
 	/// <summary>
@@ -161,5 +180,6 @@ public record Application {
 	/// verification method in the guild role verification configuration.
 	/// </summary>
 	[JsonPropertyName("role_connections_verification_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? RoleConnectionsVerificationUrl { get; init; }
 }

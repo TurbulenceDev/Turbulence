@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordChannel;
 
@@ -12,7 +13,8 @@ public record Attachment {
 	/// Attachment snowflake ID.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// Name of file attached.
@@ -24,12 +26,14 @@ public record Attachment {
 	/// Description for the file (max 1024 characters).
 	/// </summary>
 	[JsonPropertyName("description")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Description { get; init; }
 
 	/// <summary>
 	/// The attachment's <a href="https://en.wikipedia.org/wiki/Media_type">media type</a>.
 	/// </summary>
 	[JsonPropertyName("content_type")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? ContentType { get; init; }
 
 	/// <summary>
@@ -54,12 +58,14 @@ public record Attachment {
 	/// Height of file (if image).
 	/// </summary>
 	[JsonPropertyName("height")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Height { get; init; }
 
 	/// <summary>
 	/// Width of file (if image).
 	/// </summary>
 	[JsonPropertyName("width")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Width { get; init; }
 
 	/// <summary>
@@ -72,12 +78,14 @@ public record Attachment {
 	/// The duration of the audio file (currently for voice messages).
 	/// </summary>
 	[JsonPropertyName("duration_secs")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public float? DurationSecs { get; init; }
 
 	/// <summary>
 	/// Base64 encoded bytearray representing a sampled waveform (currently for voice messages).
 	/// </summary>
 	[JsonPropertyName("waveform")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Waveform { get; init; }
 
 	// TODO: Enum
@@ -86,5 +94,6 @@ public record Attachment {
 	/// flags</a> combined as a <a href="https://en.wikipedia.org/wiki/Bit_field">bitfield</a>.
 	/// </summary>
 	[JsonPropertyName("flags")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Flags { get; init; }
 }

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordChannel;
 
@@ -13,7 +14,8 @@ public record RoleSubscriptionData {
 	/// The snowflake ID of the SKU and listing that the user is subscribed to.
 	/// </summary>
 	[JsonPropertyName("role_subscription_listing_id")]
-	public required ulong RoleSubscriptionListingId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake RoleSubscriptionListingId { get; init; }
 
 	/// <summary>
 	/// The name of the tier that the user is subscribed to.

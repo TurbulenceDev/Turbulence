@@ -1,6 +1,7 @@
 using Turbulence.API.Discord.Models.DiscordPermissions;
 using Turbulence.API.Discord.Models.DiscordUser;
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordEmoji;
 
@@ -13,7 +14,8 @@ public record Emoji {
 	/// <a href="https://discord.com/developers/docs/reference#image-formatting">Emoji snowflake ID</a>.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong? Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake? Id { get; init; }
 
 	/// <summary>
 	/// Emoji name.
@@ -25,35 +27,41 @@ public record Emoji {
 	/// Roles allowed to use this emoji.
 	/// </summary>
 	[JsonPropertyName("roles")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Role[]? Roles { get; init; }
 
 	/// <summary>
 	/// User that created this emoji.
 	/// </summary>
 	[JsonPropertyName("user")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public User? User { get; init; }
 
 	/// <summary>
 	/// Whether this emoji must be wrapped in colons.
 	/// </summary>
 	[JsonPropertyName("require_colons")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? RequireColons { get; init; }
 
 	/// <summary>
 	/// Whether this emoji is managed.
 	/// </summary>
 	[JsonPropertyName("managed")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Managed { get; init; }
 
 	/// <summary>
 	/// Whether this emoji is animated.
 	/// </summary>
 	[JsonPropertyName("animated")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Animated { get; init; }
 
 	/// <summary>
 	/// Whether this emoji can be used, may be false due to loss of Server Boosts.
 	/// </summary>
 	[JsonPropertyName("available")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Available { get; init; }
 }

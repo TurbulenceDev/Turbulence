@@ -24,5 +24,6 @@ public record MessageActivity {
 	/// Rich Presence event</a>.
 	/// </summary>
 	[JsonPropertyName("party_id")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? PartyId { get; init; }
 }

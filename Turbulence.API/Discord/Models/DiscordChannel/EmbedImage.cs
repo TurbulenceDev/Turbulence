@@ -19,17 +19,20 @@ public record EmbedImage {
 	/// A proxied URL of the image.
 	/// </summary>
 	[JsonPropertyName("proxy_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? ProxyUrl { get; init; }
 
 	/// <summary>
 	/// Height of image.
 	/// </summary>
 	[JsonPropertyName("height")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Height { get; init; }
 
 	/// <summary>
 	/// Width of image.
 	/// </summary>
 	[JsonPropertyName("width")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Width { get; init; }
 }

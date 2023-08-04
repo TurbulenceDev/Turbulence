@@ -135,14 +135,18 @@ public static class Converter
             if (convertedNamespace != null)
                 imports.Add($"using {Config.NamespaceBase}.{convertedNamespace};");
 
-            string required  ;
-            if (!field.EndsWith('?'))
+            var required = !field.Contains('?');
+            
+            string requiredStr, ignore;
+            if (required)
             {
-                required = "required ";
+                requiredStr = "required ";
+                ignore = "";
             }
             else
             {
-                required = "";
+                requiredStr = "";
+                ignore = "\n\t[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]";
                 
                 // Property that isn't required has to be nullable
                 if (!convertedType.EndsWith('?'))
@@ -151,10 +155,16 @@ public static class Converter
                 }
             }
 
+            var converter = "";
+            if (convertedType.StartsWith("Snowflake"))
+            {
+                converter = "\n\t[JsonConverter(typeof(SnowflakeConverter))]";
+            }
+            
             var newline = i != propertyValues.Count - 1 ? "\n" : "";
 
             record.AppendLine(
-                $"\t[JsonPropertyName(\"{cleanField}\")]\n\tpublic {required}{convertedType} {prettyField} {{ get; init; }}{newline}");
+                $"\t[JsonPropertyName(\"{cleanField}\")]{ignore}{converter}\n\tpublic {requiredStr}{convertedType} {prettyField} {{ get; init; }}{newline}");
         }
 
         record.AppendLine("}");
@@ -243,7 +253,7 @@ public static class Converter
         ( @"^array of up to 10 (.*?)$", @"$1[]"),
         ( @"^(?:a|A)rray of (.*?)s?$", @"$1[]" ),
         ( @"^list of (.*?)s?$", @"$1[]" ),
-        ( @"^Map of Snowflakes to .*$", @"ulong[]"),
+        ( @"^Map of Snowflakes to .*$", @"Snowflake[]"),
     };
 
     private static string ToPascalCase(string input)
@@ -351,7 +361,7 @@ public static class Converter
             "int" => "int",
             "float" => "float",
             "object" => "dynamic",
-            "snowflake" => "ulong",
+            "snowflake" => "Snowflake",
             "mixed" => "dynamic",
             "ISO8601 timestamp" => "string",
             "array" => "dynamic",
@@ -376,7 +386,7 @@ public static class Converter
             "integer or string" => "/* integer or string */ dynamic",
             "string, integer, or double" => "dynamic",
             "dictionary with keys in available locales" => "string[]",
-            "snowflake or array of snowflakes" => "ulong[]",
+            "snowflake or array of snowflakes" => "Snowflake[]",
             "null" => "bool?",
             _ => null,
         };

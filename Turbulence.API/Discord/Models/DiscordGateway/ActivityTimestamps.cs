@@ -13,11 +13,13 @@ public record ActivityTimestamps {
 	/// Unix time (in milliseconds) of when the activity started.
 	/// </summary>
 	[JsonPropertyName("start")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public long? Start { get; init; }
 
 	/// <summary>
 	/// Unix time (in milliseconds) of when the activity ends.
 	/// </summary>
 	[JsonPropertyName("end")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public long? End { get; init; }
 }

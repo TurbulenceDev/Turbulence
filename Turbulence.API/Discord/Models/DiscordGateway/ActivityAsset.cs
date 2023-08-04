@@ -14,12 +14,14 @@ public record ActivityAsset {
 	/// Activity Asset Image</a>.
 	/// </summary>
 	[JsonPropertyName("large_image")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? LargeImage { get; init; }
 
 	/// <summary>
 	/// Text displayed when hovering over the large image of the activity.
 	/// </summary>
 	[JsonPropertyName("large_text")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? LargeText { get; init; }
 
 	/// <summary>
@@ -27,11 +29,13 @@ public record ActivityAsset {
 	/// Activity Asset Image</a>.
 	/// </summary>
 	[JsonPropertyName("small_image")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? SmallImage { get; init; }
 
 	/// <summary>
 	/// Text displayed when hovering over the small image of the activity.
 	/// </summary>
 	[JsonPropertyName("small_text")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? SmallText { get; init; }
 }

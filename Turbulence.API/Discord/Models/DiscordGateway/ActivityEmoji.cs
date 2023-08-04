@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordGateway;
 
@@ -19,11 +20,14 @@ public record ActivityEmoji {
 	/// Snowflake ID of the emoji.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public ulong? Id { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public Snowflake? Id { get; init; }
 
 	/// <summary>
 	/// Whether the emoji is animated.
 	/// </summary>
 	[JsonPropertyName("animated")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Animated { get; init; }
 }

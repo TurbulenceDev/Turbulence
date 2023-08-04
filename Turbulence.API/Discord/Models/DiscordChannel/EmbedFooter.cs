@@ -19,11 +19,13 @@ public record EmbedFooter {
 	/// URL of footer icon (only supports http(s) and attachments).
 	/// </summary>
 	[JsonPropertyName("icon_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? IconUrl { get; init; }
 
 	/// <summary>
 	/// A proxied URL of footer icon.
 	/// </summary>
 	[JsonPropertyName("proxy_icon_url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? ProxyIconUrl { get; init; }
 }

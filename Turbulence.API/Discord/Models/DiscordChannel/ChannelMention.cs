@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordChannel;
 
@@ -13,13 +14,15 @@ public record ChannelMention {
 	/// Snowflake ID of the channel.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required ulong Id { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of the guild containing the channel.
 	/// </summary>
 	[JsonPropertyName("guild_id")]
-	public required ulong GuildId { get; init; }
+	[JsonConverter(typeof(SnowflakeConverter))]
+	public required Snowflake GuildId { get; init; }
 
 	// TODO: Make enum
 	/// <summary>

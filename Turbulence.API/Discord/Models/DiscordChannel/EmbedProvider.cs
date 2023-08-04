@@ -13,11 +13,13 @@ public record EmbedProvider {
 	/// Name of provider.
 	/// </summary>
 	[JsonPropertyName("name")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Name { get; init; }
 
 	/// <summary>
 	/// URL of provider.
 	/// </summary>
 	[JsonPropertyName("url")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Uri? Url { get; init; }
 }

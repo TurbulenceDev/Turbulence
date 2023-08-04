@@ -26,6 +26,7 @@ public record Identify {
 	/// Whether this connection supports compression of packets.
 	/// </summary>
 	[JsonPropertyName("compress")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Compress { get; init; }
 
 	/// <summary>
@@ -33,18 +34,21 @@ public record Identify {
 	/// guild member list.
 	/// </summary>
 	[JsonPropertyName("large_threshold")]
-	public ushort? LargeThreshold { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public byte? LargeThreshold { get; init; }
 
 	/// <summary>
 	/// Used for <a href="https://discord.com/developers/docs/topics/gateway#sharding">Guild Sharding</a>.
 	/// </summary>
 	[JsonPropertyName("shard")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int[]? Shard { get; init; }
 
 	/// <summary>
 	/// Presence structure for initial presence information.
 	/// </summary>
 	[JsonPropertyName("presence")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public GatewayPresenceUpdate? Presence { get; init; }
 
 	/// <summary>
