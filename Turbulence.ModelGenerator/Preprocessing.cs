@@ -15,15 +15,14 @@ public static class Preprocessing
         // List to keep track of written files, so we can make sure there are no duplicates
         List<string> writtenFiles = new();
 
-        foreach (string file in Directory.EnumerateFiles(inPath.AbsolutePath, "*.*", SearchOption.AllDirectories))
+        foreach (var file in Directory.EnumerateFiles(inPath.AbsolutePath, "*.*", SearchOption.AllDirectories))
         {
             using StreamReader reader = new(file);
             
             // Keep track of the last ## header found, because it will be used to name JSON Params, JSON/Form and Query String Params tables
             string? lastH2 = null;
 
-            string? line;
-            while ((line = await reader.ReadLineAsync()) != null)
+            while (await reader.ReadLineAsync() is { } line)
             {
                 if (line.StartsWith("## "))
                 {
@@ -70,14 +69,14 @@ public static class Preprocessing
                            .Replace("(", "")
                            .Replace(")", "");
 
-                TableSource? table = await ExtractTable(reader, file);
+                var table = await ExtractTable(reader, file);
 
                 // Not a valid table or not a table we are interested in, continue
                 if (table == null) continue;
 
                 // We use the name of the file for the directory name to store all the tables to
                 // We assume there are no duplicates
-                string dir = Path.ChangeExtension(file, null)
+                var dir = Path.ChangeExtension(file, null)
                                   .Split(Path.DirectorySeparatorChar)[^1]
                                   .Split('_')
                                   .Select(x => char.ToUpper(x[0]) + x[1..])
@@ -112,23 +111,6 @@ public static class Preprocessing
                 serializer.WriteObject(xml, table);
             }
         }
-        
-        // Post-processing
-        try
-        {
-            // ListActiveThreadsResponse is part of of two namespaces, delete the less-complete one
-            File.Delete($"{outPath.AbsolutePath}/DiscordGuild/ListActiveThreadsResponse");
-
-            // For the second one, make field `has_more` optional as it is missing from the Guild version
-            var path = $"{outPath.AbsolutePath}/DiscordChannel/ListActiveThreadsResponse";
-            string old = await File.ReadAllTextAsync(path);
-            await File.WriteAllTextAsync(path, old.Replace("has_more", "has_more?"));
-        }
-        catch (Exception)
-        {
-            Console.WriteLine("Discord API docs have changed causing this code to now be invalid, manual investigation required");
-            throw;
-        }
     }
 
     private static async Task<TableSource?> ExtractTable(TextReader reader, string path)
@@ -159,8 +141,8 @@ public static class Preprocessing
         }
         
         // Extract URLs
-        string urlFolder = path.Split(Path.DirectorySeparatorChar)[^2];
-        string urlFile = Path.GetFileNameWithoutExtension(path)
+        var urlFolder = path.Split(Path.DirectorySeparatorChar)[^2];
+        var urlFile = Path.GetFileNameWithoutExtension(path)
                              .ToLower()
                              .Replace("_", "-");
         var discordUrl = $"https://discord.com/developers/docs/{urlFolder}/{urlFile}";

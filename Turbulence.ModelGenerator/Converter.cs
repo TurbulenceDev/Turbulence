@@ -27,12 +27,12 @@ public static class Converter
         Directory.CreateDirectory(modelPath.AbsolutePath);
 
         // First, extract all record names and their namespaces
-        foreach (string tableDir in Directory.GetDirectories(tablesPath.AbsolutePath))
+        foreach (var tableDir in Directory.GetDirectories(tablesPath.AbsolutePath))
         {
-            foreach (string tableFile in Directory.GetFiles(tableDir))
+            foreach (var tableFile in Directory.GetFiles(tableDir))
             {
-                string nameSpace = tableDir.Split(Path.DirectorySeparatorChar)[^1];
-                string recordName = tableFile.Split(Path.DirectorySeparatorChar)[^1];
+                var nameSpace = tableDir.Split(Path.DirectorySeparatorChar)[^1];
+                var recordName = tableFile.Split(Path.DirectorySeparatorChar)[^1];
 
                 if (Namespaces.ContainsKey(recordName))
                 {
@@ -47,14 +47,14 @@ public static class Converter
         }
 
         // Assumes that the depth level is exactly 1 deep
-        foreach (string tableDir in Directory.GetDirectories(tablesPath.AbsolutePath))
+        foreach (var tableDir in Directory.GetDirectories(tablesPath.AbsolutePath))
         {
-            string modelDir = Path.Combine(modelPath.AbsolutePath, tableDir.Split(Path.DirectorySeparatorChar)[^1]);
+            var modelDir = Path.Combine(modelPath.AbsolutePath, tableDir.Split(Path.DirectorySeparatorChar)[^1]);
             Directory.CreateDirectory(modelDir);
             
-            foreach (string tableFile in Directory.GetFiles(tableDir))
+            foreach (var tableFile in Directory.GetFiles(tableDir))
             {
-                string modelFile = Path.ChangeExtension(
+                var modelFile = Path.ChangeExtension(
                     Path.Combine(modelDir, tableFile.Split(Path.DirectorySeparatorChar)[^1]), ".cs");
 
                 // Write generated .cs record to file
@@ -68,14 +68,14 @@ public static class Converter
 
     private static async Task<string> TableToRecord(string path)
     {
-        string[] split = path.Split(Path.DirectorySeparatorChar);
-        string dir = split[^2];
-        string recordName = split[^1];
+        var split = path.Split(Path.DirectorySeparatorChar);
+        var dir = split[^2];
+        var recordName = split[^1];
         
         using var xml = XmlReader.Create(path);
         var serializer = new DataContractSerializer(typeof(TableSource));
-        TableSource tableSrc = (TableSource) (serializer.ReadObject(xml)
-                                             ?? throw new Exception($"Failed to deserialize file {path}."));
+        var tableSrc = (TableSource) (serializer.ReadObject(xml)
+                                      ?? throw new Exception($"Failed to deserialize file {path}."));
         xml.Dispose();
         
         var reader = new StringReader(tableSrc.Table);
@@ -86,9 +86,8 @@ public static class Converter
         SortedSet<string> imports = new(StringComparer.InvariantCulture);
 
         List<string[]> propertyValues = new();
-        
-        string? property;
-        while ((property = await reader.ReadLineAsync()) != null)
+
+        while (await reader.ReadLineAsync() is { } property)
         {
             propertyValues.Add(property.Split("|")
                                               .Where(x => !string.IsNullOrWhiteSpace(x))
@@ -98,22 +97,26 @@ public static class Converter
 
         var nameSpace = $"{Config.NamespaceBase}.{dir}";
         
-        record.AppendLine(  "using Newtonsoft.Json;");
+        record.AppendLine(  "using System.Text.Json.Serialization;");
         record.AppendLine();
         record.AppendLine( $"namespace {nameSpace};");
         record.AppendLine();
         record.AppendLine(  "/// <summary>");
         record.AppendLine(@$"/// <b>Source:</b> <a href=""{tableSrc.GithubUrl}"">GitHub</a>, <a href=""{tableSrc.DiscordUrl}"">Discord API</a>");
         record.AppendLine(  "/// </summary>");
+        record.AppendLine($"public record {recordName} {{");
 
-        foreach (string[] prop in propertyValues)
+        for (var i = 0; i < propertyValues.Count; i++)
         {
-            string field = prop[0];
-            string description = prop[2];
-            
+            var prop = propertyValues[i];
+            var field = prop[0];
+            var type = prop[1];
+            var description = prop[2];
+
             if (field.Contains("files[n]"))
             {
-                record.AppendLine("/// TODO: Implement files[n] bullshit (https://discord.com/developers/docs/reference#uploading-files)");
+                record.AppendLine(
+                    "\t// TODO: Implement files[n] bullshit (https://discord.com/developers/docs/reference#uploading-files)");
                 continue;
             }
 
@@ -123,55 +126,42 @@ public static class Converter
             // Transform ` ` into XML code blocks
             description = Regex.Replace(description, "`(.*?)`", "<c>$1</c>");
 
-            record.AppendLine($@"/// <param name=""{ConvertField(field)}"">{PrettifyDescription(description)}</param>");
-        }
-        
-        record.AppendLine($"public record {recordName} (");
-
-        for (var i = 0; i < propertyValues.Count; i++)
-        {
-            string[] prop = propertyValues[i];
-            string field = prop[0];
-            string type = prop[1];
+            record.AppendLine($"\t/// <summary>\n\t/// {PrettifyDescription(description)}\n\t/// </summary>");
             
-            if (field.Contains("files[n]"))
-            {
-                record.AppendLine("\t// TODO: Implement files[n] bullshit (https://discord.com/developers/docs/reference#uploading-files)");
-                continue;
-            }
-
-            string prettyField = ConvertField(field);
-            string cleanField = CleanField(field);
-            string convertedType = ConvertType(type, out string? convertedNamespace);
+            var prettyField = ConvertField(field);
+            var cleanField = CleanField(field);
+            var convertedType = ConvertType(type, out var convertedNamespace);
 
             if (convertedNamespace != null)
-            {
                 imports.Add($"using {Config.NamespaceBase}.{convertedNamespace};");
-            }
-            
-            bool optional = field.EndsWith('?');
-            bool nullable = type.StartsWith('?');
 
-            string requirement = (optional, nullable) switch
+            string required  ;
+            if (!field.EndsWith('?'))
             {
-                (false, false) => ", Required = Required.Always",
-                (false, true) => ", Required = Required.AllowNull",
-                (true, false) => ", Required = Required.DisallowNull",
-                (true, true) => "",
-            };
+                required = "required ";
+            }
+            else
+            {
+                required = "";
+                
+                // Property that isn't required has to be nullable
+                if (!convertedType.EndsWith('?'))
+                {
+                    convertedType += '?';
+                }
+            }
 
-            // Don't add comma if last property
-            string comma = i != propertyValues.Count - 1 ? "," : "";
+            var newline = i != propertyValues.Count - 1 ? "\n" : "";
 
             record.AppendLine(
-                $"\t[property: JsonProperty(\"{cleanField}\"{requirement})]\n\t{convertedType} {prettyField}{comma}");
+                $"\t[JsonPropertyName(\"{cleanField}\")]\n\tpublic {required}{convertedType} {prettyField} {{ get; init; }}{newline}");
         }
 
-        record.AppendLine(");");
+        record.AppendLine("}");
 
         while (imports.Count > 0)
         {
-            string import = imports.Last();
+            var import = imports.Last();
             imports.Remove(import);
         
             if (import != $"using {nameSpace};")
@@ -196,16 +186,15 @@ public static class Converter
                    .Replace("; comma-delimited array of snowflakes", "")
                    .Trim();
         
-        bool nullable = type.StartsWith("?");
+        var nullable = type.StartsWith("?");
         type = type.Replace("?", "")
                    .Trim();
-
 
         string? convertedType = null;
         var found = false;
 
         // First, see if the type matches a collection type
-        foreach ((string pattern, string replacement) in CollectionTypeMapping)
+        foreach (var (pattern, replacement) in CollectionTypeMapping)
         {
             var match = Regex.Match(type, pattern);
 
@@ -213,7 +202,7 @@ public static class Converter
 
             if (match.Groups[1].Value == string.Empty) return replacement;
 
-            string? innerType = MapInnerType(match.Groups[1].Value, out string? nSpace);
+            var innerType = MapInnerType(match.Groups[1].Value, out var nSpace);
             nameSpace = nSpace;
 
             if (innerType == null)
@@ -232,7 +221,7 @@ public static class Converter
         // Else, assume it is an inner type
         if (!found)
         {
-            convertedType = MapInnerType(type, out string? nSpace);
+            convertedType = MapInnerType(type, out var nSpace);
             nameSpace = nSpace;
         }
 
@@ -329,7 +318,7 @@ public static class Converter
         }
         
         // Case where PascalCase conversion already exists
-        if (Namespaces.TryGetValue(ToPascalCase(type), out string? nSpace))
+        if (Namespaces.TryGetValue(ToPascalCase(type), out var nSpace))
         {
             nameSpace = nSpace;
             return ToPascalCase(type);
@@ -338,7 +327,7 @@ public static class Converter
         var match = Regex.Match(type, @"(?:(?:a )?partial |a )?(.*?)(?:s)? object");
         if (match.Success)
         {
-            string convertedType = ToPascalCase(match.Groups[1].Value);
+            var convertedType = ToPascalCase(match.Groups[1].Value);
 
             if (Namespaces.TryGetValue(convertedType, out string? nSpace2))
             {
@@ -431,7 +420,7 @@ public static class Converter
         { "url", "URL" },
         { "youtube", "YouTube" },
         { "twitch", "Twitch" },
-        { "oauth2", "OAuth2 "},
+        { "oauth2", "OAuth2 " },
         { "rpc", "RPC" },
         { " id ", " ID " },
     };
@@ -439,7 +428,7 @@ public static class Converter
     private static string PrettifyDescription(string description)
     {
         // Convert the first real letter to uppercase
-        char[] chars = description.ToCharArray();
+        var chars = description.ToCharArray();
         for (var i = 0; i < chars.Length; i++)
         {
             if (!char.IsLetter(description[i])) continue;
@@ -489,14 +478,19 @@ namespace Turbulence.API.Models.DiscordMessageComponents;
 /// <summary>
 /// <b>Source:</b> <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/interactions/Message_Components.md"">GitHub</a>, <a href=""https://discord.com/developers/docs/interactions/message-components"">Discord API</a>
 /// </summary>
-/// <param name=""Type"">1: Action Row, 2: Button, 3: Select Menu, 4: Text Input</param>
-/// <param name=""Components"">Array of components.</param>
-public record MessageComponent (
-    [property: JsonProperty(""type"", Required = Required.Always)]
-    int Type,
-    [property: JsonProperty(""components"", Required = Required.Always)]
-    dynamic[] Components
-);"
+public record MessageComponent {
+    /// <summary>
+    /// 1: Action Row, 2: Button, 3: Select Menu, 4: Text Input
+    /// </summary>
+    [JsonPropertyName(""type"")]
+    public required int Type { get; init; }
+
+    /// <summary>
+    /// Array of components.
+    /// </summary>
+    [JsonPropertyName(""components"")]
+    public required dynamic[] Components { get; init; }
+}"
         );
     }
 }
