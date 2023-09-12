@@ -8,13 +8,13 @@ public static class Generate
 {
     public static async Task Main(string[] args)
     {
-        Uri downloadPath = new(Path.Combine(Config.TempPath.AbsolutePath, "Download"));
-        Uri tablesPath = new(Path.Combine(Config.TempPath.AbsolutePath, "Tables"));
+        Uri downloadPath = new(Path.Combine(Config.TempPath.LocalPath, "Download"));
+        Uri tablesPath = new(Path.Combine(Config.TempPath.LocalPath, "Tables"));
 
         await DownloadFiles(Config.DocsRoot, Config.MdFiles, downloadPath);
         PreExtract(downloadPath);
         await ExtractTables(downloadPath, tablesPath);
-        Directory.Delete(downloadPath.AbsolutePath, true);
+        Directory.Delete(downloadPath.LocalPath, true);
 
         await Convert(tablesPath, Config.OutPath);
         PostConvert(Config.OutPath);

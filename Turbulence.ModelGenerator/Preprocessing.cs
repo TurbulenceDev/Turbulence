@@ -15,7 +15,7 @@ public static class Preprocessing
         // List to keep track of written files, so we can make sure there are no duplicates
         List<string> writtenFiles = new();
 
-        foreach (var file in Directory.EnumerateFiles(inPath.AbsolutePath, "*.*", SearchOption.AllDirectories))
+        foreach (var file in Directory.EnumerateFiles(inPath.LocalPath, "*.*", SearchOption.AllDirectories))
         {
             using StreamReader reader = new(file);
             
@@ -87,7 +87,7 @@ public static class Preprocessing
                 // Suffix namespaces with Discord so records and namespaces won't have the same name
                 dir = $"Discord{dir}";
                 
-                dir = Path.Combine(outPath.AbsolutePath, dir);
+                dir = Path.Combine(outPath.LocalPath, dir);
 
                 var filename = Path.Combine(dir, name);
 
@@ -162,7 +162,7 @@ public static class Preprocessing
         var inconsistentHeaderCount = false;
         var nameFieldCount = false;
         
-        foreach (var file in Directory.EnumerateFiles(path.AbsolutePath, "*.*", SearchOption.AllDirectories))
+        foreach (var file in Directory.EnumerateFiles(path.LocalPath, "*.*", SearchOption.AllDirectories))
         {
             var text = File.ReadAllText(file);
 

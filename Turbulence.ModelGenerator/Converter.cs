@@ -24,10 +24,10 @@ public static class Converter
     /// <param name="modelPath">The directory to put the generated records.</param>
     public static async Task Convert(Uri tablesPath, Uri modelPath)
     {
-        Directory.CreateDirectory(modelPath.AbsolutePath);
+        Directory.CreateDirectory(modelPath.LocalPath);
 
         // First, extract all record names and their namespaces
-        foreach (var tableDir in Directory.GetDirectories(tablesPath.AbsolutePath))
+        foreach (var tableDir in Directory.GetDirectories(tablesPath.LocalPath))
         {
             foreach (var tableFile in Directory.GetFiles(tableDir))
             {
@@ -47,9 +47,9 @@ public static class Converter
         }
 
         // Assumes that the depth level is exactly 1 deep
-        foreach (var tableDir in Directory.GetDirectories(tablesPath.AbsolutePath))
+        foreach (var tableDir in Directory.GetDirectories(tablesPath.LocalPath))
         {
-            var modelDir = Path.Combine(modelPath.AbsolutePath, tableDir.Split(Path.DirectorySeparatorChar)[^1]);
+            var modelDir = Path.Combine(modelPath.LocalPath, tableDir.Split(Path.DirectorySeparatorChar)[^1]);
             Directory.CreateDirectory(modelDir);
             
             foreach (var tableFile in Directory.GetFiles(tableDir))
@@ -473,7 +473,7 @@ public static class Converter
     // Ran after conversion is done, for example to add missing classes
     public static void PostConvert(Uri modelsPath)
     {
-        File.WriteAllText(Path.Combine(modelsPath.AbsolutePath, "DiscordMessageComponents", "MessageComponent.cs"), 
+        File.WriteAllText(Path.Combine(modelsPath.LocalPath, "DiscordMessageComponents", "MessageComponent.cs"), 
 @"using System.Text.Json.Serialization;
 
 namespace Turbulence.API.Discord.Models.DiscordMessageComponents;
@@ -495,7 +495,7 @@ public record MessageComponent {
     public required dynamic[] Components { get; init; }
 }");
 
-        File.WriteAllText(Path.Combine(modelsPath.AbsolutePath, "DiscordGateway", "Gateway.cs"), 
+        File.WriteAllText(Path.Combine(modelsPath.LocalPath, "DiscordGateway", "Gateway.cs"), 
             @"using System.Text.Json.Serialization;
 
 namespace Turbulence.API.Discord.Models.DiscordGateway;
@@ -514,7 +514,7 @@ public record Gateway {
     public required Uri Url { get; init; }
 }");
 
-        File.WriteAllText(Path.Combine(modelsPath.AbsolutePath, "Error.cs"), 
+        File.WriteAllText(Path.Combine(modelsPath.LocalPath, "Error.cs"), 
             @"using System.Text.Json.Serialization;
 
 namespace Turbulence.API.Discord.Models;
@@ -544,7 +544,7 @@ public record Error {
     public dynamic? Errors { get; init; }
 }");
         
-        File.WriteAllText(Path.Combine(modelsPath.AbsolutePath, "DiscordGatewayEvents", "GatewayPayload.cs"), 
+        File.WriteAllText(Path.Combine(modelsPath.LocalPath, "DiscordGatewayEvents", "GatewayPayload.cs"), 
             @"using System.Text.Json.Serialization;
 
 namespace Turbulence.API.Discord.Models.DiscordGateway;
