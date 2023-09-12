@@ -25,7 +25,7 @@ public static class Downloader
         
         using var client = new HttpClient();
 
-        foreach (string file in files)
+        foreach (var file in files)
         {
             Uri toDownload = new(root + "/" + file);
             Uri outputFile = new(Path.Combine(outPath.AbsolutePath, file));
