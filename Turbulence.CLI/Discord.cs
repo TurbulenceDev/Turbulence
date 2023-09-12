@@ -1,8 +1,8 @@
 ﻿using System.Net.WebSockets;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using Turbulence.API.Discord;
+using Turbulence.API.Discord.Models;
 using Turbulence.API.Discord.Models.DiscordChannel;
 using Turbulence.API.Discord.Models.DiscordGateway;
 using Turbulence.API.Discord.Models.DiscordGatewayEvents;
@@ -11,8 +11,22 @@ using Turbulence.API.Discord.Models.DiscordUser;
 
 namespace Turbulence.CLI
 {
+    public class Event<T>
+    {
+        public Event(T data)
+        {
+            Data = data;
+        }
+
+        public T Data { get; set; }
+    }
+
     public class Discord
     {
+        // Events
+        public static event EventHandler<Event<Ready>>? OnReadyEvent;
+        public static event EventHandler<Event<Message>>? OnMessageCreate;
+
         // idk where to move this
         private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
         public static HttpClient HttpClient = new();
@@ -107,7 +121,7 @@ namespace Turbulence.CLI
             };
             var seri = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true });
 
-            Console.WriteLine(seri);
+            //Console.WriteLine(seri);
             return WebSocket.SendAsync(Encoding.UTF8.GetBytes(seri), default, true, default);
         }
 
@@ -138,6 +152,7 @@ namespace Turbulence.CLI
         }
 
         // checks if a message should trigger a notification
+        //TODO: fix
         private static async Task<bool> ShouldNotify(Message message, bool mentioned)
         {
             //flow:
@@ -259,7 +274,7 @@ namespace Turbulence.CLI
 
                     if (result.EndOfMessage)
                     {
-                        Console.WriteLine(Encoding.UTF8.GetString(buffer));
+                        //Console.WriteLine(Encoding.UTF8.GetString(buffer));
                         msg = JsonSerializer.Deserialize<GatewayPayload>(Encoding.UTF8.GetString(buffer[..result.Count]));
                     }
                     else // handle longer messages
@@ -301,14 +316,14 @@ namespace Turbulence.CLI
 
         public static async void HandleGatewayMessage(GatewayPayload msg)
         {
-            Console.WriteLine($"WS Receive: {msg.Opcode}");
+            //Console.WriteLine($"WS Receive: {msg.Opcode}");
             switch (msg.Opcode)
             {
                 case GatewayOpcode.DISPATCH:
                     {
                         _lastSequence = msg.SequenceNumber; // save the sequence for the next heartbeat (only set if op 0)
-                        Console.WriteLine($"Name: {msg.EventName}, Sequence: {msg.SequenceNumber}");
-                        Console.WriteLine(JsonSerializer.Serialize(msg));
+                        //Console.WriteLine($"Name: {msg.EventName}, Sequence: {msg.SequenceNumber}");
+                        //Console.WriteLine(JsonSerializer.Serialize(msg));
                         if (msg.Data == null)
                             return;
 
@@ -317,8 +332,9 @@ namespace Turbulence.CLI
                         //      then we wouldnt need to do this (dynamic) shit. also needs the exported models
                         switch (msg.EventName)
                         {
+                            //TODO: enumify these (nuts), https://discord.com/developers/docs/topics/rpc#commands-and-events-rpc-events
                             case "MESSAGE_CREATE":
-                                Console.WriteLine(msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+                                //Console.WriteLine(msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
 
                                 if (msg.Data.Deserialize<Message>() is not { } message)
                                 {
@@ -326,7 +342,7 @@ namespace Turbulence.CLI
                                     return;
                                 }
 
-                                var mentioned = await IsMentioned(message);
+                                /*var mentioned = await IsMentioned(message);
                                 if (mentioned)
                                 {
                                     Console.ForegroundColor = ConsoleColor.Red;
@@ -343,7 +359,8 @@ namespace Turbulence.CLI
                                 // TODO: edit the msg content with mentioned role/user names as well as making it a reply
                                 Console.ForegroundColor = ConsoleColor.Green;
                                 Console.WriteLine($"{message.Author.Username}: {message.Content}");
-                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.ForegroundColor = ConsoleColor.White;*/
+                                OnMessageCreate?.Invoke(null, new(message));
                                 break;
                             case "READY":
                                 if (msg.Data.Deserialize<Ready>() is not { } ready)
@@ -361,14 +378,15 @@ namespace Turbulence.CLI
                                 // foreach (var member in ready.)
                                 //     MemberInfos.Add(member);
 
-                                Console.WriteLine("READY");
+                                /*Console.WriteLine("READY");
                                 Console.WriteLine($"Current User: {User.GlobalName} ({User.Username})");
                                 Console.WriteLine("Servers:");
                                 foreach (var guild in Guilds)
-                                    Console.WriteLine($"-{guild.Name} (ID: {guild.Id})");
+                                    Console.WriteLine($"-{guild.Name} (ID: {guild.Id})");*/
+                                OnReadyEvent?.Invoke(null, new(ready));
                                 break;
                             default:
-                                Console.WriteLine($"Data: {msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true })}");
+                                Console.WriteLine($"[Event: {msg.EventName}] Data: {msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true })}");
                                 break;
                         }
                         break;
@@ -376,6 +394,8 @@ namespace Turbulence.CLI
                 case GatewayOpcode.HEARTBEAT:
                     // We should send a heartbeat now without waiting so we cancel the delay
                     HeartbeatToken.Cancel();
+                    break;
+                case GatewayOpcode.HEARTBEAT_ACK: // received a heartbeat, do nothing
                     break;
                 case GatewayOpcode.HELLO:
                     if (msg.Data.Deserialize<Hello>() is not { } hello)
@@ -385,10 +405,10 @@ namespace Turbulence.CLI
                     }
 
                     _heartbeatInterval = hello.HeartbeatInterval;
-                    Console.WriteLine($"Interval: {_heartbeatInterval}");
+                    //Console.WriteLine($"Interval: {_heartbeatInterval}");
                     break;
                 default:
-                    Console.WriteLine($"Data: {msg.Data}");
+                    Console.WriteLine($"[OP: {msg.Opcode}] Data: {msg.Data}");
                     break;
             }
         }
@@ -396,6 +416,17 @@ namespace Turbulence.CLI
         public async Task<User> GetCurrentUser()
         {
             return User ?? await Api.GetCurrentUser(HttpClient);
+        }
+
+        //TODO: cache this or smth
+        public async Task<List<Message>> GetMessages(ulong channelID)
+        {
+            return await Api.GetChannelMessages(HttpClient, channelID);
+        }
+
+        public async Task<List<Channel>> GetGuildChannels(Snowflake guild)
+        {
+            return await Api.GetGuildChannels(HttpClient, guild);
         }
     }
 }

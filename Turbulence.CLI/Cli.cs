@@ -32,6 +32,25 @@ public class Cli
 
             var discord = new Discord();
             await discord.Start();
+            Discord.OnReadyEvent += async (sender, msg) =>
+            {
+                Console.WriteLine("Ready");
+                if (msg.Data.Guilds.Length == 0)
+                {
+                    Console.WriteLine("No Guilds.");
+                    return;
+                }
+                var guild = msg.Data.Guilds[0];
+                var channels = await discord.GetGuildChannels(guild.Id);
+                var channel = channels.First(c => c.Type == ChannelType.GUILD_TEXT);
+                Console.WriteLine($"Guild: {guild.Name} ({guild.Id}), Channel: {channel.Name} ({channel.Id})");
+                var msgs = await discord.GetMessages(channel.Id);
+                foreach (var m in msgs)
+                {
+                    Console.WriteLine($"{m.Author.Username}: {m.Content}");
+                }
+            };
+            
 
             //TODO: run thread
             while (true)
