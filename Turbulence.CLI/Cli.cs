@@ -1,21 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Net.WebSockets;
-using System.Text;
-using System.Text.Json;
-using Turbulence.API.Discord;
 using Turbulence.API.Discord.Models.DiscordChannel;
-using Turbulence.API.Discord.Models.DiscordGateway;
-using Turbulence.API.Discord.Models.DiscordGatewayEvents;
-using Turbulence.API.Discord.Models.DiscordGuild;
-using Turbulence.API.Discord.Models.DiscordUser;
-using static Turbulence.API.Discord.Models.DiscordGateway.GatewayOpcode;
 
 namespace Turbulence.CLI;
 
 public class Cli
 {
-    public static string Token = string.Empty;
-
     private static async Task Main()
     {
         try
@@ -28,9 +17,8 @@ public class Cli
                 Console.WriteLine("No token set. Use 'dotnet user-secrets set token [your token]' to set a token.");
                 return;
             }
-            Token = token;
 
-            var discord = new Discord();
+            var discord = new Discord(token);
             await discord.Start();
             Discord.OnReadyEvent += async (sender, msg) =>
             {

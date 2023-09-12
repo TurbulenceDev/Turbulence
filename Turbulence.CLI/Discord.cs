@@ -23,6 +23,8 @@ namespace Turbulence.CLI
 
     public class Discord
     {
+        //TODO: should this class contain the token?
+        private string Token;
         // Events
         public static event EventHandler<Event<Ready>>? OnReadyEvent;
         public static event EventHandler<Event<Message>>? OnMessageCreate;
@@ -31,12 +33,14 @@ namespace Turbulence.CLI
         private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
         public static HttpClient HttpClient = new();
         ClientWebSocket WebSocket { get; set; }
-        public Discord()
+        public Discord(string token)
         {
             // Set up http client
             HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
             // WS
             WebSocket = new();
+            // Token
+            Token = token;
         }
 
         public async Task Start()
@@ -44,16 +48,14 @@ namespace Turbulence.CLI
             //TODO: according to the docs this should be cached and only re-requested if the cached version doesnt exist/is not reachable
             var gateway = await Api.GetGateway(HttpClient);
 
-            //TODO: either give it as a param or access a static main app class?
-            var token = Cli.Token;
-            HttpClient.DefaultRequestHeaders.Add("Authorization", token);
+            HttpClient.DefaultRequestHeaders.Add("Authorization", Token);
 
             SetWebsocketHeaders();
             await WebSocket.ConnectAsync(new Uri($"{gateway.AbsoluteUri}/?encoding=json&v={Api.Version}"), default);
-            await SendIdentify(token);
-            // Start the tasks
-            Task.Run(() => ReceiveTask(WebSocket));
-            Task.Run(() => HeartbeatTask(WebSocket)); //TODO: implement a send queue, to issue gateway commands async
+            await SendIdentify();
+            // Start the tasks //TODO: save the tasks?
+            _ = Task.Run(ReceiveTask);
+            _ = Task.Run(HeartbeatTask); //TODO: implement a send queue, to issue gateway commands async
         }
 
         public void SetWebsocketHeaders()
@@ -70,14 +72,14 @@ namespace Turbulence.CLI
             WebSocket.Options.SetRequestHeader("Cache-Control", "no-cache");
         }
 
-        public Task SendIdentify(string token)
+        public Task SendIdentify()
         {
             GatewayPayload payload = new()
             {
                 Opcode = GatewayOpcode.IDENTIFY,
                 Data = JsonSerializer.SerializeToNode(new Identify
                 {
-                    Token = token,
+                    Token = Token,
                     //TODO: turn into an bitfield enum
                     Capabilities = 0b11101111111101, //TODO: use official caps, which probably require other models
                     Properties = new IdentifyConnectionProperties
@@ -206,19 +208,19 @@ namespace Turbulence.CLI
         private static int? _heartbeatInterval; // Time between heartbeats
         private static int? _lastSequence;
         private static readonly CancellationTokenSource HeartbeatToken = new();
-        private static async Task HeartbeatTask(WebSocket webSocket)
+        private async Task HeartbeatTask()
         {
             while (_heartbeatInterval == null)
             {
                 await Task.Delay(1000);
-                if (webSocket.State != WebSocketState.Open)
+                if (WebSocket.State != WebSocketState.Open)
                     return;
             }
 
             // first wait heartbeat interval + jitter (ignoring jitter here)
             await Task.Delay(_heartbeatInterval.Value, HeartbeatToken.Token);
 
-            while (webSocket.State == WebSocketState.Open)
+            while (WebSocket.State == WebSocketState.Open)
             {
                 //TODO: probably check if we got a ack (op 11) after the last heartbeat we sent. if not we "should" reconnect
                 GatewayPayload heartBeat = new()
@@ -228,7 +230,7 @@ namespace Turbulence.CLI
                     SequenceNumber = null,
                     EventName = null,
                 };
-                await webSocket.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(heartBeat)), default, true, default);
+                await WebSocket.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(heartBeat)), default, true, default);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("WS Send: Heartbeat");
                 Console.ForegroundColor = ConsoleColor.White;
@@ -245,7 +247,7 @@ namespace Turbulence.CLI
             }
         }
 
-        private static async Task ReceiveTask(WebSocket webSocket)
+        private async Task ReceiveTask()
         {
             // TODO: something here takes up a lot of ram. may be the json stuff not being gc'ed
             const int bufferSize = 1024 * 4;
@@ -256,19 +258,19 @@ namespace Turbulence.CLI
                 var arraySegment = new ArraySegment<byte>(buffer);
 
                 GatewayPayload? msg = null;
-                while (webSocket.State == WebSocketState.Open)
+                while (WebSocket.State == WebSocketState.Open)
                 {
                     // Clear buffer
                     Array.Clear(buffer);
 
                     // Read the message
-                    var result = await webSocket.ReceiveAsync(arraySegment, default);
+                    var result = await WebSocket.ReceiveAsync(arraySegment, default);
 
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
                         Console.WriteLine($"Closing: {Encoding.UTF8.GetString(buffer)}");
                         Console.WriteLine(result.CloseStatus);
-                        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                        await WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
                         continue;
                     }
 
@@ -285,7 +287,7 @@ namespace Turbulence.CLI
                         var count = result.Count;
                         while (!result.EndOfMessage)
                         {
-                            result = await webSocket.ReceiveAsync(arraySegment, CancellationToken.None);
+                            result = await WebSocket.ReceiveAsync(arraySegment, CancellationToken.None);
                             if (result.MessageType == WebSocketMessageType.Close)
                                 continue;
 
@@ -419,12 +421,12 @@ namespace Turbulence.CLI
         }
 
         //TODO: cache this or smth
-        public async Task<List<Message>> GetMessages(ulong channelID)
+        public async Task<Message[]> GetMessages(ulong channelID)
         {
             return await Api.GetChannelMessages(HttpClient, channelID);
         }
 
-        public async Task<List<Channel>> GetGuildChannels(Snowflake guild)
+        public async Task<Channel[]> GetGuildChannels(Snowflake guild)
         {
             return await Api.GetGuildChannels(HttpClient, guild);
         }

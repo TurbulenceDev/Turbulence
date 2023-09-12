@@ -76,14 +76,14 @@ public static class Api
     }
 
     // https://discord.com/developers/docs/resources/channel#get-channel-messages
-    public static async Task<List<Message>> GetChannelMessages(HttpClient client, ulong channelId, int limit = 50)
+    public static async Task<Message[]> GetChannelMessages(HttpClient client, ulong channelId, int limit = 50)
     {
-        return await Get<List<Message>>(client, $"/channels/{channelId}/messages?limit={limit}");
+        return await Get<Message[]>(client, $"/channels/{channelId}/messages?limit={limit}");
     }
     // https://discord.com/developers/docs/resources/guild#get-guild-channels
-    public static async Task<List<Channel>> GetGuildChannels(HttpClient client, Snowflake guild)
+    public static async Task<Channel[]> GetGuildChannels(HttpClient client, Snowflake guild)
     {
-        return await Get<List<Channel>>(client, $"/guilds/{guild}/channels");
+        return await Get<Channel[]>(client, $"/guilds/{guild}/channels");
     }
 
 }

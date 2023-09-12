@@ -2,7 +2,6 @@ using Turbulence.API.Discord.Models.DiscordEmoji;
 using Turbulence.API.Discord.Models.DiscordPermissions;
 using Turbulence.API.Discord.Models.DiscordSticker;
 using System.Text.Json.Serialization;
-using Turbulence.API.Discord.JsonConverters;
 
 namespace Turbulence.API.Discord.Models.DiscordGuild;
 
@@ -316,4 +315,7 @@ public record Guild {
 	/// </summary>
 	[JsonPropertyName("safety_alerts_channel_id")]
 	public required Snowflake? SafetyAlertsChannelId { get; init; }
+
+	[JsonPropertyName("channels")]
+    public required DiscordChannel.Channel[] Channels { get; init; }
 }
