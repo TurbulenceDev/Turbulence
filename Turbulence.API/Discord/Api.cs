@@ -10,7 +10,7 @@ namespace Turbulence.API.Discord;
 
 public static class Api
 {
-    public const string Version = "10";
+    public const string Version = "9";
     private const string RootAdress = "https://discord.com/api";
     private const string ApiRoot = $"{RootAdress}/v{Version}";
 

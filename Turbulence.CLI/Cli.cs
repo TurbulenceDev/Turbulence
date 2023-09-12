@@ -71,7 +71,8 @@ public class Cli
                 Data = JsonSerializer.SerializeToNode(new Identify
                 {
                     Token = token,
-                    Capabilities = 4605,
+                    //TODO: turn into an bitfield enum
+                    Capabilities = 0b11101111111101, //TODO: use official caps, which probably require other models
                     Properties = new IdentifyConnectionProperties
                     {
                         Os = "Linux",
