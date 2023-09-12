@@ -16,14 +16,12 @@ public record MessageReference {
 	/// </summary>
 	[JsonPropertyName("message_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? MessageId { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of the originating message's channel.
 	/// </summary>
 	[JsonPropertyName("channel_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake ChannelId { get; init; }
 
 	/// <summary>
@@ -31,7 +29,6 @@ public record MessageReference {
 	/// </summary>
 	[JsonPropertyName("guild_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? GuildId { get; init; }
 
 	/// <summary>

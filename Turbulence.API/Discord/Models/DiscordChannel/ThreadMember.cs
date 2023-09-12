@@ -19,7 +19,6 @@ public record ThreadMember {
 	/// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>
@@ -28,15 +27,13 @@ public record ThreadMember {
 	/// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
 	/// </summary>
 	[JsonPropertyName("user_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake UserId { get; init; }
 
-	// TODO: Deserialize ISO8601 into something usable
 	/// <summary>
 	/// Time the user last joined the thread.
 	/// </summary>
 	[JsonPropertyName("join_timestamp")]
-	public required string JoinTimestamp { get; init; }
+	public required DateTimeOffset JoinTimestamp { get; init; }
 
 	/// <summary>
 	/// Any user-thread settings, currently only used for notifications.

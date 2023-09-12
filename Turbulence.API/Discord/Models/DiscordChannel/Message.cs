@@ -1,11 +1,10 @@
 using Turbulence.API.Discord.Models.DiscordApplication;
 // using Turbulence.API.Discord.Models.DiscordMessageComponents;
-using Turbulence.API.Discord.Models.DiscordPermissions;
 using Turbulence.API.Discord.Models.DiscordReceivingAndResponding;
 using Turbulence.API.Discord.Models.DiscordSticker;
 using Turbulence.API.Discord.Models.DiscordUser;
 using System.Text.Json.Serialization;
-using Turbulence.API.Discord.JsonConverters;
+using Turbulence.API.Discord.Models.DiscordGuild;
 
 namespace Turbulence.API.Discord.Models.DiscordChannel;
 
@@ -21,14 +20,12 @@ public record Message {
 	/// Snowflake ID of the message.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of the channel the message was sent in.
 	/// </summary>
 	[JsonPropertyName("channel_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake ChannelId { get; init; }
 
 	/// <summary>
@@ -48,19 +45,17 @@ public record Message {
 	[JsonPropertyName("content")]
 	public required string Content { get; init; }
 
-	// TODO: Deserialize ISO8601 timestamp to something usable
 	/// <summary>
 	/// When this message was sent.
 	/// </summary>
 	[JsonPropertyName("timestamp")]
-	public required string Timestamp { get; init; }
+	public required DateTimeOffset Timestamp { get; init; }
 
-	// TODO: Deserialize ISO8601 timestamp to something usable
 	/// <summary>
 	/// When this message was edited (or null if never).
 	/// </summary>
 	[JsonPropertyName("edited_timestamp")]
-	public required string? EditedTimestamp { get; init; }
+	public required DateTimeOffset? EditedTimestamp { get; init; }
 
 	/// <summary>
 	/// Whether this was a TTS message.
@@ -84,7 +79,7 @@ public record Message {
 	/// Roles specifically mentioned in this message.
 	/// </summary>
 	[JsonPropertyName("mention_roles")]
-	public required Role[] MentionRoles { get; init; }
+	public required Snowflake[] MentionRoles { get; init; }
 
 	/// <summary>
 	/// Channels specifically mentioned in this message.
@@ -135,7 +130,6 @@ public record Message {
 	/// </summary>
 	[JsonPropertyName("webhook_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? WebhookId { get; init; }
 
 	/// <summary>
@@ -165,7 +159,6 @@ public record Message {
 	/// </summary>
 	[JsonPropertyName("application_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? ApplicationId { get; init; }
 
 	/// <summary>
@@ -250,4 +243,69 @@ public record Message {
 	[JsonPropertyName("role_subscription_data")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public RoleSubscriptionData? RoleSubscriptionData { get; init; }
+	
+	#region CREATE_MESSAGE Extra fields
+	// Maybe refactor this into a separate class or into event args
+	
+	/// <summary>
+	/// ID of the guild the message was sent in, unless it is an ephemeral message.
+	///
+	/// Only available if this message was retrieved from a <c>MESSAGE_CREATED</c> or <c>MESSAGE_UPDATED</c> event.
+	/// </summary>
+	[JsonPropertyName("guild_id")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public Snowflake? GuildId { get; init; }
+
+	/// <summary>
+	/// Member properties for this message's author. Missing for ephemeral messages and messages from webhooks.
+	///
+	/// Only available if this message was retrieved from a <c>MESSAGE_CREATED</c> or <c>MESSAGE_UPDATED</c> event.
+	/// </summary>
+	[JsonPropertyName("member")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public GuildMember? Member { get; init; }
+
+	#endregion
+}
+
+/// <summary>
+/// The type of the message.
+///
+/// See the
+/// <a href="https://discord.com/developers/docs/resources/channel#message-object-message-types">Discord API
+/// documentation</a>.
+/// </summary>
+public enum MessageType
+{
+	DEFAULT = 0,
+	RECIPIENT_ADD = 1,
+	RECIPIENT_REMOVE = 2,
+	CALL = 3,
+	CHANNEL_NAME_CHANGE = 4,
+	CHANNEL_ICON_CHANGE = 5,
+	CHANNEL_PINNED_MESSAGE = 6,
+	USER_JOIN = 7,
+	GUILD_BOOST = 8,
+	GUILD_BOOST_TIER_1 = 9,
+	GUILD_BOOST_TIER_2 = 10,
+	GUILD_BOOST_TIER_3 = 11,
+	CHANNEL_FOLLOW_ADD = 12,
+	GUILD_DISCOVERY_DISQUALIFIED = 14,
+	GUILD_DISCOVERY_REQUALIFIED = 15,
+	GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING = 16,
+	GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING = 17,
+	THREAD_CREATED = 18,
+	REPLY = 19,
+	CHAT_INPUT_COMMAND = 20,
+	THREAD_STARTER_MESSAGE = 21,
+	GUILD_INVITE_REMINDER = 22,
+	CONTEXT_MENU_COMMAND = 23,
+	AUTO_MODERATION_ACTION = 24,
+	ROLE_SUBSCRIPTION_PURCHASE = 25,
+	INTERACTION_PREMIUM_UPSELL = 26,
+	STAGE_START = 27,
+	STAGE_END = 28,
+	STAGE_SPEAKER = 29,
+	STAGE_TOPIC = 31,
+	GUILD_APPLICATION_PREMIUM_SUBSCRIPTION = 32,
 }

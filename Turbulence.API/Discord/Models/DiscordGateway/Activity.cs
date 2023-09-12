@@ -8,7 +8,7 @@ namespace Turbulence.API.Discord.Models.DiscordGateway;
 /// documentation</a> or
 /// <a href="https://github.com/discord/discord-api-docs/blob/main/docs/topics/Gateway_Events.md#activity-object">GitHub
 /// </a>.
-/// /// </summary>
+/// </summary>
 public record Activity {
 	/// <summary>
 	/// Activity's name.
@@ -49,7 +49,6 @@ public record Activity {
 	/// </summary>
 	[JsonPropertyName("application_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? ApplicationId { get; init; }
 
 	/// <summary>

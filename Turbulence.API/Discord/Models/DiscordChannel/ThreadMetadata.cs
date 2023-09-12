@@ -25,12 +25,11 @@ public record ThreadMetadata {
 	[JsonPropertyName("auto_archive_duration")]
 	public required int AutoArchiveDuration { get; init; }
 
-	// TODO: Deserialize ISO8601 into something useful
 	/// <summary>
 	/// Timestamp when the thread's archive status was last changed, used for calculating recent activity.
 	/// </summary>
 	[JsonPropertyName("archive_timestamp")]
-	public required string ArchiveTimestamp { get; init; }
+	public required DateTimeOffset ArchiveTimestamp { get; init; }
 
 	/// <summary>
 	/// Whether the thread is locked; when a thread is locked, only users with <c>MANAGE_THREADS</c> can unarchive it.
@@ -45,11 +44,10 @@ public record ThreadMetadata {
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public bool? Invitable { get; init; }
 
-	// TODO: Deserialize ISO8601 into something useful
 	/// <summary>
 	/// Timestamp when the thread was created; only populated for threads created after 2022-01-09.
 	/// </summary>
 	[JsonPropertyName("create_timestamp")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public string? CreateTimestamp { get; init; }
+	public DateTimeOffset? CreateTimestamp { get; init; }
 }

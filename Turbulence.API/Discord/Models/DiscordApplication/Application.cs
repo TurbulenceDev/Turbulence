@@ -17,7 +17,6 @@ public record Application {
 	/// The snowflake ID of the app.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>
@@ -104,7 +103,6 @@ public record Application {
 	/// </summary>
 	[JsonPropertyName("guild_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? GuildId { get; init; }
 
 	/// <summary>
@@ -120,7 +118,6 @@ public record Application {
 	/// </summary>
 	[JsonPropertyName("primary_sku_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? PrimarySkuId { get; init; }
 
 	/// <summary>

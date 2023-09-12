@@ -12,7 +12,6 @@ public record User {
 	/// The user's snowflake ID.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>

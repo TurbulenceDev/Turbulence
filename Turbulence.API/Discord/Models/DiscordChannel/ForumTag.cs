@@ -16,7 +16,6 @@ public record ForumTag {
 	/// The snowflake ID of the tag.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>
@@ -38,7 +37,6 @@ public record ForumTag {
 	/// Must be <c>null</c> if <see cref="EmojiName"/> is set.
 	/// </summary>
 	[JsonPropertyName("emoji_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? EmojiId { get; init; }
 
 	/// <summary>

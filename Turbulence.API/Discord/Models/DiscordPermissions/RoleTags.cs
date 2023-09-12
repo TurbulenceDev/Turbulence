@@ -16,7 +16,6 @@ public record RoleTags {
 	/// </summary>
 	[JsonPropertyName("bot_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? BotId { get; init; }
 
 	/// <summary>
@@ -24,7 +23,6 @@ public record RoleTags {
 	/// </summary>
 	[JsonPropertyName("integration_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? IntegrationId { get; init; }
 
 	/// <summary>
@@ -32,14 +30,13 @@ public record RoleTags {
 	/// </summary>
 	[JsonPropertyName("premium_subscriber")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public bool PremiumSubscriber => throw new NotImplementedException();
+	public bool? PremiumSubscriber => throw new NotImplementedException();
 
 	/// <summary>
 	/// The snowflake ID of this role's subscription sku and listing.
 	/// </summary>
 	[JsonPropertyName("subscription_listing_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? SubscriptionListingId { get; init; }
 
 	/// <summary>
@@ -47,12 +44,12 @@ public record RoleTags {
 	/// </summary>
 	[JsonPropertyName("available_for_purchase")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public bool AvailableForPurchase => throw new NotImplementedException();
+	public bool? AvailableForPurchase => throw new NotImplementedException();
 
 	/// <summary>
 	/// Whether this role is a guild's linked role.
 	/// </summary>
 	[JsonPropertyName("guild_connections")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public bool GuildConnections => throw new NotImplementedException();
+	public bool? GuildConnections => throw new NotImplementedException();
 }

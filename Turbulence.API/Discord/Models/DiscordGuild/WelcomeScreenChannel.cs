@@ -15,7 +15,6 @@ public record WelcomeScreenChannel {
 	/// The channel's snowflake ID.
 	/// </summary>
 	[JsonPropertyName("channel_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake ChannelId { get; init; }
 
 	/// <summary>
@@ -29,7 +28,6 @@ public record WelcomeScreenChannel {
 	/// custom.
 	/// </summary>
 	[JsonPropertyName("emoji_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? EmojiId { get; init; }
 
 	/// <summary>

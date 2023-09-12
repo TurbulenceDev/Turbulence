@@ -11,7 +11,6 @@ public record DefaultReaction {
 	/// The ID of a guild's custom emoji.
 	/// </summary>
 	[JsonPropertyName("emoji_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? EmojiId { get; init; }
 
 	/// <summary>

@@ -155,16 +155,10 @@ public static class Converter
                 }
             }
 
-            var converter = "";
-            if (convertedType.StartsWith("Snowflake"))
-            {
-                converter = "\n\t[JsonConverter(typeof(SnowflakeConverter))]";
-            }
-            
             var newline = i != propertyValues.Count - 1 ? "\n" : "";
 
             record.AppendLine(
-                $"\t[JsonPropertyName(\"{cleanField}\")]{ignore}{converter}\n\tpublic {requiredStr}{convertedType} {prettyField} {{ get; init; }}{newline}");
+                $"\t[JsonPropertyName(\"{cleanField}\")]{ignore}\n\tpublic {requiredStr}{convertedType} {prettyField} {{ get; init; }}{newline}");
         }
 
         record.AppendLine("}");
@@ -363,7 +357,7 @@ public static class Converter
             "object" => "dynamic",
             "snowflake" => "Snowflake",
             "mixed" => "dynamic",
-            "ISO8601 timestamp" => "string",
+            "ISO8601 timestamp" => "DateTimeOffset",
             "array" => "dynamic",
             "dict" => "dynamic",
             "two integer" => "int",

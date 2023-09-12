@@ -17,7 +17,6 @@ public record MessageInteraction {
 	/// Snowflake ID of the interaction.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	// TODO: Enum

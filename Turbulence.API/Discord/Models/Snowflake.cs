@@ -1,5 +1,9 @@
+using System.Text.Json.Serialization;
+using Turbulence.API.Discord.JsonConverters;
+
 namespace Turbulence.API.Discord.Models;
 
+[JsonConverter(typeof(SnowflakeConverter))]
 public record Snowflake(ulong Id)
 {
     public DateTimeOffset Timestamp { get; init; } = GetTimestamp(Id);
@@ -11,4 +15,6 @@ public record Snowflake(ulong Id)
     {
         return DateTimeOffset.FromUnixTimeMilliseconds((long)((id >> 22) + DiscordEpoch));
     }
+
+    public override string ToString() => Id.ToString();
 }

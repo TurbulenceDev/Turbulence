@@ -35,7 +35,6 @@ public record GuildMember {
 	/// Array of <a href="https://discord.com/developers/docs/topics/permissions#role-object">role</a> object IDs.
 	/// </summary>
 	[JsonPropertyName("roles")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake[] Roles { get; init; }
 
 	/// <summary>
@@ -88,7 +87,6 @@ public record GuildMember {
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? Permissions { get; init; }
 
-	// TODO: Deserialize this ISO8601 string to something usable
 	/// <summary>
 	/// When the user's <a href="https://support.discord.com/hc/en-us/articles/4413305239191-Time-Out-FAQ">timeout</a>
 	/// will expire and the user will be able to communicate in the guild again, null or a time in the past if the user
@@ -96,5 +94,5 @@ public record GuildMember {
 	/// </summary>
 	[JsonPropertyName("communication_disabled_until")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public string? CommunicationDisabledUntil { get; init; }
+	public DateTimeOffset? CommunicationDisabledUntil { get; init; }
 }

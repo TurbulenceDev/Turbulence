@@ -14,7 +14,6 @@ public record Sticker {
 	/// <a href="https://discord.com/developers/docs/reference#image-formatting">ID of the sticker</a>.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>
@@ -22,7 +21,6 @@ public record Sticker {
 	/// </summary>
 	[JsonPropertyName("pack_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? PackId { get; init; }
 
 	/// <summary>
@@ -77,7 +75,6 @@ public record Sticker {
 	/// </summary>
 	[JsonPropertyName("guild_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? GuildId { get; init; }
 
 	/// <summary>

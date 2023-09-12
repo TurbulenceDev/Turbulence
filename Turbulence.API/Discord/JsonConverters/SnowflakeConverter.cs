@@ -11,7 +11,7 @@ public class SnowflakeConverter : JsonConverter<Snowflake>
         if (ulong.TryParse(reader.GetString(), out var id))
             return new Snowflake(id);
 
-        throw new JsonException($"Failed to convert {typeToConvert} to Snowflake");
+        throw new JsonException();
     }
 
     public override void Write(Utf8JsonWriter writer, Snowflake snowflake, JsonSerializerOptions _)

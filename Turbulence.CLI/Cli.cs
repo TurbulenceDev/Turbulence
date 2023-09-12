@@ -2,14 +2,16 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
+using Turbulence.API;
 using Turbulence.API.Discord;
-using Turbulence.API.Discord.Models;
 using Turbulence.API.Discord.Models.DiscordChannel;
 using Turbulence.API.Discord.Models.DiscordGateway;
 using Turbulence.API.Discord.Models.DiscordGatewayEvents;
+using Turbulence.API.Discord.Models.DiscordGuild;
 using Turbulence.API.Discord.Models.DiscordUser;
+using Turbulence.API.Extensions;
+using static Turbulence.API.Discord.Models.DiscordChannel.ChannelType;
+using static Turbulence.API.Discord.Models.DiscordGateway.GatewayOpcode;
 
 namespace Turbulence.CLI;
 
@@ -23,9 +25,11 @@ public class Cli
 
     // TODO: move these cached objects into 1. their own classes (more efficient than keeping json stuff around) 2. into the api
     public static User User = null!;
-    public static List<dynamic> MemberInfos = new(); // TODO: should we like put the roles into a simple array?
-    public static List<dynamic> Servers = new();
-    public static List<dynamic> ServerSettings = new(); // TODO: listen to the guild settings update event
+    //public static List<dynamic> MemberInfos = new(); // TODO: should we like put the roles into a simple array?
+    public static List<Guild> Guilds = new();
+    //public static List<dynamic> ServerSettings = new(); // TODO: listen to the guild settings update event
+
+    private static HttpClient _client = new();
 
     private static async Task Main()
     {
@@ -40,11 +44,8 @@ public class Cli
                 return;
             }
 
-            // Set up http client
-            var client = new HttpClient();
-
             // TODO: according to the docs this should be cached and only re-requested if the cached version doesnt exist/is not reachable
-            var gateway = await Api.GetGateway(client);
+            var gateway = await Api.GetGateway(_client);
 
             var ws = new ClientWebSocket();
             // TODO: implement zlib (de)compression
@@ -63,26 +64,33 @@ public class Cli
 
             //Console.WriteLine(token);
 
-            client.DefaultRequestHeaders.Add("Authorization", token);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
-
-            // Print some crap about the user
-            User = await Api.GetCurrentUser(client);
-            Console.WriteLine(User.Username);
+            _client.DefaultRequestHeaders.Add("Authorization", token);
+            _client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
 
             // Send identify
             GatewayPayload payload = new()
             {
-                Opcode = 2,
+                Opcode = IDENTIFY,
                 Data = JsonSerializer.SerializeToNode(new Identify
                 {
                     Token = token,
-                    Intents = 0b1111111111111111111111,
+                    Capabilities = 0b11111111111101,
                     Properties = new IdentifyConnectionProperties
                     {
-                        Os = "Windows",
+                        Os = "Linux",
                         Browser = "Firefox",
-                        Device = "",
+                        Device = string.Empty,
+                        SystemLocale = "en-US",
+                        BrowserUserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0",
+                        BrowserVersion = "116.0",
+                        OsVersion = "",
+                        Referrer = "",
+                        ReferringDomain = "",
+                        ReferrerCurrent = "",
+                        ReferringDomainCurrent = "",
+                        ReleaseChannel = "stable",
+                        ClientBuildNumber = 218051,
+                        ClientEventSource = null,
                     },
                     Presence = new GatewayPresenceUpdate()
                     {
@@ -91,7 +99,17 @@ public class Cli
                         Activities = Array.Empty<Activity>(),
                         Afk = false,
                     },
-                    Shard = null,
+                    Compress = false,
+                    ClientState = new ClientState
+                    {
+                        GuildVersions = new object(),
+                        HighestLastMessageId = "0",
+                        ReadStateVersion = 0,
+                        UserGuildSettingsVersion = -1,
+                        UserSettingsVersion = -1,
+                        PrivateChannelsVersion = "0",
+                        ApiCodeVersion = 0,
+                    },
                 }),
                 SequenceNumber = null,
                 EventName = null,
@@ -114,40 +132,29 @@ public class Cli
         Console.WriteLine("Finished?");
     }
 
-    private static bool IsMentioned(Message message)
+    private static async Task<bool> IsMentioned(Message message)
     {
-        Console.WriteLine(message.Author.Id.Timestamp);
-        Console.WriteLine(User.Id.Timestamp);
+        // Was everyone pinged?
+        if (message.MentionEveryone)
+            return true;
 
         // Were we directly pinged (this also handles replies)?
         if (message.Mentions.Any(m => m.Id == User.Id))
             return true;
         
         // Was our role pinged?
-        foreach (var mentionedRole in message.MentionRoles)
+        if (message.GuildId is not { } guildId)
         {
-            foreach (var info in MemberInfos)
-            {
-                // okay for some reason this shit contains list with objects. havent seen a list here having more than one object but idk what discord is planning
-                foreach (var obj in info)
-                {
-                    if (obj.user_id != User.Id)
-                        continue;
-
-                    foreach (var ownedRole in obj.roles)
-                    {
-                        if (ownedRole == mentionedRole)
-                            return true;
-                    }
-                }
-            }
+            // Not a guild
+            return false;
         }
 
-        return message.MentionEveryone;
+        var member = await Api.GetCurrentUserGuildMember(_client, guildId);
+        return member.Roles.Any(r => message.MentionRoles.Any(m => m.Id == r.Id));
     }
 
     // checks if a message should trigger a notification
-    private static bool ShouldNotify(Message message, bool mentioned)
+    private static async Task<bool> ShouldNotify(Message message, bool mentioned)
     {
         //flow:
         // msg comes in
@@ -160,37 +167,37 @@ public class Cli
         // each setting can contain guild wide settings and specific channel overrides
         //TODO: make message_notifications (0 = all, 1 = only mention, 2 = none, 3 = inherit server) into a enum
         //TODO: also check ignore @everyone/@here/roles if we disabled it; probably need a MentionType enum instead of a bool
-        foreach (var setting in ServerSettings)
-        {
-            // is server muted? no ping if not mentioned
-            // if (setting.guild_id == message.guild_id && setting.muted == true)
-            //     return mentioned; // mentions still go through mutes //TODO: can we set "ignore @everyone" here?
-
-            // check channel specific
-            foreach (var channelOverride in setting.channel_overrides)
-            {
-                if (channelOverride.channel_id == message.ChannelId)
-                {
-                    // channel muted
-                    if (channelOverride.muted == true)
-                        return false;
-
-                    var notification = channelOverride.message_notifications;
-                    if (notification == 3) //inherit from server
-                        notification = setting.message_notifications;
-
-                    return notification == 0 || // notify all
-                        (notification == 1 && mentioned); // only mention
-                }
-            }
-
-            // // then check server wide mute/notif settings
-            // if (setting.guild_id == message.guild_id)
-            // {
-            //     return setting.message_notifications == 0 || // notify all
-            //             (setting.message_notifications == 1 && mentioned); // only mention
-            // }
-        }
+        // foreach (var setting in ServerSettings)
+        // {
+        //     // is server muted? no ping if not mentioned
+        //     if (setting.guild_id == message.guild_id && setting.muted == true)
+        //         return mentioned; // mentions still go through mutes //TODO: can we set "ignore @everyone" here?
+        //
+        //     // check channel specific
+        //     foreach (var channelOverride in setting.channel_overrides)
+        //     {
+        //         if (channelOverride.channel_id == message.ChannelId)
+        //         {
+        //             // channel muted
+        //             if (channelOverride.muted == true)
+        //                 return false;
+        //
+        //             var notification = channelOverride.message_notifications;
+        //             if (notification == 3) //inherit from server
+        //                 notification = setting.message_notifications;
+        //
+        //             return notification == 0 || // notify all
+        //                 (notification == 1 && mentioned); // only mention
+        //         }
+        //     }
+        //
+        //     // then check server wide mute/notif settings
+        //     if (setting.guild_id == message.guild_id)
+        //     {
+        //         return setting.message_notifications == 0 || // notify all
+        //                 (setting.message_notifications == 1 && mentioned); // only mention
+        //     }
+        // }
 
         // if there is no entry/we are here, it should probably notify
         return true;
@@ -213,7 +220,7 @@ public class Cli
             //TODO: probably check if we got a ack (op 11) after the last heartbeat we sent. if not we "should" reconnect
             GatewayPayload heartBeat = new()
             {
-                Opcode = 1,
+                Opcode = HEARTBEAT,
                 Data = _lastSequence,
                 SequenceNumber = null,
                 EventName = null,
@@ -297,7 +304,7 @@ public class Cli
                     Console.WriteLine($"WS Receive: {msg.Opcode}");
                     switch (msg.Opcode)
                     {
-                        case 0:
+                        case DISPATCH:
                         {
                             _lastSequence = msg.SequenceNumber; // save the sequence for the next heartbeat (only set if op 0)
                             Console.WriteLine($"Name: {msg.EventName}, Sequence: {msg.SequenceNumber}");
@@ -311,13 +318,15 @@ public class Cli
                             switch (msg.EventName)
                             {
                                 case "MESSAGE_CREATE":
+                                    Console.WriteLine(msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+                                    
                                     if (msg.Data.Deserialize<Message>() is not { } message)
                                     {
                                         Console.WriteLine("Invalid message received on MESSAGE_CREATE");
                                         continue;
                                     }
-
-                                    var mentioned = IsMentioned(message);
+                                    
+                                    var mentioned = await IsMentioned(message);
                                     if (mentioned)
                                     {
                                         Console.ForegroundColor = ConsoleColor.Red;
@@ -325,7 +334,7 @@ public class Cli
                                         Console.ForegroundColor = ConsoleColor.White;
                                     }
                                     // check if we should get a notification
-                                    if (ShouldNotify(message, mentioned))
+                                    if (await ShouldNotify(message, mentioned))
                                     {
                                         Console.ForegroundColor = ConsoleColor.Yellow;
                                         Console.Write("[NOTIF] ");
@@ -336,34 +345,39 @@ public class Cli
                                     Console.WriteLine($"{message.Author.Username}: {message.Content}");
                                     Console.ForegroundColor = ConsoleColor.White;
                                     break;
-                                // case "READY":
-                                //     // Cache that shit //TODO: cache more/all. probably also need like private channels etc
-                                //     foreach (var guild in data.guilds)
-                                //         Servers.Add(guild);
-                                //     foreach (var guildSetting in data.user_guild_settings.entries)
-                                //         ServerSettings.Add(guildSetting);
-                                //     User = data.user;
-                                //     foreach (var member in data.merged_members)
-                                //         MemberInfos.Add(member);
-                                //
-                                //
-                                //     Console.WriteLine("READY");
-                                //     Console.WriteLine($"Current User: {User.username}#{User.discriminator}");
-                                //     Console.WriteLine("Servers:");
-                                //     foreach (var guild in Servers)
-                                //         Console.WriteLine($"-{guild.name} (ID: {guild.id})");
-                                //     break;
-                                // default:
-                                //     Console.WriteLine($"Data: {data}");
-                                //     break;
+                                case "READY":
+                                     if (msg.Data.Deserialize<Ready>() is not { } ready)
+                                     {
+                                         Console.WriteLine("READY event on MESSAGE_CREATE was null");
+                                         continue;
+                                     }
+                                     
+                                     // Cache that shit //TODO: cache more/all. probably also need like private channels etc
+                                     foreach (var guild in ready.Guilds)
+                                         Guilds.Add(guild);
+                                     // foreach (var guildSetting in ready.user_guild_settings.entries)
+                                     //     ServerSettings.Add(guildSetting);
+                                     User = ready.User;
+                                     // foreach (var member in ready.)
+                                     //     MemberInfos.Add(member);
+
+                                     Console.WriteLine("READY");
+                                     Console.WriteLine($"Current User: {User.GlobalName} ({User.Username})");
+                                     Console.WriteLine("Servers:");
+                                     foreach (var guild in Guilds)
+                                         Console.WriteLine($"-{guild.Name} (ID: {guild.Id})");
+                                     break;
+                                 default:
+                                     Console.WriteLine($"Data: {msg.Data.ToJsonString( new JsonSerializerOptions { WriteIndented = true })}");
+                                     break;
                             }
                             break;
                         }
-                        case 1: // Heartbeat Request
-                            // we should send a heartbeat now without waiting so we cancel the delay
+                        case HEARTBEAT:
+                            // We should send a heartbeat now without waiting so we cancel the delay
                             HeartbeatToken.Cancel();
                             break;
-                        case 10: // Gateway Hello
+                        case HELLO:
                             if (msg.Data.Deserialize<Hello>() is not { } hello)
                             {
                                 Console.WriteLine("Got Hello without heartbeat interval");

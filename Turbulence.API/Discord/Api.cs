@@ -1,7 +1,9 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using Turbulence.API.Discord.Models;
+using Turbulence.API.Discord.Models.DiscordChannel;
 using Turbulence.API.Discord.Models.DiscordGateway;
+using Turbulence.API.Discord.Models.DiscordGuild;
 using Turbulence.API.Discord.Models.DiscordUser;
 
 namespace Turbulence.API.Discord;
@@ -55,5 +57,21 @@ public static class Api
     public static async Task<User> GetCurrentUser(HttpClient client)
     {
         return await Get<User>(client, "/users/@me");
+    }
+    
+    // Implements https://discord.com/developers/docs/resources/user#get-current-user-guild-member
+    public static async Task<GuildMember> GetCurrentUserGuildMember(HttpClient client, ulong guildId)
+    {
+        return await Get<GuildMember>(client, $"/users/@me/guilds/{guildId}/member");
+    }
+
+    public static async Task<Channel> GetChannel(HttpClient client, ulong channelId)
+    {
+        return await Get<Channel>(client, $"/channels/{channelId}");
+    }
+
+    public static async Task<Guild> GetGuild(HttpClient client, Snowflake guildId)
+    {
+        return await Get<Guild>(client, $"/guilds/{guildId}");
     }
 }

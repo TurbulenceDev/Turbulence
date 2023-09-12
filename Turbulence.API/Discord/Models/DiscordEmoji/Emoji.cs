@@ -14,7 +14,6 @@ public record Emoji {
 	/// <a href="https://discord.com/developers/docs/reference#image-formatting">Emoji snowflake ID</a>.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? Id { get; init; }
 
 	/// <summary>

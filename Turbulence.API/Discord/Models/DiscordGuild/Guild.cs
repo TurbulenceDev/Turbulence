@@ -18,7 +18,6 @@ public record Guild {
 	/// Guild snowflake ID.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>
@@ -63,13 +62,13 @@ public record Guild {
 	/// endpoint and is relative to the requested user.
 	/// </summary>
 	[JsonPropertyName("owner")]
-	public required bool Owner { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public bool? Owner { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of owner.
 	/// </summary>
 	[JsonPropertyName("owner_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake OwnerId { get; init; }
 
 	/// <summary>
@@ -81,7 +80,8 @@ public record Guild {
 	/// endpoint and is relative to the requested user.
 	/// </summary>
 	[JsonPropertyName("permissions")]
-	public required string Permissions { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public string? Permissions { get; init; }
 
 	[Obsolete("Use Channel.RtcRegion instead")]
 	[JsonPropertyName("region")]
@@ -91,7 +91,6 @@ public record Guild {
 	/// Snowflake ID of AFK channel.
 	/// </summary>
 	[JsonPropertyName("afk_channel_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? AfkChannelId { get; init; }
 
 	/// <summary>
@@ -112,7 +111,6 @@ public record Guild {
 	/// </summary>
 	[JsonPropertyName("widget_channel_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? WidgetChannelId { get; init; }
 
 	// TODO: Make enum
@@ -171,14 +169,12 @@ public record Guild {
 	/// Application snowflake ID of the guild creator if it is bot-created.
 	/// </summary>
 	[JsonPropertyName("application_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? ApplicationId { get; init; }
 
 	/// <summary>
 	/// The snowflake ID of the channel where guild notices such as welcome messages and boost events are posted.
 	/// </summary>
 	[JsonPropertyName("system_channel_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? SystemChannelId { get; init; }
 
 	// TODO: Make enum
@@ -193,7 +189,6 @@ public record Guild {
 	/// The snowflake ID of the channel where Community guilds can display rules and/or guidelines.
 	/// </summary>
 	[JsonPropertyName("rules_channel_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? RulesChannelId { get; init; }
 
 	/// <summary>
@@ -255,7 +250,6 @@ public record Guild {
 	/// The snowflake ID of the channel where admins and moderators of Community guilds receive notices from Discord.
 	/// </summary>
 	[JsonPropertyName("public_updates_channel_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? PublicUpdatesChannelId { get; init; }
 
 	/// <summary>
@@ -321,6 +315,5 @@ public record Guild {
 	/// Discord.
 	/// </summary>
 	[JsonPropertyName("safety_alerts_channel_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake? SafetyAlertsChannelId { get; init; }
 }

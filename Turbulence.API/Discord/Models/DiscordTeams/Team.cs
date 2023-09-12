@@ -18,7 +18,6 @@ public record Team {
 	/// The unique snowflake ID of the team.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>
@@ -37,6 +36,5 @@ public record Team {
 	/// The user snowflake ID of the current team owner.
 	/// </summary>
 	[JsonPropertyName("owner_user_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake OwnerUserId { get; init; }
 }

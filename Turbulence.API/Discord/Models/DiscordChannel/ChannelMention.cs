@@ -14,14 +14,12 @@ public record ChannelMention {
 	/// Snowflake ID of the channel.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of the guild containing the channel.
 	/// </summary>
 	[JsonPropertyName("guild_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake GuildId { get; init; }
 
 	// TODO: Make enum

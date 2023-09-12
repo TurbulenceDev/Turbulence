@@ -13,7 +13,6 @@ public record Attachment {
 	/// Attachment snowflake ID.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>

@@ -16,7 +16,6 @@ public record Channel {
 	/// The snowflake ID of this channel.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>
@@ -24,14 +23,13 @@ public record Channel {
 	/// </a>.
 	/// </summary>
 	[JsonPropertyName("type")]
-	public required int Type { get; init; }
+	public required ChannelType Type { get; init; }
 
 	/// <summary>
 	/// The snowflake ID of the guild (may be missing for some channel objects received over gateway guild dispatches).
 	/// </summary>
 	[JsonPropertyName("guild_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? GuildId { get; init; }
 
 	/// <summary>
@@ -76,7 +74,6 @@ public record Channel {
 	/// </summary>
 	[JsonPropertyName("last_message_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? LastMessageId { get; init; }
 
 	/// <summary>
@@ -98,7 +95,8 @@ public record Channel {
 	/// permission <c>manage_messages</c> or <c>manage_channel</c>, are unaffected.
 	/// </summary>
 	[JsonPropertyName("rate_limit_per_user")]
-	public required int RateLimitPerUser { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public int? RateLimitPerUser { get; init; }
 
 	/// <summary>
 	/// The recipients of the DM.
@@ -119,7 +117,6 @@ public record Channel {
 	/// </summary>
 	[JsonPropertyName("owner_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? OwnerId { get; init; }
 
 	/// <summary>
@@ -127,7 +124,6 @@ public record Channel {
 	/// </summary>
 	[JsonPropertyName("application_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? ApplicationId { get; init; }
 
 	/// <summary>
@@ -143,7 +139,6 @@ public record Channel {
 	/// </summary>
 	[JsonPropertyName("parent_id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? ParentId { get; init; }
 
 	/// <summary>
@@ -175,7 +170,8 @@ public record Channel {
 	/// Number of messages (not including the initial message or deleted messages) in a thread.
 	/// </summary>
 	[JsonPropertyName("message_count")]
-	public required int MessageCount { get; init; }
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public int? MessageCount { get; init; }
 
 	/// <summary>
 	/// An approximate count of users in a thread, stops counting at 50.
@@ -245,7 +241,6 @@ public record Channel {
 	/// </summary>
 	[JsonPropertyName("applied_tags")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake[]? AppliedTags { get; init; }
 
 	/// <summary>
@@ -284,4 +279,77 @@ public record Channel {
 	[JsonPropertyName("default_forum_layout")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? DefaultForumLayout { get; init; }
+}
+
+/// <summary>
+/// See the <a href="https://discord.com/developers/docs/resources/channel#channel-object-channel-types">Discord API
+/// documentation.</a>
+/// </summary>
+public enum ChannelType
+{
+	/// <summary>
+	/// A text channel within a server.
+	/// </summary>
+	GUILD_TEXT = 0,
+
+	/// <summary>
+	/// A direct message between users.
+	/// </summary>
+	DM = 1,
+
+	/// <summary>
+	/// A voice channel within a server.
+	/// </summary>
+	GUILD_VOICE = 2,
+
+	/// <summary>
+	/// A direct message between multiple users.
+	/// </summary>
+	GROUP_DM = 3,
+
+	/// <summary>
+	/// An organizational category that contains up to 50 channels.
+	/// </summary>
+	GUILD_CATEGORY = 4,
+
+	/// <summary>
+	/// A channel that users can follow and crosspost into their own server (formerly news channels).
+	/// </summary>
+	GUILD_ANNOUNCEMENT = 5,
+
+	/// <summary>
+	/// A temporary sub-channel within a GUILD_ANNOUNCEMENT channel.
+	/// </summary>
+	ANNOUNCEMENT_THREAD = 10,
+
+	/// <summary>
+	/// A temporary sub-channel within a GUILD_TEXT or GUILD_FORUM channel.
+	/// </summary>
+	PUBLIC_THREAD = 11,
+
+	/// <summary>
+	/// A temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the
+	/// MANAGE_THREADS permission.
+	/// </summary>
+	PRIVATE_THREAD = 12,
+
+	/// <summary>
+	/// A voice channel for hosting events with an audience.
+	/// </summary>
+	GUILD_STAGE_VOICE = 13,
+
+	/// <summary>
+	/// The channel in a hub containing the listed servers.
+	/// </summary>
+	GUILD_DIRECTORY = 14,
+
+	/// <summary>
+	/// Channel that can only contain threads.
+	/// </summary>
+	GUILD_FORUM = 15,
+
+	/// <summary>
+	/// Channel that can only contain threads, similar to GUILD_FORUM channels.
+	/// </summary>
+	GUILD_MEDIA = 16,
 }

@@ -14,7 +14,6 @@ public record StickerItem {
 	/// Snowflake ID of the sticker.
 	/// </summary>
 	[JsonPropertyName("id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake Id { get; init; }
 
 	/// <summary>

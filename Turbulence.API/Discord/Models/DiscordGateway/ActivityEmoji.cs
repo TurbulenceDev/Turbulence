@@ -21,7 +21,6 @@ public record ActivityEmoji {
 	/// </summary>
 	[JsonPropertyName("id")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public Snowflake? Id { get; init; }
 
 	/// <summary>

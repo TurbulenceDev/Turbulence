@@ -28,7 +28,6 @@ public record TeamMember {
 	/// The snowflake ID of the parent team of which they are a member.
 	/// </summary>
 	[JsonPropertyName("team_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake TeamId { get; init; }
 
 	/// <summary>

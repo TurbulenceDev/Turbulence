@@ -14,7 +14,6 @@ public record RoleSubscriptionData {
 	/// The snowflake ID of the SKU and listing that the user is subscribed to.
 	/// </summary>
 	[JsonPropertyName("role_subscription_listing_id")]
-	[JsonConverter(typeof(SnowflakeConverter))]
 	public required Snowflake RoleSubscriptionListingId { get; init; }
 
 	/// <summary>
