@@ -2,15 +2,12 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using Turbulence.API;
 using Turbulence.API.Discord;
 using Turbulence.API.Discord.Models.DiscordChannel;
 using Turbulence.API.Discord.Models.DiscordGateway;
 using Turbulence.API.Discord.Models.DiscordGatewayEvents;
 using Turbulence.API.Discord.Models.DiscordGuild;
 using Turbulence.API.Discord.Models.DiscordUser;
-using Turbulence.API.Extensions;
-using static Turbulence.API.Discord.Models.DiscordChannel.ChannelType;
 using static Turbulence.API.Discord.Models.DiscordGateway.GatewayOpcode;
 
 namespace Turbulence.CLI;
@@ -21,7 +18,7 @@ public class Cli
     private static int? _lastSequence;
     private static readonly CancellationTokenSource HeartbeatToken = new();
 
-    private const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0";
+    private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
 
     // TODO: move these cached objects into 1. their own classes (more efficient than keeping json stuff around) 2. into the api
     public static User User = null!;
@@ -74,14 +71,14 @@ public class Cli
                 Data = JsonSerializer.SerializeToNode(new Identify
                 {
                     Token = token,
-                    Capabilities = 0b11111111111101,
+                    Capabilities = 4605,
                     Properties = new IdentifyConnectionProperties
                     {
                         Os = "Linux",
                         Browser = "Firefox",
                         Device = string.Empty,
                         SystemLocale = "en-US",
-                        BrowserUserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0",
+                        BrowserUserAgent = UserAgent,
                         BrowserVersion = "116.0",
                         OsVersion = "",
                         Referrer = "",
@@ -89,8 +86,8 @@ public class Cli
                         ReferrerCurrent = "",
                         ReferringDomainCurrent = "",
                         ReleaseChannel = "stable",
-                        ClientBuildNumber = 218051,
-                        ClientEventSource = null,
+                        ClientBuildNumber = 226944, //TODO: dynamically get this
+                        ClientEventSource = string.Empty,
                     },
                     Presence = new GatewayPresenceUpdate()
                     {
