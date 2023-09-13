@@ -15,9 +15,16 @@ namespace Turbulence.TGUI
         private List<string> CurrentMessages = new();
         //TODO: move that class into .Core instead of relying on CLI here :weary:
 
+        // Additional components
+        private ScrollBarView messageScrollbar;
+
         public Main()
         {
             InitializeComponent();
+            // Set component stuff
+            messageScrollbar = new ScrollBarView(messages, true);
+            messages.SetSource(CurrentMessages);
+            statusMenu.Title = "Not connected";
             // Hook up events
             /// menu bar
             var file = menuBar.Menus[0];
@@ -29,7 +36,32 @@ namespace Turbulence.TGUI
             /// server view
             serverTree.SelectionChanged += ServerTree_SelectionChanged;
             /// messages
-            messages.SetSource(CurrentMessages);
+            //// Draw scrollbar on
+            messages.DrawContent += (e) => {
+                messageScrollbar.Size = messages.Source.Count;
+                messageScrollbar.Position = messages.TopItem;
+                messageScrollbar.OtherScrollBarView.Size = messages.Maxlength;
+                messageScrollbar.OtherScrollBarView.Position = messages.LeftItem;
+                messageScrollbar.Refresh();
+            };
+            //// Vertical set
+            messageScrollbar.ChangedPosition += () => {
+                messages.TopItem = messageScrollbar.Position;
+                if (messages.TopItem != messageScrollbar.Position)
+                {
+                    messageScrollbar.Position = messages.TopItem;
+                }
+                messages.SetNeedsDisplay();
+            };
+            //// Horizontal set
+            messageScrollbar.OtherScrollBarView.ChangedPosition += () => {
+                messages.LeftItem = messageScrollbar.OtherScrollBarView.Position;
+                if (messages.LeftItem != messageScrollbar.OtherScrollBarView.Position)
+                {
+                    messageScrollbar.OtherScrollBarView.Position = messages.LeftItem;
+                }
+                messages.SetNeedsDisplay();
+            };
 
             // Get Token
             var config = new ConfigurationManager().AddUserSecrets<Main>().Build();
@@ -64,7 +96,8 @@ namespace Turbulence.TGUI
                 // add message
                 CurrentMessages.Add($"{msg.Author.Username}: {msg.Content}");
                 // refresh view
-                messages.SetNeedsDisplay();
+                //messages.SetNeedsDisplay();
+                messages.ScrollDown(1);
             }
         }
 
@@ -79,8 +112,8 @@ namespace Turbulence.TGUI
                 return; //TODO: user feedback?
 
             // send
-            await Discord.SendMessage(channel, content.ToString()!);
             textInput.Text = string.Empty;
+            await Discord.SendMessage(channel, content.ToString()!);
             //TODO: refresh messages?
         }
 
@@ -102,9 +135,9 @@ namespace Turbulence.TGUI
                     {
                         CurrentMessages.Add($"{msg.Author.Username}: {msg.Content}");
                     }
-                    //redraw
-                    messages.SetNeedsDisplay();
-                    //TODO: scroll down to the bottom
+                    // scroll down to the bottom (also refreshes)
+                    messages.SelectedItem = CurrentMessages.Count - 1; // else mouse scrolling will start at the beginning
+                    messages.ScrollDown(CurrentMessages.Count);
                 }
                 return;
             }
@@ -149,6 +182,8 @@ namespace Turbulence.TGUI
                 }
                 serverTree.AddObject(serverNode);
             }
+            // redraw
+            serverTree.SetNeedsDisplay();
         }
     }
 }

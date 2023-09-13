@@ -114,14 +114,14 @@ namespace Turbulence.TGUI {
             this.messageView.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.messageView.Title = "Messages";
             this.Add(this.messageView);
-            this.messages.Width = Dim.Fill(0);
+            this.messages.Width = Dim.Fill(1);
             this.messages.Height = Dim.Fill(0);
             this.messages.X = 0;
             this.messages.Y = 0;
             this.messages.Visible = true;
             this.messages.Data = "messages";
             this.messages.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.messages.Source = new Terminal.Gui.ListWrapper(new string[] {});
+            this.messages.Source = new Terminal.Gui.ListWrapper(new string[0]);
             this.messages.AllowsMarking = false;
             this.messages.AllowsMultipleSelection = false;
             this.messageView.Add(this.messages);
@@ -138,7 +138,7 @@ namespace Turbulence.TGUI {
             this.textInputView.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.textInputView.Title = "Write Message";
             this.Add(this.textInputView);
-            this.textInput.Width = Dim.Fill(9);
+            this.textInput.Width = Dim.Fill(10);
             this.textInput.Height = 1;
             this.textInput.X = 0;
             this.textInput.Y = 0;
@@ -148,9 +148,9 @@ namespace Turbulence.TGUI {
             this.textInput.Text = "";
             this.textInput.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.textInputView.Add(this.textInput);
-            this.sendButton.Width = 8;
+            this.sendButton.Width = 9;
             this.sendButton.Height = 1;
-            this.sendButton.X = 83;
+            this.sendButton.X = 81;
             this.sendButton.Y = 0;
             this.sendButton.Visible = true;
             this.sendButton.Data = "sendButton";
@@ -180,9 +180,8 @@ namespace Turbulence.TGUI {
             this.discordMenu.Children = new Terminal.Gui.MenuItem[] {
                     this.setTokenMenuItem};
             this.statusMenu = new Terminal.Gui.MenuBarItem();
-            this.statusMenu.Title = "Not Connected";
+            this.statusMenu.Title = "Status";
             this.statusMenu.Children = new Terminal.Gui.MenuItem[0];
-            this.statusMenu.Data = "statusMenu";
             this.menuBar.Menus = new Terminal.Gui.MenuBarItem[] {
                     this.fileMenu,
                     this.discordMenu,
