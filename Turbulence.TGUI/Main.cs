@@ -107,8 +107,10 @@ namespace Turbulence.TGUI
                 foreach (var channel in ordered)
                 {
                     // create the node
-                    var channelNode = new TreeNode(channel.Name);
-                    channelNode.Tag = new ChannelNode(channel.Id, channel.Name, channel.Type);
+                    var channelNode = new TreeNode(channel.Name)
+                    {
+                        Tag = new ChannelNode(channel.Id, channel.Name, channel.Type)
+                    };
                     // now add to server or parent channel
                     if (channel.ParentId == null) // add to root
                     {

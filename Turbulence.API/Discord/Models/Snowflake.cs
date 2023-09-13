@@ -17,15 +17,15 @@ public record Snowflake(ulong Id)
     }
 
     private static ulong Counter = 0;
-    // https://github.com/uowuo/abaddon/blob/master/src/discord/snowflake.cpp#L29
-    //TODO: figure out whereever this comes from
-    public static Snowflake FromNow()
+    // https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right
+    public static Snowflake Now()
     {
         var now = DateTimeOffset.UtcNow;
         var millis = (ulong)now.ToUnixTimeMilliseconds();
         var epoch = millis - DiscordEpoch;
-        ulong snowflake = epoch << 22;
-        snowflake |= Counter++ % 4096;
+        var snowflake = epoch << 22;
+        // could also add the worker and process ids here
+        snowflake |= Counter++ % 4096; // add the increment
         return new Snowflake(snowflake);
     }
 
