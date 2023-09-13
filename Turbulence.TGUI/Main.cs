@@ -12,6 +12,7 @@ namespace Turbulence.TGUI
     {
         public Discord Discord;
         private ulong currentChannel = 0;
+        private List<string> CurrentMessages = new();
         //TODO: move that class into .Core instead of relying on CLI here :weary:
 
         public Main()
@@ -27,7 +28,8 @@ namespace Turbulence.TGUI
             sendButton.Clicked += () => SendMessage();
             /// server view
             serverTree.SelectionChanged += ServerTree_SelectionChanged;
-            //TODO: use something other than a textfield for messages
+            /// messages
+            messages.SetSource(CurrentMessages);
 
             // Get Token
             var config = new ConfigurationManager().AddUserSecrets<Main>().Build();
@@ -41,6 +43,7 @@ namespace Turbulence.TGUI
             Discord = new(token);
             // Hook events
             Discord.OnReadyEvent += Discord_OnReadyEvent;
+            Discord.OnMessageCreate += Discord_OnMessageCreate;
             Task.Run(Discord.Start);
             statusMenu.Title = "Connecting...";
         }
@@ -50,6 +53,19 @@ namespace Turbulence.TGUI
             var ready = e.Data;
             statusMenu.Title = "Connected";
             SetServers(ready.Guilds);
+        }
+
+        private void Discord_OnMessageCreate(object? sender, Event<Message> e)
+        {
+            var msg = e.Data;
+            if (msg.ChannelId == currentChannel)
+            {
+                //TODO: move this into a function?
+                // add message
+                CurrentMessages.Add($"{msg.Author.Username}: {msg.Content}");
+                // refresh view
+                messages.SetNeedsDisplay();
+            }
         }
 
         public async void SendMessage()
@@ -81,7 +97,13 @@ namespace Turbulence.TGUI
                     currentChannel = node.ID;
                     messageView.Title = $"Messages: {node.Name}";
                     var msgs = await Discord.GetMessages(node.ID);
-                    messages.Text = string.Join("\n", msgs.Reverse().Select(m => $"{m.Author.Username}: {m.Content}"));
+                    CurrentMessages.Clear();
+                    foreach (var msg in msgs.Reverse())
+                    {
+                        CurrentMessages.Add($"{msg.Author.Username}: {msg.Content}");
+                    }
+                    //redraw
+                    messages.SetNeedsDisplay();
                     //TODO: scroll down to the bottom
                 }
                 return;

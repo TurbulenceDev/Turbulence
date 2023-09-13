@@ -16,7 +16,6 @@ namespace Turbulence.TGUI {
     public partial class Main : Terminal.Gui.Window {
         
         private Terminal.Gui.ColorScheme tgDefault;
-       
         
         private Terminal.Gui.FrameView serverView;
         
@@ -24,7 +23,7 @@ namespace Turbulence.TGUI {
         
         private Terminal.Gui.FrameView messageView;
         
-        private Terminal.Gui.TextView messages;
+        private Terminal.Gui.ListView messages;
         
         private Terminal.Gui.FrameView textInputView;
         
@@ -42,14 +41,14 @@ namespace Turbulence.TGUI {
         
         private Terminal.Gui.MenuItem setTokenMenuItem;
         
-        private Terminal.Gui.MenuBarItem statusMenu; 
+        private Terminal.Gui.MenuBarItem statusMenu;
         
         private void InitializeComponent() {
             this.menuBar = new Terminal.Gui.MenuBar();
             this.sendButton = new Terminal.Gui.Button();
             this.textInput = new Terminal.Gui.TextField();
             this.textInputView = new Terminal.Gui.FrameView();
-            this.messages = new Terminal.Gui.TextView();
+            this.messages = new Terminal.Gui.ListView();
             this.messageView = new Terminal.Gui.FrameView();
             this.serverTree = new Terminal.Gui.TreeView();
             this.serverView = new Terminal.Gui.FrameView();
@@ -120,13 +119,11 @@ namespace Turbulence.TGUI {
             this.messages.X = 0;
             this.messages.Y = 0;
             this.messages.Visible = true;
-            this.messages.ColorScheme = this.tgDefault;
-            this.messages.AllowsTab = true;
-            this.messages.AllowsReturn = true;
-            this.messages.WordWrap = false;
             this.messages.Data = "messages";
-            this.messages.Text = "";
             this.messages.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.messages.Source = new Terminal.Gui.ListWrapper(new string[] {});
+            this.messages.AllowsMarking = false;
+            this.messages.AllowsMultipleSelection = false;
             this.messageView.Add(this.messages);
             this.textInputView.Width = 93;
             this.textInputView.Height = 3;
@@ -184,6 +181,8 @@ namespace Turbulence.TGUI {
                     this.setTokenMenuItem};
             this.statusMenu = new Terminal.Gui.MenuBarItem();
             this.statusMenu.Title = "Not Connected";
+            this.statusMenu.Children = new Terminal.Gui.MenuItem[0];
+            this.statusMenu.Data = "statusMenu";
             this.menuBar.Menus = new Terminal.Gui.MenuBarItem[] {
                     this.fileMenu,
                     this.discordMenu,
