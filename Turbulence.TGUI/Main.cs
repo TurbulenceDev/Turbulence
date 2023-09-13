@@ -1,10 +1,13 @@
 using Microsoft.Extensions.Configuration;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
+using Turbulence.API.Discord.Models;
 using Turbulence.API.Discord.Models.DiscordChannel;
 using Turbulence.API.Discord.Models.DiscordGateway;
 using Turbulence.API.Discord.Models.DiscordGuild;
+using Turbulence.API.Discord.Models.DiscordUser;
 using Turbulence.CLI;
+using Channel = Turbulence.API.Discord.Models.DiscordChannel.Channel;
 
 namespace Turbulence.TGUI
 {
@@ -84,19 +87,19 @@ namespace Turbulence.TGUI
         {
             var ready = e.Data;
             statusMenu.Title = "Connected";
-            SetServers(ready.Guilds);
+            SetServers(ready.PrivateChannels, ready.Users, ready.Guilds);
         }
 
         private void Discord_OnMessageCreate(object? sender, Event<Message> e)
         {
+            //TODO: this isnt called when sending a dm
             var msg = e.Data;
             if (msg.ChannelId == currentChannel)
             {
                 //TODO: move this into a function?
                 // add message
                 CurrentMessages.Add($"{msg.Author.Username}: {msg.Content}");
-                // refresh view
-                //messages.SetNeedsDisplay();
+                // scroll down 1 message
                 messages.ScrollDown(1);
             }
         }
@@ -124,8 +127,8 @@ namespace Turbulence.TGUI
 
             if (e.NewValue.Tag is ChannelNode node)
             {
-                // channel
-                if (node.Type == ChannelType.GUILD_TEXT)
+                // channel or dm
+                if (node.Type == ChannelType.GUILD_TEXT || node.Type == ChannelType.DM || node.Type == ChannelType.GROUP_DM)
                 {
                     currentChannel = node.ID;
                     messageView.Title = $"Messages: {node.Name}";
@@ -146,10 +149,34 @@ namespace Turbulence.TGUI
             throw new Exception("we shouldnt be here");
         }
 
-        public void SetServers(Guild[] servers)
+        public void SetServers(Channel[] privateChannels, User[] users, Guild[] servers)
         {
             //TODO: use a treebuilder
             serverTree.ClearObjects();
+            // first add the private channels
+            var dmNode = new TreeNode("DMs")
+            {
+                Tag = new ServerNode(new(0))
+            };
+            // build a user id 2 name dict
+            Dictionary<Snowflake, string> userNames = new();
+            foreach (var user in users)
+            {
+                userNames.Add(user.Id, user.Username);
+            }
+            //TODO: sort by last message timestamp?
+            foreach (var dm in privateChannels)
+            {
+                // get the channel name by getting the name of the recipients (or the id if the lookup fails)
+                var name = string.Join(", ", dm.RecipientIDs!.Select(r => userNames.ContainsKey(r) ? userNames[r].ToString() : r.ToString()));
+                var channelNode = new TreeNode(name)
+                {
+                    Tag = new ChannelNode(dm.Id, name, dm.Type)
+                };
+                dmNode.Children.Add(channelNode);
+            }
+            serverTree.AddObject(dmNode);
+            // then add the remaining servers
             foreach (var server in servers)
             {
                 var serverNode = new TreeNode(server.Name)

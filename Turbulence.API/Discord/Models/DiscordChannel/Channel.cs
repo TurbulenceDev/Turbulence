@@ -279,6 +279,10 @@ public record Channel {
 	[JsonPropertyName("default_forum_layout")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? DefaultForumLayout { get; init; }
+
+    [JsonPropertyName("recipient_ids")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Snowflake[]? RecipientIDs { get; init; }
 }
 
 /// <summary>

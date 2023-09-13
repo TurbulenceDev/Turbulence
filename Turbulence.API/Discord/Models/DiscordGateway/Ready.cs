@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Turbulence.API.Discord.Models.DiscordApplication;
+using Turbulence.API.Discord.Models.DiscordChannel;
 using Turbulence.API.Discord.Models.DiscordGuild;
 using Turbulence.API.Discord.Models.DiscordUser;
 
@@ -64,4 +65,10 @@ public record Ready {
 	[JsonPropertyName("application")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Application? Application { get; init; }
+
+    [JsonPropertyName("private_channels")]
+    public required Channel[] PrivateChannels { get; init; }
+
+    [JsonPropertyName("users")]
+    public required User[] Users { get; init; }
 }
