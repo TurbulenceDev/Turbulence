@@ -16,5 +16,18 @@ public record Snowflake(ulong Id)
         return DateTimeOffset.FromUnixTimeMilliseconds((long)((id >> 22) + DiscordEpoch));
     }
 
+    private static ulong Counter = 0;
+    // https://github.com/uowuo/abaddon/blob/master/src/discord/snowflake.cpp#L29
+    //TODO: figure out whereever this comes from
+    public static Snowflake FromNow()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var millis = (ulong)now.ToUnixTimeMilliseconds();
+        var epoch = millis - DiscordEpoch;
+        ulong snowflake = epoch << 22;
+        snowflake |= Counter++ % 4096;
+        return new Snowflake(snowflake);
+    }
+
     public override string ToString() => Id.ToString();
 }

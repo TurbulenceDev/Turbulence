@@ -430,5 +430,10 @@ namespace Turbulence.CLI
         {
             return await Api.GetGuildChannels(HttpClient, guild);
         }
+
+        public async Task<Message> SendMessage(ulong channelID, string content)
+        {
+            return await Api.CreateMessage(HttpClient, channelID, content);
+        }
     }
 }

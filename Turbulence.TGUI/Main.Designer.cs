@@ -159,7 +159,7 @@ namespace Turbulence.TGUI {
             this.sendButton.Data = "sendButton";
             this.sendButton.Text = "Send";
             this.sendButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.sendButton.IsDefault = false;
+            this.sendButton.IsDefault = true;
             this.textInputView.Add(this.sendButton);
             this.menuBar.Width = Dim.Fill(0);
             this.menuBar.Height = 1;

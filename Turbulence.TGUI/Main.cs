@@ -11,6 +11,7 @@ namespace Turbulence.TGUI
     public partial class Main
     {
         public Discord Discord;
+        private ulong currentChannel = 0;
         //TODO: move that class into .Core instead of relying on CLI here :weary:
 
         public Main()
@@ -51,13 +52,20 @@ namespace Turbulence.TGUI
             SetServers(ready.Guilds);
         }
 
-        public void SendMessage()
+        public async void SendMessage()
         {
             var content = textInput.Text;
             if (content.IsEmpty)
                 return;
 
-            //TODO: send
+            var channel = currentChannel;
+            if (channel == 0)
+                return; //TODO: user feedback?
+
+            // send
+            await Discord.SendMessage(channel, content.ToString()!);
+            textInput.Text = string.Empty;
+            //TODO: refresh messages?
         }
 
         private async void ServerTree_SelectionChanged(object? sender, SelectionChangedEventArgs<ITreeNode> e)
@@ -70,6 +78,7 @@ namespace Turbulence.TGUI
                 // channel
                 if (node.Type == ChannelType.GUILD_TEXT)
                 {
+                    currentChannel = node.ID;
                     messageView.Title = $"Messages: {node.Name}";
                     var msgs = await Discord.GetMessages(node.ID);
                     messages.Text = string.Join("\n", msgs.Reverse().Select(m => $"{m.Author.Username}: {m.Content}"));
