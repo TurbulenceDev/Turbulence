@@ -7,67 +7,82 @@ using Turbulence.API.Discord.Models.DiscordGateway;
 using Turbulence.API.Discord.Models.DiscordGuild;
 using Turbulence.API.Discord.Models.DiscordUser;
 using Turbulence.CLI;
+using Turbulence.TGUI.Views;
 using Channel = Turbulence.API.Discord.Models.DiscordChannel.Channel;
 
 namespace Turbulence.TGUI;
 
-public partial class TurbulenceWindow : Window
+public sealed class TurbulenceWindow : Window
 {
     private readonly Discord _discord;
     private ulong _currentChannel = 0;
     private readonly List<string> _currentMessages = new();
     // TODO: move that class into .Core instead of relying on CLI here :weary:
 
+    private readonly MenuBarView _menuBar = new();
+    private readonly TextInputView _textInput = new();
+    private readonly MessagesView _messages = new();
+    private readonly ServerView _serverView = new();
+
     // Additional components
     private readonly ScrollBarView _messageScrollbar;
 
     public TurbulenceWindow()
     {
-        InitializeComponent();
+        Title = "Turbulence";
+        Border.BorderStyle = BorderStyle.Rounded;
+        Width = Dim.Fill();
+        Height = Dim.Fill();
+
+        Add(_menuBar);
+        Add(_textInput);
+        Add(_messages);
+        Add(_serverView);
+
         // Set component stuff
-        _messageScrollbar = new ScrollBarView(messages, true);
-        messages.SetSource(_currentMessages);
-        statusMenu.Title = "Not connected";
+        _messageScrollbar = new ScrollBarView(_messages.Messages, true);
+        _messages.Messages.SetSource(_currentMessages);
+        _menuBar.StatusMenu.Title = "Not connected";
         
         // Hook up events
         // menu bar
-        var file = menuBar.Menus[0];
+        var file = _menuBar.Menus[0];
         file.Children[0].Action = () => Application.RequestStop();
-        var discord = menuBar.Menus[1];
+        var discord = _menuBar.Menus[1];
         
         // TODO: set token
         // text input
-        sendButton.Clicked += SendMessage;
+        _textInput.SendButton.Clicked += SendMessage;
         
         // server view
-        serverTree.SelectionChanged += ServerTree_SelectionChanged;
+        _serverView.ServerTree.SelectionChanged += ServerTree_SelectionChanged;
         
         // messages
         // Draw scrollbar on
-        messages.DrawContent += (e) => {
-            _messageScrollbar.Size = messages.Source.Count;
-            _messageScrollbar.Position = messages.TopItem;
-            _messageScrollbar.OtherScrollBarView.Size = messages.Maxlength;
-            _messageScrollbar.OtherScrollBarView.Position = messages.LeftItem;
+        _messages.Messages.DrawContent += (e) => {
+            _messageScrollbar.Size = _messages.Messages.Source.Count;
+            _messageScrollbar.Position = _messages.Messages.TopItem;
+            _messageScrollbar.OtherScrollBarView.Size = _messages.Messages.Maxlength;
+            _messageScrollbar.OtherScrollBarView.Position = _messages.Messages.LeftItem;
             _messageScrollbar.Refresh();
         };
         // Vertical set
         _messageScrollbar.ChangedPosition += () => {
-            messages.TopItem = _messageScrollbar.Position;
-            if (messages.TopItem != _messageScrollbar.Position)
+            _messages.Messages.TopItem = _messageScrollbar.Position;
+            if (_messages.Messages.TopItem != _messageScrollbar.Position)
             {
-                _messageScrollbar.Position = messages.TopItem;
+                _messageScrollbar.Position = _messages.Messages.TopItem;
             }
-            messages.SetNeedsDisplay();
+            _messages.Messages.SetNeedsDisplay();
         };
         // Horizontal set
         _messageScrollbar.OtherScrollBarView.ChangedPosition += () => {
-            messages.LeftItem = _messageScrollbar.OtherScrollBarView.Position;
-            if (messages.LeftItem != _messageScrollbar.OtherScrollBarView.Position)
+            _messages.Messages.LeftItem = _messageScrollbar.OtherScrollBarView.Position;
+            if (_messages.Messages.LeftItem != _messageScrollbar.OtherScrollBarView.Position)
             {
-                _messageScrollbar.OtherScrollBarView.Position = messages.LeftItem;
+                _messageScrollbar.OtherScrollBarView.Position = _messages.Messages.LeftItem;
             }
-            messages.SetNeedsDisplay();
+            _messages.Messages.SetNeedsDisplay();
         };
 
         // Get Token
@@ -84,13 +99,13 @@ public partial class TurbulenceWindow : Window
         Discord.OnReadyEvent += Discord_OnReadyEvent;
         Discord.OnMessageCreate += Discord_OnMessageCreate;
         Task.Run(_discord.Start);
-        statusMenu.Title = "Connecting...";
+        _menuBar.StatusMenu.Title = "Connecting...";
     }
 
     private void Discord_OnReadyEvent(object? sender, Event<Ready> e)
     {
         var ready = e.Data;
-        statusMenu.Title = "Connected";
+        _menuBar.StatusMenu.Title = "Connected";
         SetServers(ready.PrivateChannels, ready.Users, ready.Guilds);
     }
 
@@ -104,13 +119,13 @@ public partial class TurbulenceWindow : Window
             // add message
             _currentMessages.Add($"{msg.Author.Username}: {msg.Content}");
             // scroll down 1 message
-            messages.ScrollDown(1);
+            _messages.Messages.ScrollDown(1);
         }
     }
 
     public async void SendMessage()
     {
-        var content = textInput.Text;
+        var content = _textInput.TextInput.Text;
         if (content.IsEmpty)
             return;
 
@@ -119,7 +134,7 @@ public partial class TurbulenceWindow : Window
             return; // TODO: user feedback?
 
         // send
-        textInput.Text = string.Empty;
+        _textInput.TextInput.Text = string.Empty;
         await _discord.SendMessage(channel, content.ToString()!);
         // TODO: refresh messages?
     }
@@ -135,7 +150,7 @@ public partial class TurbulenceWindow : Window
             if (node.Type == ChannelType.GUILD_TEXT || node.Type == ChannelType.DM || node.Type == ChannelType.GROUP_DM)
             {
                 _currentChannel = node.Id;
-                messageView.Title = $"Messages: {node.Name}";
+                _messages.Title = $"Messages: {node.Name}";
                 var msgs = await _discord.GetMessages(node.Id);
                 _currentMessages.Clear();
                 foreach (var msg in msgs.Reverse())
@@ -143,8 +158,8 @@ public partial class TurbulenceWindow : Window
                     _currentMessages.Add($"{msg.Author.Username}: {msg.Content}");
                 }
                 // scroll down to the bottom (also refreshes)
-                messages.SelectedItem = _currentMessages.Count - 1; // else mouse scrolling will start at the beginning
-                messages.ScrollDown(_currentMessages.Count);
+                _messages.Messages.SelectedItem = _currentMessages.Count - 1; // else mouse scrolling will start at the beginning
+                _messages.Messages.ScrollDown(_currentMessages.Count);
             }
             return;
         }
@@ -156,7 +171,7 @@ public partial class TurbulenceWindow : Window
     public void SetServers(Channel[] privateChannels, User[] users, Guild[] servers)
     {
         // TODO: use a treebuilder
-        serverTree.ClearObjects();
+        _serverView.ServerTree.ClearObjects();
         // first add the private channels
         var dmNode = new TreeNode("DMs")
         {
@@ -179,7 +194,7 @@ public partial class TurbulenceWindow : Window
             };
             dmNode.Children.Add(channelNode);
         }
-        serverTree.AddObject(dmNode);
+        _serverView.ServerTree.AddObject(dmNode);
         // then add the remaining servers
         foreach (var server in servers)
         {
@@ -211,9 +226,9 @@ public partial class TurbulenceWindow : Window
                         throw new Exception($"Parent channel {channel.ParentId} not found");
                 }
             }
-            serverTree.AddObject(serverNode);
+            _serverView.ServerTree.AddObject(serverNode);
         }
         // redraw
-        serverTree.SetNeedsDisplay();
+        _serverView.ServerTree.SetNeedsDisplay();
     }
 }
