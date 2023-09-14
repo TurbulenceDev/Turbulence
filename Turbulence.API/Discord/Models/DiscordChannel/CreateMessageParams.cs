@@ -39,7 +39,7 @@ public record CreateMessageParams {
 	/// </summary>
 	/*[JsonPropertyName("allowed_mentions")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public AllowedMentions? AllowedMentions { get; init; }*/ //TODO: allowed mentions
+	public AllowedMentions? AllowedMentions { get; init; }*/ // TODO: allowed mentions
 
 	/// <summary>
 	/// Include to make your message a reply.
@@ -53,7 +53,7 @@ public record CreateMessageParams {
 	/// </summary>
 	/*[JsonPropertyName("components")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public MessageComponent[]? Components { get; init; }*/ //TODO: message components
+	public MessageComponent[]? Components { get; init; }*/ // TODO: message components
 
 	/// <summary>
 	/// IDs of up to 3 <a href="https://discord.com/developers/docs/resources/sticker#sticker-object">stickers</a> in the server to send in the message.
