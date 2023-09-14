@@ -23,7 +23,7 @@ namespace Turbulence.CLI
 
     public class Discord
     {
-        //TODO: should this class contain the token?
+        // TODO: should this class contain the token?
         private string Token;
         // Events
         public static event EventHandler<Event<Ready>>? OnReadyEvent;
@@ -45,7 +45,7 @@ namespace Turbulence.CLI
 
         public async Task Start()
         {
-            //TODO: according to the docs this should be cached and only re-requested if the cached version doesnt exist/is not reachable
+            // TODO: according to the docs this should be cached and only re-requested if the cached version doesnt exist/is not reachable
             var gateway = await Api.GetGateway(HttpClient);
 
             HttpClient.DefaultRequestHeaders.Add("Authorization", Token);
@@ -53,14 +53,14 @@ namespace Turbulence.CLI
             SetWebsocketHeaders();
             await WebSocket.ConnectAsync(new Uri($"{gateway.AbsoluteUri}/?encoding=json&v={Api.Version}"), default);
             await SendIdentify();
-            // Start the tasks //TODO: save the tasks?
+            // Start the tasks // TODO: save the tasks?
             _ = Task.Run(ReceiveTask);
-            _ = Task.Run(HeartbeatTask); //TODO: implement a send queue, to issue gateway commands async
+            _ = Task.Run(HeartbeatTask); // TODO: implement a send queue, to issue gateway commands async
         }
 
         public void SetWebsocketHeaders()
         {
-            //TODO: implement zlib (de)compression //TODO: additional headers like Accept-Language etc? (also doesnt contain Connection: keep-alive); enable deflate extension (not used)?
+            // TODO: implement zlib (de)compression // TODO: additional headers like Accept-Language etc? (also doesnt contain Connection: keep-alive); enable deflate extension (not used)?
             WebSocket.Options.SetRequestHeader("User-Agent", UserAgent);
             WebSocket.Options.SetRequestHeader("Origin", "https://discord.com");
             WebSocket.Options.SetRequestHeader("Accept", "*/*");
@@ -80,8 +80,8 @@ namespace Turbulence.CLI
                 Data = JsonSerializer.SerializeToNode(new Identify
                 {
                     Token = Token,
-                    //TODO: turn into an bitfield enum
-                    Capabilities = 0b11101111111101, //TODO: use official caps, which probably require other models
+                    // TODO: turn into an bitfield enum
+                    Capabilities = 0b11101111111101, // TODO: use official caps, which probably require other models
                     Properties = new IdentifyConnectionProperties
                     {
                         Os = "Linux",
@@ -96,7 +96,7 @@ namespace Turbulence.CLI
                         ReferrerCurrent = "",
                         ReferringDomainCurrent = "",
                         ReleaseChannel = "stable",
-                        ClientBuildNumber = 226944, //TODO: dynamically get this
+                        ClientBuildNumber = 226944, // TODO: dynamically get this
                         ClientEventSource = string.Empty,
                     },
                     Presence = new GatewayPresenceUpdate()
@@ -154,7 +154,7 @@ namespace Turbulence.CLI
         }
 
         // checks if a message should trigger a notification
-        //TODO: fix
+        // TODO: fix
         private static async Task<bool> ShouldNotify(Message message, bool mentioned)
         {
             //flow:
@@ -166,13 +166,13 @@ namespace Turbulence.CLI
             // notif depending on server message notification settings
 
             // each setting can contain guild wide settings and specific channel overrides
-            //TODO: make message_notifications (0 = all, 1 = only mention, 2 = none, 3 = inherit server) into a enum
-            //TODO: also check ignore @everyone/@here/roles if we disabled it; probably need a MentionType enum instead of a bool
+            // TODO: make message_notifications (0 = all, 1 = only mention, 2 = none, 3 = inherit server) into a enum
+            // TODO: also check ignore @everyone/@here/roles if we disabled it; probably need a MentionType enum instead of a bool
             // foreach (var setting in ServerSettings)
             // {
             //     // is server muted? no ping if not mentioned
             //     if (setting.guild_id == message.guild_id && setting.muted == true)
-            //         return mentioned; // mentions still go through mutes //TODO: can we set "ignore @everyone" here?
+            //         return mentioned; // mentions still go through mutes // TODO: can we set "ignore @everyone" here?
             //
             //     // check channel specific
             //     foreach (var channelOverride in setting.channel_overrides)
@@ -204,7 +204,7 @@ namespace Turbulence.CLI
             return false;
         }
 
-        //TODO: move these into a gateway class thingy?
+        // TODO: move these into a gateway class thingy?
         private static int? _heartbeatInterval; // Time between heartbeats
         private static int? _lastSequence;
         private static readonly CancellationTokenSource HeartbeatToken = new();
@@ -222,7 +222,7 @@ namespace Turbulence.CLI
 
             while (WebSocket.State == WebSocketState.Open)
             {
-                //TODO: probably check if we got a ack (op 11) after the last heartbeat we sent. if not we "should" reconnect
+                // TODO: probably check if we got a ack (op 11) after the last heartbeat we sent. if not we "should" reconnect
                 GatewayPayload heartBeat = new()
                 {
                     Opcode = GatewayOpcode.HEARTBEAT,
@@ -282,7 +282,7 @@ namespace Turbulence.CLI
                     else // handle longer messages
                     {
                         // create a stream and append the messages till we reach the end of the messages
-                        var byteBuffer = new MemoryStream(bufferSize); //TODO: switch to smth other than MemoryStream? apparently has unnecessary overhead
+                        var byteBuffer = new MemoryStream(bufferSize); // TODO: switch to smth other than MemoryStream? apparently has unnecessary overhead
                         byteBuffer.Write(buffer, 0, buffer.Length);
                         var count = result.Count;
                         while (!result.EndOfMessage)
@@ -329,12 +329,12 @@ namespace Turbulence.CLI
                         if (msg.Data == null)
                             return;
 
-                        //TODO: move this into a custom resolver of the GatewayPayload class
+                        // TODO: move this into a custom resolver of the GatewayPayload class
                         //      by dynamically assigning subclasses to the data according to the event name
                         //      then we wouldnt need to do this (dynamic) shit. also needs the exported models
                         switch (msg.EventName)
                         {
-                            //TODO: enumify these (nuts), https://discord.com/developers/docs/topics/rpc#commands-and-events-rpc-events
+                            // TODO: enumify these (nuts), https://discord.com/developers/docs/topics/rpc#commands-and-events-rpc-events
                             case "MESSAGE_CREATE":
                                 //Console.WriteLine(msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
 
@@ -371,7 +371,7 @@ namespace Turbulence.CLI
                                     return;
                                 }
 
-                                // Cache that shit //TODO: cache more/all. probably also need like private channels etc
+                                // Cache that shit // TODO: cache more/all. probably also need like private channels etc
                                 foreach (var guild in ready.Guilds)
                                     Guilds.Add(guild);
                                 // foreach (var guildSetting in ready.user_guild_settings.entries)
@@ -420,7 +420,7 @@ namespace Turbulence.CLI
             return User ?? await Api.GetCurrentUser(HttpClient);
         }
 
-        //TODO: cache this or smth
+        // TODO: cache this or smth
         public async Task<Message[]> GetMessages(ulong channelID)
         {
             return await Api.GetChannelMessages(HttpClient, channelID);

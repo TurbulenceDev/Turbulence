@@ -128,7 +128,7 @@ public static class Api
             Content = content,
             Nonce = nonce,
             Tts = false,
-            Flags = 0 //TODO: silent
+            Flags = 0 // TODO: silent
         };
         return await Post<Message>(client, $"/channels/{channelId}/messages", JsonSerializer.Serialize(obj));
     }

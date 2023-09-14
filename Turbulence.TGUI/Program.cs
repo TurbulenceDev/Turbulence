@@ -1,19 +1,13 @@
 ﻿using Terminal.Gui;
 using Turbulence.TGUI;
 
-internal class Program
-{
-    private static void Main(string[] args)
-    {
-        Application.Init();
+Application.Init();
 
-        try
-        {
-            Application.Run(new Main());
-        }
-        finally
-        {
-            Application.Shutdown();
-        }
-    }
+try
+{
+    Application.Run(new TurbulenceWindow());
+}
+finally
+{
+    Application.Shutdown();
 }

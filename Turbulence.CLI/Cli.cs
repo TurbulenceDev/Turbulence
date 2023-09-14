@@ -40,7 +40,7 @@ public class Cli
             };
             
 
-            //TODO: run thread
+            // TODO: run thread
             while (true)
             {
                 await Task.Delay(1000);
