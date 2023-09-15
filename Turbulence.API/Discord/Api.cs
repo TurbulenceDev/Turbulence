@@ -120,7 +120,7 @@ public static class Api
     }
 
     // https://discord.com/developers/docs/resources/channel#create-message
-    public static async Task<Message> CreateMessage(HttpClient client, ulong channelId, string content)
+    public static async Task<Message> CreateAndSendMessage(HttpClient client, ulong channelId, string content)
     {
         var nonce = Snowflake.Now().ToString();
         CreateMessageParams obj = new()
