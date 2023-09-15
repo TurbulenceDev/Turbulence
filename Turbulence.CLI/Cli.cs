@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Turbulence.API.Discord.Models.DiscordChannel;
+using Turbulence.Discord;
+using Turbulence.Discord.Models.DiscordChannel;
 
 namespace Turbulence.CLI;
 
@@ -18,9 +19,9 @@ public class Cli
                 return;
             }
 
-            var discord = new Discord();
+            var discord = new Client();
             await discord.Start();
-            Discord.OnReadyEvent += async (sender, msg) =>
+            Client.Ready += async (sender, msg) =>
             {
                 Console.WriteLine("Ready");
                 if (msg.Data.Guilds.Length == 0)
@@ -38,7 +39,6 @@ public class Cli
                     Console.WriteLine($"{m.Author.Username}: {m.Content}");
                 }
             };
-            
 
             // TODO: run thread
             while (true)

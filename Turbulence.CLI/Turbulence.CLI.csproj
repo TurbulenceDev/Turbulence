@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Turbulence.API\Turbulence.API.csproj" />
+    <ProjectReference Include="..\Turbulence.Discord\Turbulence.Discord.csproj" />
   </ItemGroup>
 
 </Project>

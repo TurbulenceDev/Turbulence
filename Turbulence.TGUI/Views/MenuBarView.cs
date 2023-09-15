@@ -1,13 +1,17 @@
 using Terminal.Gui;
+using Turbulence.Core.ViewModels;
 
 namespace Turbulence.TGUI.Views;
 
 public class MenuBarView : MenuBar
 {
-    private readonly MenuBarItem _statusMenu = new() { Title = "Status" };
+    private readonly MenuBarViewModel _vm = new();
+    private readonly MenuBarItem _statusMenu;
     
     public MenuBarView()
     {
+        _statusMenu = new MenuBarItem { Title = _vm.Status };
+        
         Width = Dim.Fill();
         Height = 1;
         Menus = new[]
@@ -32,9 +36,9 @@ public class MenuBarView : MenuBar
         };
     }
 
-    // TODO: Move this to viewmodel
     public void SetStatus(string status)
     {
-        _statusMenu.Title = status;
+        _vm.Status = status;
+        _statusMenu.Title = _vm.Status;
     }
 }

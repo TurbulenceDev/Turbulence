@@ -1,29 +1,28 @@
 using Microsoft.Extensions.Configuration;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
-using Turbulence.API.Discord.Models;
-using Turbulence.API.Discord.Models.DiscordChannel;
-using Turbulence.API.Discord.Models.DiscordGateway;
-using Turbulence.API.Discord.Models.DiscordGuild;
-using Turbulence.API.Discord.Models.DiscordUser;
-using Turbulence.CLI;
+using Turbulence.Core;
+using Turbulence.Core.ViewModels;
+using Turbulence.Discord.Models;
+using Turbulence.Discord.Models.DiscordGateway;
+using Turbulence.Discord.Models.DiscordGuild;
+using Turbulence.Discord.Models.DiscordUser;
+using Turbulence.Discord;
 using Turbulence.TGUI.Views;
-using static Turbulence.API.Discord.Models.DiscordChannel.ChannelType;
-using Channel = Turbulence.API.Discord.Models.DiscordChannel.Channel;
+using Channel = Turbulence.Discord.Models.DiscordChannel.Channel;
+using Message = Turbulence.Discord.Models.DiscordChannel.Message;
 
 namespace Turbulence.TGUI;
 
 public sealed class TurbulenceWindow : Window
 {
-    private readonly Discord _discord;
-    public ulong CurrentChannel = 0;
-    private readonly List<string> _currentMessages = new();
     // TODO: move that class into .Core instead of relying on CLI here :weary:
 
+    private readonly TurbulenceWindowViewModel _vm = new();
     private readonly MenuBarView _menuBar = new();
     private readonly TextInputView _textInput;
-    private readonly MessagesView _messages = new();
-    private readonly ServerListView _serverList = new();
+    private readonly MessagesView _messages;
+    private readonly ServerListView _serverList;
 
     public TurbulenceWindow()
     {
@@ -32,7 +31,10 @@ public sealed class TurbulenceWindow : Window
         Width = Dim.Fill();
         Height = Dim.Fill();
 
-        _textInput = new TextInputView(this);
+        var messagesVm = new MessagesViewModel(_vm);
+        _messages = new MessagesView(messagesVm);
+        _textInput = new TextInputView(_vm);
+        _serverList = new ServerListView(new ServerListViewModel(_vm, messagesVm));
         
         Add(_menuBar);
         Add(_textInput);
@@ -40,7 +42,6 @@ public sealed class TurbulenceWindow : Window
         Add(_serverList);
 
         // Set component stuff
-        _messages.Messages.SetSource(_currentMessages);
         _menuBar.SetStatus("Not connected");
         
         // Hook up events
@@ -50,10 +51,6 @@ public sealed class TurbulenceWindow : Window
         var discord = _menuBar.Menus[1];
         
         // TODO: set token
-        // text input
-        
-        // server view
-        _serverList.ServerTree.SelectionChanged += ServerTree_SelectionChanged;
 
         // Get Token
         var config = new ConfigurationManager().AddUserSecrets<TurbulenceWindow>().Build();
@@ -64,59 +61,32 @@ public sealed class TurbulenceWindow : Window
         }
 
         // Start Discord
-        _discord = new Discord();
         // Hook events
-        Discord.OnReadyEvent += Discord_OnReadyEvent;
-        Discord.OnMessageCreate += Discord_OnMessageCreate;
-        Task.Run(_discord.Start);
+        Client.Ready += OnReady;
+        Client.MessageCreated += OnMessageCreated;
+        Task.Run(_vm.Client.Start);
         _menuBar.SetStatus("Connecting...");
     }
 
-    private void Discord_OnReadyEvent(object? sender, Event<Ready> e)
+    private void OnReady(object? sender, Event<Ready> e)
     {
         var ready = e.Data;
         _menuBar.SetStatus("Connected");
         SetServers(ready.PrivateChannels, ready.Users, ready.Guilds);
     }
 
-    private void Discord_OnMessageCreate(object? sender, Event<Message> e)
+    private void OnMessageCreated(object? sender, Event<Message> e)
     {
         // TODO: this isnt called when sending a dm
         var msg = e.Data;
-        if (msg.ChannelId == CurrentChannel)
+        if (msg.ChannelId == _vm.CurrentChannel)
         {
             // TODO: move this into a function?
             // add message
-            _currentMessages.Add($"{msg.Author.Username}: {msg.Content}");
+            _messages.AddMessage($"{msg.Author.Username}: {msg.Content}");
             // scroll down 1 message
-            _messages.Messages.ScrollDown(1);
+            _messages.MessagesListView.ScrollDown(1);
         }
-    }
-
-    private async void ServerTree_SelectionChanged(object? sender, SelectionChangedEventArgs<ITreeNode> e)
-    {
-        if (e.NewValue.Tag is ServerNode)
-            return; // server => do nothing
-
-        if (e.NewValue.Tag is not ChannelNode node)
-            throw new Exception("we shouldnt be here"); // this shouldnt happen
-
-        // channel or dm
-        if (node.Type is not (GUILD_TEXT or DM or GROUP_DM))
-            return;
-            
-        CurrentChannel = node.Id;
-        _messages.Title = $"Messages: {node.Name}";
-        var msgs = await _discord.GetMessages(node.Id);
-        _currentMessages.Clear();
-        foreach (var msg in msgs.Reverse())
-        {
-            _currentMessages.Add($"{msg.Author.Username}: {msg.Content}");
-        }
-
-        // scroll down to the bottom (also refreshes)
-        _messages.Messages.SelectedItem = _currentMessages.Count - 1; // else mouse scrolling will start at the beginning
-        _messages.Messages.ScrollDown(_currentMessages.Count);
     }
 
     public void SetServers(Channel[] privateChannels, User[] users, Guild[] servers)

@@ -476,7 +476,7 @@ public static class Converter
         File.WriteAllText(Path.Combine(modelsPath.LocalPath, "DiscordMessageComponents", "MessageComponent.cs"), 
 @"using System.Text.Json.Serialization;
 
-namespace Turbulence.API.Discord.Models.DiscordMessageComponents;
+namespace Turbulence.Discord.Models.DiscordMessageComponents;
 
 /// <summary>
 /// <b>Source:</b> <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/interactions/Message_Components.md"">GitHub</a>, <a href=""https://discord.com/developers/docs/interactions/message-components"">Discord API</a>
@@ -498,7 +498,7 @@ public record MessageComponent {
         File.WriteAllText(Path.Combine(modelsPath.LocalPath, "DiscordGateway", "Gateway.cs"), 
             @"using System.Text.Json.Serialization;
 
-namespace Turbulence.API.Discord.Models.DiscordGateway;
+namespace Turbulence.Discord.Models.DiscordGateway;
 
 /// <summary>
 /// <b>Source:</b> <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/topics/Gateway.md#get-gateway--get-gateway"">GitHub</a>, <a href=""https://discord.com/developers/docs/topics/gateway#get-gateway"">Discord API</a>
@@ -517,7 +517,7 @@ public record Gateway {
         File.WriteAllText(Path.Combine(modelsPath.LocalPath, "Error.cs"), 
             @"using System.Text.Json.Serialization;
 
-namespace Turbulence.API.Discord.Models;
+namespace Turbulence.Discord.Models;
 
 /// <summary>
 /// <b>Source:</b> <a href=""https://discord.com/developers/docs/reference#error-messages"">GitHub</a>, <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/Reference.md#error-messages"">Discord API</a>
@@ -547,7 +547,7 @@ public record Error {
         File.WriteAllText(Path.Combine(modelsPath.LocalPath, "DiscordGatewayEvents", "GatewayPayload.cs"), 
             @"using System.Text.Json.Serialization;
 
-namespace Turbulence.API.Discord.Models.DiscordGateway;
+namespace Turbulence.Discord.Models.DiscordGateway;
 
 /// <summary>
 /// <b>Source:</b> <a href=""https://discord.com/developers/docs/topics/gateway-events#payload-structure"">GitHub</a>, <a href=""https://github.com/discord/discord-api-docs/blob/main/docs/topics/Gateway_Events.md#payload-structure"">Discord API</a>

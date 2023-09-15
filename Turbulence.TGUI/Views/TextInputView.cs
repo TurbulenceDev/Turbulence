@@ -17,11 +17,11 @@ public sealed class TextInputView : FrameView
     };
 
     private readonly TextInputViewModel _vm = new();
-    private readonly TurbulenceWindow _window; // TODO: This should probably not be necessary
+    private readonly TurbulenceWindowViewModel _parentVm; // TODO: This should probably not be necessary
 
-    public TextInputView(TurbulenceWindow window)
+    public TextInputView(TurbulenceWindowViewModel parentVm)
     {
-        _window = window;
+        _parentVm = parentVm;
         
         Title = "Write Message";
         Y = 25;
@@ -43,8 +43,7 @@ public sealed class TextInputView : FrameView
         if (content.IsEmpty)
             return;
         
-        // TODO: brain is too molten rn to think about how you should access _currentChannel from here
-        var channel = _window.CurrentChannel;
+        var channel = _parentVm.CurrentChannel;
         if (channel == 0)
             return; // TODO: user feedback?
         

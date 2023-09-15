@@ -21,7 +21,7 @@ public static class Config
     /// <summary>
     /// The base of the namespace of the output files
     /// </summary>
-    public const string NamespaceBase = "Turbulence.API.Discord.Models";
+    public const string NamespaceBase = "Turbulence.Discord.Models";
     
     /// <summary>
     /// Location of .md files to generate models for, appended to the root directory.

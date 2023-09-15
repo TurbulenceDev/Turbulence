@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
-using Turbulence.CLI;
+using Turbulence.Discord;
 
 namespace Turbulence.Core.ViewModels;
 
@@ -8,7 +8,7 @@ public partial class TextInputViewModel
     [RelayCommand]
     private static async Task SendMessage(Message? message)
     {
-        await new Discord().SendMessage(message!.Content!, message.Channel!.Value);
+        await new Client().SendMessage(message!.Content!, message.Channel!.Value);
     }
 }
 
