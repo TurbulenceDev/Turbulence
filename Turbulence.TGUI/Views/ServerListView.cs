@@ -2,7 +2,7 @@ using Terminal.Gui;
 
 namespace Turbulence.TGUI.Views;
 
-public sealed class ServerView : FrameView
+public sealed class ServerListView : FrameView
 {
     public readonly TreeView ServerTree = new()
     {
@@ -10,7 +10,7 @@ public sealed class ServerView : FrameView
         Height = Dim.Fill(),
     };
     
-    public ServerView()
+    public ServerListView()
     {
         Title = "Servers";
         X = 0;

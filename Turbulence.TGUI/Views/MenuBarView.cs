@@ -4,7 +4,7 @@ namespace Turbulence.TGUI.Views;
 
 public class MenuBarView : MenuBar
 {
-    public readonly MenuBarItem StatusMenu = new() { Title = "Status" };
+    private readonly MenuBarItem _statusMenu = new() { Title = "Status" };
     
     public MenuBarView()
     {
@@ -28,7 +28,13 @@ public class MenuBarView : MenuBar
                     new MenuItem { Title = "_Set Token" },
                 },
             },
-            StatusMenu,
+            _statusMenu,
         };
+    }
+
+    // TODO: Move this to viewmodel
+    public void SetStatus(string status)
+    {
+        _statusMenu.Title = status;
     }
 }
