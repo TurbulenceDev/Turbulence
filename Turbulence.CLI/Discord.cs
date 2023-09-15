@@ -1,6 +1,7 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 using Turbulence.API.Discord;
 using Turbulence.API.Discord.Models;
 using Turbulence.API.Discord.Models.DiscordChannel;
@@ -33,14 +34,14 @@ namespace Turbulence.CLI
         private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
         public static HttpClient HttpClient = new();
         ClientWebSocket WebSocket { get; set; }
-        public Discord(string token)
+        public Discord()
         {
             // Set up http client
             HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
             // WS
             WebSocket = new();
             // Token
-            Token = token;
+            Token = new ConfigurationManager().AddUserSecrets<Cli>().Build()["token"]!; // TODO: BAD
         }
 
         public async Task Start()
@@ -431,9 +432,9 @@ namespace Turbulence.CLI
             return await Api.GetGuildChannels(HttpClient, guild);
         }
 
-        public async Task<Message> SendMessage(ulong channelID, string content)
+        public async Task<Message> SendMessage(string content, ulong channelId)
         {
-            return await Api.CreateMessage(HttpClient, channelID, content);
+            return await Api.CreateAndSendMessage(HttpClient, channelId, content);
         }
     }
 }

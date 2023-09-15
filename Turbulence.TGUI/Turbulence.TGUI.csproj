@@ -9,12 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
     <PackageReference Include="Terminal.Gui" Version="1.*" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Turbulence.CLI\Turbulence.CLI.csproj" />
+    <ProjectReference Include="..\Turbulence.Core\Turbulence.Core.csproj" />
   </ItemGroup>
 
 </Project>

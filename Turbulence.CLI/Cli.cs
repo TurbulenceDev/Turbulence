@@ -18,7 +18,7 @@ public class Cli
                 return;
             }
 
-            var discord = new Discord(token);
+            var discord = new Discord();
             await discord.Start();
             Discord.OnReadyEvent += async (sender, msg) =>
             {

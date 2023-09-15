@@ -16,12 +16,12 @@ namespace Turbulence.TGUI;
 public sealed class TurbulenceWindow : Window
 {
     private readonly Discord _discord;
-    private ulong _currentChannel = 0;
+    public ulong CurrentChannel = 0;
     private readonly List<string> _currentMessages = new();
     // TODO: move that class into .Core instead of relying on CLI here :weary:
 
     private readonly MenuBarView _menuBar = new();
-    private readonly TextInputView _textInput = new();
+    private readonly TextInputView _textInput;
     private readonly MessagesView _messages = new();
     private readonly ServerListView _serverList = new();
 
@@ -32,6 +32,8 @@ public sealed class TurbulenceWindow : Window
         Width = Dim.Fill();
         Height = Dim.Fill();
 
+        _textInput = new TextInputView(this);
+        
         Add(_menuBar);
         Add(_textInput);
         Add(_messages);
@@ -49,7 +51,6 @@ public sealed class TurbulenceWindow : Window
         
         // TODO: set token
         // text input
-        _textInput.SendButton.Clicked += SendMessage;
         
         // server view
         _serverList.ServerTree.SelectionChanged += ServerTree_SelectionChanged;
@@ -63,7 +64,7 @@ public sealed class TurbulenceWindow : Window
         }
 
         // Start Discord
-        _discord = new Discord(token);
+        _discord = new Discord();
         // Hook events
         Discord.OnReadyEvent += Discord_OnReadyEvent;
         Discord.OnMessageCreate += Discord_OnMessageCreate;
@@ -82,7 +83,7 @@ public sealed class TurbulenceWindow : Window
     {
         // TODO: this isnt called when sending a dm
         var msg = e.Data;
-        if (msg.ChannelId == _currentChannel)
+        if (msg.ChannelId == CurrentChannel)
         {
             // TODO: move this into a function?
             // add message
@@ -90,22 +91,6 @@ public sealed class TurbulenceWindow : Window
             // scroll down 1 message
             _messages.Messages.ScrollDown(1);
         }
-    }
-
-    public async void SendMessage()
-    {
-        var content = _textInput.TextInput.Text;
-        if (content.IsEmpty)
-            return;
-
-        var channel = _currentChannel;
-        if (channel == 0)
-            return; // TODO: user feedback?
-
-        // send
-        _textInput.TextInput.Text = string.Empty;
-        await _discord.SendMessage(channel, content.ToString()!);
-        // TODO: refresh messages?
     }
 
     private async void ServerTree_SelectionChanged(object? sender, SelectionChangedEventArgs<ITreeNode> e)
@@ -120,7 +105,7 @@ public sealed class TurbulenceWindow : Window
         if (node.Type is not (GUILD_TEXT or DM or GROUP_DM))
             return;
             
-        _currentChannel = node.Id;
+        CurrentChannel = node.Id;
         _messages.Title = $"Messages: {node.Name}";
         var msgs = await _discord.GetMessages(node.Id);
         _currentMessages.Clear();
