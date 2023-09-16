@@ -1,22 +1,24 @@
 using Terminal.Gui;
 using Terminal.Gui.Trees;
+using Turbulence.Core;
 using Turbulence.Core.ViewModels;
 
 namespace Turbulence.TGUI.Views;
 
 public sealed class ServerListView : FrameView
 {
-    public readonly TreeView ServerTree = new()
-    {
-        Width = Dim.Fill(),
-        Height = Dim.Fill(),
-    };
-
+    private readonly TreeView _serverTree;
     private readonly ServerListViewModel _vm;
     
     public ServerListView(ServerListViewModel vm)
     {
         _vm = vm;
+        _serverTree = new TreeView
+        {
+            Width = Dim.Fill(),
+            Height = Dim.Fill(),
+            TreeBuilder = null, // TODO: Fix
+        };
         
         Title = "Servers";
         X = 0;
@@ -25,9 +27,10 @@ public sealed class ServerListView : FrameView
         Height = Dim.Fill();
         Border = new Border { BorderStyle = BorderStyle.Rounded };
         
-        Add(ServerTree);
+        Add(_serverTree);
 
-        ServerTree.SelectionChanged += SelectionChanged;
+        _serverTree.SelectionChanged += SelectionChanged;
+        _vm.TreeUpdated += (_, _) => _serverTree.SetNeedsDisplay();
     }
 
     private void SelectionChanged(object? _, SelectionChangedEventArgs<ITreeNode> e)

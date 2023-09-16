@@ -65,9 +65,4 @@ public sealed class MessagesView : FrameView
             MessagesListView.ScrollDown(((MessagesViewModel)sender).CurrentMessages.Count);
         };
     }
-
-    public void AddMessage(string message)
-    {
-        _vm.CurrentMessages.Add(message);
-    }
 }
