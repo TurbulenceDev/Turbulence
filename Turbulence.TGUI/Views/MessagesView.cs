@@ -5,7 +5,7 @@ namespace Turbulence.TGUI.Views;
 
 public sealed class MessagesView : FrameView
 {
-    public readonly ListView MessagesListView = new()
+    private readonly ListView _messagesListView = new()
     {
         Width = Dim.Fill(1),
         Height = Dim.Fill(),
@@ -25,44 +25,57 @@ public sealed class MessagesView : FrameView
         Height = 24;
         Border = new Border { BorderStyle = BorderStyle.Rounded };
 
-        Add(MessagesListView);
-        MessagesListView.SetSource(_vm.CurrentMessages);
-        _scrollbar = new ScrollBarView(MessagesListView, true);
+        Add(_messagesListView);
+        _messagesListView.SetSource(_vm.CurrentMessages);
+        _scrollbar = new ScrollBarView(_messagesListView, true);
 
         // Draw scrollbar on
-        MessagesListView.DrawContent += _ => {
-            _scrollbar.Size = MessagesListView.Source.Count;
-            _scrollbar.Position = MessagesListView.TopItem;
-            _scrollbar.OtherScrollBarView.Size = MessagesListView.Maxlength;
-            _scrollbar.OtherScrollBarView.Position = MessagesListView.LeftItem;
+        _messagesListView.DrawContent += _ => {
+            _scrollbar.Size = _messagesListView.Source.Count;
+            _scrollbar.Position = _messagesListView.TopItem;
+            _scrollbar.OtherScrollBarView.Size = _messagesListView.Maxlength;
+            _scrollbar.OtherScrollBarView.Position = _messagesListView.LeftItem;
             _scrollbar.Refresh();
         };
 
         // Vertical set
         _scrollbar.ChangedPosition += () => {
-            MessagesListView.TopItem = _scrollbar.Position;
-            if (MessagesListView.TopItem != _scrollbar.Position)
+            _messagesListView.TopItem = _scrollbar.Position;
+            if (_messagesListView.TopItem != _scrollbar.Position)
             {
-                _scrollbar.Position = MessagesListView.TopItem;
+                _scrollbar.Position = _messagesListView.TopItem;
             }
-            MessagesListView.SetNeedsDisplay();
+            _messagesListView.SetNeedsDisplay();
         };
 
         // Horizontal set
         _scrollbar.OtherScrollBarView.ChangedPosition += () => {
-            MessagesListView.LeftItem = _scrollbar.OtherScrollBarView.Position;
-            if (MessagesListView.LeftItem != _scrollbar.OtherScrollBarView.Position)
+            _messagesListView.LeftItem = _scrollbar.OtherScrollBarView.Position;
+            if (_messagesListView.LeftItem != _scrollbar.OtherScrollBarView.Position)
             {
-                _scrollbar.OtherScrollBarView.Position = MessagesListView.LeftItem;
+                _scrollbar.OtherScrollBarView.Position = _messagesListView.LeftItem;
             }
-            MessagesListView.SetNeedsDisplay();
+            _messagesListView.SetNeedsDisplay();
         };
 
         _vm.ShowNewChannel += (sender, _) =>
         {
             // scroll down to the bottom (also refreshes)
-            MessagesListView.SelectedItem = ((MessagesViewModel)sender!).CurrentMessages.Count - 1; // else mouse scrolling will start at the beginning
-            MessagesListView.ScrollDown(((MessagesViewModel)sender).CurrentMessages.Count);
+            _messagesListView.SelectedItem = ((MessagesViewModel)sender!).CurrentMessages.Count - 1; // else mouse scrolling will start at the beginning
+            _messagesListView.ScrollDown(((MessagesViewModel)sender).CurrentMessages.Count);
+        };
+
+        _vm.PropertyChanged += (_, args) =>
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(MessagesViewModel.Title):
+                    Title = _vm.Title;
+                    break;
+                case nameof(MessagesViewModel.CurrentMessages):
+                    _messagesListView.SetNeedsDisplay();
+                    break;
+            }
         };
     }
 }

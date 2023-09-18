@@ -1,19 +1,22 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
+using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordGateway;
 using Msg = Turbulence.Discord.Models.DiscordChannel.Message;
 
 namespace Turbulence.Core.ViewModels;
 
-public class TurbulenceWindowViewModel
+public class TurbulenceWindowViewModel : ViewModelBase, IRecipient<SetCurrentChannel>
 {
     public readonly Client Client = new(); // TODO: Move this to model or something I guess
-    public ulong CurrentChannel = 0;
-
-    private static readonly WeakReferenceMessenger Messenger = new();
+    public Snowflake CurrentChannel = new(0);
 
     public TurbulenceWindowViewModel()
     {
+        Messenger.Send(new SetStatusMessage("Not connected"));
+        Task.Run(Client.Start);
+        Messenger.Send(new SetStatusMessage("Connecting..."));
+        
         Client.Ready += OnReady;
         Client.MessageCreated += OnMessageCreated;
     }
@@ -22,7 +25,7 @@ public class TurbulenceWindowViewModel
     {
         var ready = e.Data;
 
-        Messenger.Send(new SetServersMessage(ready.PrivateChannels, ready.Users, ready.Guilds));
+        Messenger.Send(new SetServersMessage(ready.PrivateChannels.ToList(), ready.Users.ToList(), ready.Guilds.ToList()));
         Messenger.Send(new SetStatusMessage("Connected"));
     }
 
@@ -35,4 +38,11 @@ public class TurbulenceWindowViewModel
             Messenger.Send(new SendMessageMessage($"{msg.Author.Username}: {msg.Content}"));
         }
     }
+
+    public void Receive(SetCurrentChannel m)
+    {
+        CurrentChannel = m.Id;
+    }
 }
+
+public record SetCurrentChannel(Snowflake Id);

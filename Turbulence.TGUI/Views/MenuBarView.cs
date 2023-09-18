@@ -6,11 +6,10 @@ namespace Turbulence.TGUI.Views;
 public class MenuBarView : MenuBar
 {
     private readonly MenuBarViewModel _vm = new();
-    private readonly MenuBarItem _statusMenu;
-    
+
     public MenuBarView()
     {
-        _statusMenu = new MenuBarItem { Title = _vm.Status };
+        var statusMenu = new MenuBarItem { Title = _vm.Status };
         
         Width = Dim.Fill();
         Height = 1;
@@ -32,13 +31,13 @@ public class MenuBarView : MenuBar
                     new MenuItem { Title = "_Set Token" },
                 },
             },
-            _statusMenu,
+            statusMenu,
         };
-    }
 
-    public void SetStatus(string status)
-    {
-        _vm.Status = status;
-        _statusMenu.Title = _vm.Status;
+        _vm.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(MenuBarViewModel.Status))
+                statusMenu.Title = _vm.Status;
+        };
     }
 }

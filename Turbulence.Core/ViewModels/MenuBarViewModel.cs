@@ -1,12 +1,17 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 
 namespace Turbulence.Core.ViewModels;
 
-public class MenuBarViewModel : IRecipient<SetStatusMessage>
+public partial class MenuBarViewModel : ViewModelBase, IRecipient<SetStatusMessage>
 {
-    public string Status { get; set; } = "Status"; // TODO: Bind to view
-
-    public void Receive(SetStatusMessage m) => Status = m.Status;
+    [ObservableProperty]
+    private string? _status = "Status";
+    
+    public void Receive(SetStatusMessage m)
+    {
+        Status = m.Status;
+    }
 }
 
 public record SetStatusMessage(string Status);

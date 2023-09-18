@@ -1,11 +1,17 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using Turbulence.Discord;
+using Turbulence.Discord.Models;
 
 namespace Turbulence.Core.ViewModels;
 
-public class MessagesViewModel : IRecipient<ShowChannelMessage>, IRecipient<SendMessageMessage>
+public partial class MessagesViewModel : ViewModelBase, IRecipient<ShowChannelMessage>, IRecipient<SendMessageMessage>
 {
-    public readonly List<string> CurrentMessages = new();
-    public string Title = "";
+    [ObservableProperty]
+    private List<string> _currentMessages = new();
+    
+    [ObservableProperty]
+    private string _title = "";
 
     private readonly TurbulenceWindowViewModel _parentVm;
 
@@ -16,10 +22,10 @@ public class MessagesViewModel : IRecipient<ShowChannelMessage>, IRecipient<Send
         _parentVm = parentVm;
     }
 
-    public async void Receive(ShowChannelMessage message)
+    public async void Receive(ShowChannelMessage m)
     {
-        Title = $"Messages: {message.Node.Name}";
-        var msgs = await _parentVm.Client.GetMessages(message.Node.Id);
+        Title = $"Messages: {m.Name}";
+        var msgs = await _parentVm.Client.GetMessages(m.Id);
         CurrentMessages.Clear();
         foreach (var msg in msgs.Reverse())
         {
@@ -39,5 +45,5 @@ public class MessagesViewModel : IRecipient<ShowChannelMessage>, IRecipient<Send
     }
 }
 
-public record ShowChannelMessage(ChannelNode Node);
+public record ShowChannelMessage(Snowflake Id, string Name);
 public record SendMessageMessage(string Message);
