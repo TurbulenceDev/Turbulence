@@ -27,12 +27,7 @@ public record Snowflake(ulong Id) : IComparable<Snowflake>
 
     public override string ToString() => Id.ToString();
 
-    public int CompareTo(Snowflake? other)
-    {
-        if (other == null)
-            return 1;
-        return Id > other.Id ? 1 : Id == other.Id ? 0 : -1;
-    }
+    public int CompareTo(Snowflake? other) => Id.CompareTo(other?.Id);
 
     private class SnowflakeConverter : JsonConverter<Snowflake>
     {
