@@ -136,7 +136,7 @@ public record Message {
 	/// <a href="https://discord.com/developers/docs/resources/channel#message-object-message-types">Type of message</a>.
 	/// </summary>
 	[JsonPropertyName("type")]
-	public required int Type { get; init; } // TODO: Make enum
+	public required MessageType Type { get; init; }
 
 	/// <summary>
 	/// Sent with Rich Presence-related chat embeds.

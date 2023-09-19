@@ -37,7 +37,14 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<ShowChannelMe
         CurrentMessages.Clear();
         foreach (var msg in msgs.Reverse())
         {
-            CurrentMessages.Add($"{msg.Author.Username}: {msg.Content}");
+            //TODO: let view handle the actual frontend stuff and only give it the messages?
+            var message = msg.Type switch
+            {
+                MessageType.THREAD_CREATED => $"{msg.Author.Username} created Thread \"{msg.Content}\"",
+                MessageType.CALL => $"{msg.Author.Username} called",
+                _ => $"{msg.Author.Username}: {msg.Content}"
+            };
+            CurrentMessages.Add(message);
         }
         
         ShowNewChannel?.Invoke(this, EventArgs.Empty);
