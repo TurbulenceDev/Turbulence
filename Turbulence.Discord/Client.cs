@@ -40,7 +40,9 @@ namespace Turbulence.Discord
             // WS
             WebSocket = new();
             // Token
-            Token = new ConfigurationManager().AddUserSecrets<Client>().Build()["token"]!; // TODO: BAD
+            Token = new ConfigurationManager().AddUserSecrets<Client>().Build()["token"]!; // TODO: BAD, move out of client
+            if (Token == null)
+                throw new Exception("No token set");
         }
 
         public async Task Start()
