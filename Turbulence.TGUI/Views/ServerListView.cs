@@ -89,10 +89,13 @@ public class ServerTreeBuilder : ITreeBuilder<ServerTreeNode>
             {
                 // Return channels that have no parent ordered by position
                 // TODO: Are there channels without parents that have a position other than 0?
-                // TODO: Order isn't correct anyways
+                // INFO: https://github.com/Rapptz/discord.py/issues/2392#issuecomment-707455919
                 return serverNode.Server.Channels
-                    .OrderBy(c => c.Position ?? int.MaxValue)
-                    .Where(c => c.ParentId == null)
+                    .Where(c => c.ParentId == null) // top level
+                    .OrderBy(c => c.Type == GUILD_CATEGORY ? 1 : 0) // channels without categories should be at the top
+                    .ThenBy(c => c.Type) // then by channel type
+                    .ThenBy(c => c.Position) // then sort by position
+                    .ThenBy(c => c.Id) // sort by raw channel id if pos are the same
                     .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Server channel has no name")));
             }
             case ChannelNode { Channel.Type: GUILD_CATEGORY } categoryNode:
@@ -110,12 +113,18 @@ public class ServerTreeBuilder : ITreeBuilder<ServerTreeNode>
                     // TODO: Need to deduplicate this code somehow but too tired right now
                     return guild2.Channels
                         .Where(c => c.ParentId == categoryNode.Channel.Id)
+                        .OrderBy(c => c.Type)
+                        .ThenBy(c => c.Position)
+                        .ThenBy(c => c.Id)
                         .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Guild channel has no name")));
                 }
 
                 // Return children of this channel category
                 return guild.Channels
                     .Where(c => c.ParentId == categoryNode.Channel.Id)
+                    .OrderBy(c => c.Type)
+                    .ThenBy(c => c.Position)
+                    .ThenBy(c => c.Id)
                     .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Guild channel has no name")));
             }
             default:

@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace Turbulence.Discord.Models;
 
 [JsonConverter(typeof(SnowflakeConverter))]
-public record Snowflake(ulong Id)
+public record Snowflake(ulong Id) : IComparable<Snowflake>
 {
     public DateTimeOffset Timestamp { get; init; } = DateTimeOffset.FromUnixTimeMilliseconds((long)((Id >> 22) + DiscordEpoch));
     public const ulong DiscordEpoch = 1420070400000;
@@ -26,6 +26,13 @@ public record Snowflake(ulong Id)
     }
 
     public override string ToString() => Id.ToString();
+
+    public int CompareTo(Snowflake? other)
+    {
+        if (other == null)
+            return 1;
+        return Id > other.Id ? 1 : Id == other.Id ? 0 : -1;
+    }
 
     private class SnowflakeConverter : JsonConverter<Snowflake>
     {
