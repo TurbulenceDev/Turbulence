@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Turbulence.Discord.Models.DiscordUser;
+using static Turbulence.Discord.Models.DiscordChannel.ChannelType;
 
 namespace Turbulence.Discord.Models.DiscordChannel;
 
@@ -10,7 +11,7 @@ namespace Turbulence.Discord.Models.DiscordChannel;
 /// or <a href="https://github.com/discord/discord-api-docs/blob/main/docs/resources/Channel.md#channel-object">GitHub
 /// </a>.
 /// </summary>
-public record Channel {
+public record Channel : IComparable<Channel> {
 	/// <summary>
 	/// The snowflake ID of this channel.
 	/// </summary>
@@ -282,6 +283,25 @@ public record Channel {
     [JsonPropertyName("recipient_ids")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Snowflake[]? RecipientIDs { get; init; }
+
+    public int CompareTo(Channel? other)
+    {
+	    // INFO: https://github.com/Rapptz/discord.py/issues/2392#issuecomment-707455919
+	    if (other == null)
+		    return -1;
+
+	    if (Type.ComparePositionTo(other.Type) is var t and not 0)
+		    return t;
+
+	    if (Position?.CompareTo(other.Position) is { } p and not 0)
+		    return p;
+
+	    if (Id.Timestamp.CompareTo(other.Id.Timestamp) is var i and not 0)
+		    return i;
+
+	    // If IDs are the same, it's the same channel
+	    return 0;
+    }
 }
 
 /// <summary>
@@ -355,4 +375,26 @@ public enum ChannelType
 	/// Channel that can only contain threads, similar to GUILD_FORUM channels.
 	/// </summary>
 	GUILD_MEDIA = 16,
+}
+
+public static class ChannelTypeExtensions
+{ 
+	public static int ComparePositionTo(this ChannelType type, ChannelType other)
+	{
+		return type switch
+		{
+			// Categories go after normal channels
+			GUILD_CATEGORY when other is not GUILD_CATEGORY => 1,
+			not GUILD_CATEGORY when other is GUILD_CATEGORY => -1,
+			
+			// Text channels go before voice channels
+			GUILD_VOICE when other is GUILD_TEXT => 1,
+			GUILD_TEXT when other is GUILD_VOICE => -1,
+			
+			// TODO: Implement more cases
+			
+			// No specific ordering between these types
+			_ => 0,
+		};
+	}
 }

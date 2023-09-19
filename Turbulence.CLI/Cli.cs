@@ -21,7 +21,7 @@ public class Cli
 
             var discord = new Client();
             await discord.Start();
-            Client.Ready += async (sender, msg) =>
+            Client.Ready += async (_, msg) =>
             {
                 Console.WriteLine("Ready");
                 if (msg.Data.Guilds.Length == 0)

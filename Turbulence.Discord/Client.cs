@@ -364,7 +364,7 @@ namespace Turbulence.Discord
                                 Console.ForegroundColor = ConsoleColor.Green;
                                 Console.WriteLine($"{message.Author.Username}: {message.Content}");
                                 Console.ForegroundColor = ConsoleColor.White;*/
-                                MessageCreated?.Invoke(null, new(message));
+                                MessageCreated?.Invoke(null, new Event<Message>(message));
                                 break;
                             case "READY":
                                 if (msg.Data.Deserialize<Ready>() is not { } ready)
@@ -387,7 +387,7 @@ namespace Turbulence.Discord
                                 Console.WriteLine("Servers:");
                                 foreach (var guild in Guilds)
                                     Console.WriteLine($"-{guild.Name} (ID: {guild.Id})");*/
-                                Ready?.Invoke(null, new(ready));
+                                Ready?.Invoke(null, new Event<Ready>(ready));
                                 break;
                             default:
                                 Console.WriteLine($"[Event: {msg.EventName}] Data: {msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true })}");
