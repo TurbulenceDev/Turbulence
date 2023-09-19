@@ -20,7 +20,11 @@ public class MenuBarView : MenuBar
                 Title = "_File",
                 Children = new[]
                 {
-                    new MenuItem { Title = "_Quit" },
+                    new MenuItem
+                    {
+                        Title = "_Quit",
+                        Action = () => Application.RequestStop(),
+                    },
                 },
             },
             new MenuBarItem
