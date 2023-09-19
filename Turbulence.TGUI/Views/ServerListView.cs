@@ -97,19 +97,14 @@ public class ServerTreeBuilder : ITreeBuilder<ServerTreeNode>
             {
                 if (_vm.Servers.Find(g => g.Id == categoryNode.Channel.GuildId) is not { } guild)
                 {
+                    // Failed to find guild, probably because the guild was from a gateway event. Get it from the API directly
                     // TODO: Can we do this another way?
                     var channel = Task.Run(() => Api.GetChannel(Client.HttpClient, categoryNode.Channel.Id)).GetAwaiter().GetResult();
 
-                    if (_vm.Servers.Find(g => g.Id == channel.GuildId) is not { } guild2)
-                    {
+                    if (_vm.Servers.Find(g => g.Id == channel.GuildId) is not { } retryGuild)
                         throw new Exception("Can't find guild associated with channel");
-                    }
 
-                    // TODO: Need to deduplicate this code somehow but too tired right now
-                    return guild2.Channels
-                        .Where(c => c.ParentId == categoryNode.Channel.Id)
-                        .Order()
-                        .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Guild channel has no name")));
+                    guild = retryGuild;
                 }
 
                 // Return children of this channel category
