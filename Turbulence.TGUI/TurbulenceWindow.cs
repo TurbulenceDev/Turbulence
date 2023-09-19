@@ -23,7 +23,7 @@ public sealed class TurbulenceWindow : Window
         _menuBar = new MenuBarView();
         _messages = new MessagesView(new MessagesViewModel(_vm));
         _textInput = new TextInputView(_vm);
-        _serverList = new ServerListView(new ServerListViewModel());
+        _serverList = new ServerListView();
         
         Add(_menuBar);
         Add(_textInput);

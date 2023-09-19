@@ -431,9 +431,9 @@ namespace Turbulence.Discord
             return await Api.GetGuildChannels(HttpClient, guild);
         }
 
-        public async Task<Message> SendMessage(string content, ulong channelId)
+        public async Task<Message> SendMessage(string content, Channel channel)
         {
-            return await Api.CreateAndSendMessage(HttpClient, channelId, content);
+            return await Api.CreateAndSendMessage(HttpClient, channel, content);
         }
     }
 }

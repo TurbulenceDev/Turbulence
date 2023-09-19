@@ -1,5 +1,6 @@
 using Terminal.Gui;
 using Turbulence.Core.ViewModels;
+using Message = Turbulence.Core.ViewModels.Message;
 
 namespace Turbulence.TGUI.Views;
 
@@ -39,18 +40,13 @@ public sealed class TextInputView : FrameView
     // TODO: Async probably?
     private void SendMessage()
     {
-        var content = _textInput.Text;
-        if (content.IsEmpty)
+        var message = _textInput.Text.ToString();
+        if (string.IsNullOrWhiteSpace(message))
             return;
-        
-        var channel = _parentVm.CurrentChannel;
-        if (channel == 0)
-            return; // TODO: user feedback?
-        
-        _vm.SendMessageCommand.Execute(new Message(content.ToString(), channel));
 
-        // send
+        _vm.SendMessageCommand.Execute(new Message(message, _parentVm.CurrentChannel!));
+
         _textInput.Text = string.Empty;
-        // TODO: refresh messages?
+        // TODO: Refresh messages?
     }
 }

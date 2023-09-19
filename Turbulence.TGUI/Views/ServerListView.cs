@@ -1,20 +1,19 @@
 using Terminal.Gui;
 using Terminal.Gui.Trees;
 using Turbulence.Core.ViewModels;
-using Turbulence.Discord.Models;
-using Turbulence.Discord.Models.DiscordChannel;
+using Turbulence.Discord;
+using static Turbulence.Discord.Models.DiscordChannel.ChannelType;
 
 namespace Turbulence.TGUI.Views;
 
 public sealed class ServerListView : FrameView
 {
-    private readonly TreeView _serverTree;
-    private readonly ServerListViewModel _vm;
+    private readonly TreeView<ServerTreeNode> _serverTree;
+    private readonly ServerListViewModel _vm = new();
     
-    public ServerListView(ServerListViewModel vm)
+    public ServerListView()
     {
-        _vm = vm;
-        _serverTree = new TreeView
+        _serverTree = new TreeView<ServerTreeNode>
         {
             Width = Dim.Fill(),
             Height = Dim.Fill(),
@@ -29,21 +28,29 @@ public sealed class ServerListView : FrameView
         Border = new Border { BorderStyle = BorderStyle.Rounded };
         
         Add(_serverTree);
-        
-        _serverTree.AddObject(new TreeNode("DMs"));
 
         _serverTree.SelectionChanged += (_, e) =>
         {
-            if (e.NewValue is ChannelNode channelNode)
+            if (e.NewValue is ChannelNode
+                {
+                    Channel.Type: GUILD_TEXT or GUILD_FORUM or GROUP_DM or DM or PUBLIC_THREAD or PRIVATE_THREAD
+                    or ANNOUNCEMENT_THREAD or GUILD_ANNOUNCEMENT or GUILD_MEDIA, // TODO: this sucks
+                } channelNode)
             { 
-                _vm.SelectionChangedCommand.Execute((channelNode.Id, channelNode.Text));
+                _vm.SelectionChangedCommand.Execute(channelNode.Channel);
             }
         };
-        _vm.TreeUpdated += (_, _) => _serverTree.SetNeedsDisplay();
+        _vm.TreeUpdated += (_, _) =>
+        {
+            _serverTree.ClearObjects();
+            _serverTree.AddObject(new DmsNode());
+            _serverTree.AddObjects(_vm.Servers.Select(g => new ServerNode(g)));
+            _serverTree.SetNeedsDisplay();
+        };
     }
 }
 
-public class ServerTreeBuilder : ITreeBuilder<ITreeNode>
+public class ServerTreeBuilder : ITreeBuilder<ServerTreeNode>
 {
     public bool SupportsCanExpand => true;
     private readonly ServerListViewModel _vm;
@@ -53,107 +60,66 @@ public class ServerTreeBuilder : ITreeBuilder<ITreeNode>
         _vm = vm;
     }
 
-    public bool CanExpand(ITreeNode node)
+    public bool CanExpand(ServerTreeNode node)
     {
-        return node is { Text: "DMs" };
+        return node is DmsNode or ServerNode or ChannelNode { Channel.Type: GUILD_CATEGORY };
     }
 
-    public IEnumerable<ITreeNode> GetChildren(ITreeNode node)
+    public IEnumerable<ServerTreeNode> GetChildren(ServerTreeNode node)
     {
-        if (node is { Text: "DMs" })
+        switch (node)
         {
-            // build a user id 2 name dict
-            var userNames = _vm.Users.ToDictionary(u => u.Id, u => u.Username);
-            List<ITreeNode> list = new();
-            
-            
-            // TODO: sort by last message timestamp?
-            foreach (var dm in _vm.PrivateChannels)
+            case DmsNode:
             {
-                // get the channel name by getting the name of the recipients (or the id if the lookup fails)
-                var name = string.Join(", ", dm.RecipientIDs!.Select(r => userNames.TryGetValue(r, out var userName) ? userName : r.ToString()));
-                list.Add(new ChannelNode(dm.Id, name, ChannelType.DM));
-            }
+                // build a user id 2 name dict
+                var userNames = _vm.Users.ToDictionary(u => u.Id, u => u.Username);
+                List<ServerTreeNode> list = new();
             
-            return list;
+                // TODO: Sort by last message timestamp?
+                foreach (var dm in _vm.PrivateChannels)
+                {
+                    // get the channel name by getting the name of the recipients (or the id if the lookup fails)
+                    var name = string.Join(", ", dm.RecipientIDs!.Select(r => userNames.TryGetValue(r, out var userName) ? userName : r.ToString()));
+                    list.Add(new ChannelNode(dm, name));
+                }
+            
+                return list;
+            }
+            case ServerNode serverNode:
+            {
+                // Return channels that have no parent ordered by position
+                // TODO: Are there channels without parents that have a position other than 0?
+                // TODO: Order isn't correct anyways
+                return serverNode.Server.Channels
+                    .OrderBy(c => c.Position ?? int.MaxValue)
+                    .Where(c => c.ParentId == null)
+                    .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Server channel has no name")));
+            }
+            case ChannelNode { Channel.Type: GUILD_CATEGORY } categoryNode:
+            {
+                if (_vm.Servers.Find(g => g.Id == categoryNode.Channel.GuildId) is not { } guild)
+                {
+                    // TODO: Can we do this another way?
+                    var channel = Task.Run(() => Api.GetChannel(Client.HttpClient, categoryNode.Channel.Id)).GetAwaiter().GetResult();
+
+                    if (_vm.Servers.Find(g => g.Id == channel.GuildId) is not { } guild2)
+                    {
+                        throw new Exception("Can't find guild associated with channel");
+                    }
+
+                    // TODO: Need to deduplicate this code somehow but too tired right now
+                    return guild2.Channels
+                        .Where(c => c.ParentId == categoryNode.Channel.Id)
+                        .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Guild channel has no name")));
+                }
+
+                // Return children of this channel category
+                return guild.Channels
+                    .Where(c => c.ParentId == categoryNode.Channel.Id)
+                    .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Guild channel has no name")));
+            }
+            default:
+                return Enumerable.Empty<ServerTreeNode>();
         }
-
-        return new List<ITreeNode>();
-
-        // // // TODO: use a treebuilder
-        // _serverTree.ClearObjects();
-        // // first add the private channels
-        // var dmNode = new TreeNode("DMs")
-        // {
-        //     Tag = new ServerNode(new Snowflake(0)),
-        // };
-        // // build a user id 2 name dict
-        // var userNames = users.ToDictionary(u => u.Id, u => u.Username);
-        //
-        // // TODO: sort by last message timestamp?
-        // foreach (var dm in privateChannels)
-        // {
-        //     // get the channel name by getting the name of the recipients (or the id if the lookup fails)
-        //     var name = string.Join(", ", dm.RecipientIDs!.Select(r => userNames.ContainsKey(r) ? userNames[r].ToString() : r.ToString()));
-        //     var channelNode = new TreeNode(name)
-        //     {
-        //         Tag = new ChannelNode(dm.Id, name, dm.Type)
-        //     };
-        //     dmNode.Children.Add(channelNode);
-        // }
-        // Tree.Add((TreeNodeData)dmNode.Tag);
-        // //_serverTree.AddObject(dmNode);
-        // // then add the remaining servers
-        // foreach (var server in servers)
-        // {
-        //     var serverNode = new TreeNode(server.Name)
-        //     {
-        //         Tag = new ServerNode(server.Id),
-        //     };
-        //     // TODO: are there channels without parents that have a position other than 0?
-        //     var ordered = server.Channels.OrderBy(c => c.ParentId == null ? 0 : 1 + c.Position); // prioritize the ones without parents, then add the position
-        //     Dictionary<ulong, TreeNode> channelNodes = new();
-        //     foreach (var channel in ordered)
-        //     {
-        //         // create the node
-        //         var channelNode = new TreeNode(channel.Name)
-        //         {
-        //             Tag = new ChannelNode(channel.Id, channel.Name, channel.Type),
-        //         };
-        //         // now add to server or parent channel
-        //         if (channel.ParentId == null) // add to root
-        //         {
-        //             serverNode.Children.Add(channelNode);
-        //             channelNodes.Add(channel.Id, channelNode);
-        //         }
-        //         else // has a parent
-        //         {
-        //             if (channelNodes.TryGetValue(channel.ParentId, out var parent))
-        //                 parent.Children.Add(channelNode);
-        //             else
-        //                 throw new Exception($"Parent channel {channel.ParentId} not found");
-        //         }
-        //     }
-        //     _serverTree.AddObject((TreeNodeData)serverNode.Tag);
-        // }
-        // // redraw
-        // _serverTree.SetNeedsDisplay();
-        //
-        // if (node is TreeNode tree)
-        // {
-        //     
-        // }
-        //
-        // if (node is ServerNode server)
-        // {
-        //     return new List<TreeNodeData> { server };
-        // }
-        //
-        // if (node is ChannelNode channel)
-        // {
-        //     return new List<TreeNodeData> { channel };
-        // }
-        //
-        // throw new NotImplementedException();
     }
 }

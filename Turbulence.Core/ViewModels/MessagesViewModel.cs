@@ -1,7 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
-using Turbulence.Discord.Models;
+using Turbulence.Discord.Models.DiscordChannel;
+using static Turbulence.Discord.Models.DiscordChannel.ChannelType;
 
 namespace Turbulence.Core.ViewModels;
 
@@ -24,8 +25,15 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<ShowChannelMe
 
     public async void Receive(ShowChannelMessage m)
     {
-        Title = $"Messages: {m.Name}";
-        var msgs = await _parentVm.Client.GetMessages(m.Id);
+        Title = m.Channel.Type switch
+        {
+            DM => $"Messages: {(m.Channel.Recipients is { } recipients
+                ? recipients.First().Username
+                : (await Api.GetChannel(Client.HttpClient, m.Channel.Id)).Recipients?.First().Username) ?? "unknown"}",
+            _ => $"Messages: {m.Channel.Name}",
+        };
+
+        var msgs = await _parentVm.Client.GetMessages(m.Channel.Id);
         CurrentMessages.Clear();
         foreach (var msg in msgs.Reverse())
         {
@@ -45,5 +53,5 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<ShowChannelMe
     }
 }
 
-public record ShowChannelMessage(Snowflake Id, string Name);
+public record ShowChannelMessage(Channel Channel);
 public record SendMessageMessage(string Message);

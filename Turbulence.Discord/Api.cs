@@ -120,7 +120,7 @@ public static class Api
     }
 
     // https://discord.com/developers/docs/resources/channel#create-message
-    public static async Task<Message> CreateAndSendMessage(HttpClient client, ulong channelId, string content)
+    public static async Task<Message> CreateAndSendMessage(HttpClient client, Channel channel, string content)
     {
         var nonce = Snowflake.Now().ToString();
         CreateMessageParams obj = new()
@@ -130,6 +130,6 @@ public static class Api
             Tts = false,
             Flags = 0, // TODO: silent
         };
-        return await Post<Message>(client, $"/channels/{channelId}/messages", JsonSerializer.Serialize(obj));
+        return await Post<Message>(client, $"/channels/{channel.Id}/messages", JsonSerializer.Serialize(obj));
     }
 }

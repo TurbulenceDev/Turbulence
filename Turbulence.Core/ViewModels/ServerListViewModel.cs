@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordGuild;
 using Turbulence.Discord.Models.DiscordUser;
@@ -11,30 +10,20 @@ public partial class ServerListViewModel : ViewModelBase, IRecipient<SetServersM
 {
     public List<Channel> PrivateChannels = new();
     public List<User> Users = new();
-    public List<Guild> Guilds = new();
+    public List<Guild> Servers = new();
 
     public event EventHandler? TreeUpdated;
 
     [RelayCommand]
-    private void SelectionChanged((Snowflake Id, string Name) channel)
+    private void SelectionChanged(Channel channel)
     {
-        // if (data is ServerNode)
-        //     return;
-        //
-        // if (data is not ChannelNode node)
-        //     throw new Exception("This shouldn't happen");
-        //
-        // if (node.Type is not (GUILD_TEXT or DM or GROUP_DM))
-        //     return;
-
-        Messenger.Send(new SetCurrentChannel(channel.Id));
-        Messenger.Send(new ShowChannelMessage(channel.Id, channel.Name));
+        Messenger.Send(new SetCurrentChannel(channel));
+        Messenger.Send(new ShowChannelMessage(channel));
     }
+
     public void Receive(SetServersMessage m)
     {
-        PrivateChannels = m.PrivateChannels;
-        Users = m.Users;
-        Guilds = m.Guilds;
+        (PrivateChannels, Users, Servers) = (m.PrivateChannels, m.Users, m.Guilds);
         
         TreeUpdated?.Invoke(null, EventArgs.Empty);
     }

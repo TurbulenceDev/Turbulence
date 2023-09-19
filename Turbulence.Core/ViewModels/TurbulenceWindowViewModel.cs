@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
-using Turbulence.Discord.Models;
+using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordGateway;
 using Msg = Turbulence.Discord.Models.DiscordChannel.Message;
 
@@ -9,7 +9,7 @@ namespace Turbulence.Core.ViewModels;
 public class TurbulenceWindowViewModel : ViewModelBase, IRecipient<SetCurrentChannel>
 {
     public readonly Client Client = new(); // TODO: Move this to model or something I guess
-    public Snowflake CurrentChannel = new(0);
+    public Channel? CurrentChannel;
 
     public TurbulenceWindowViewModel()
     {
@@ -33,7 +33,7 @@ public class TurbulenceWindowViewModel : ViewModelBase, IRecipient<SetCurrentCha
     {
         // TODO: this isnt called when sending a dm
         var msg = e.Data;
-        if (msg.ChannelId == CurrentChannel)
+        if (CurrentChannel?.Id is { } id && msg.ChannelId == id)
         {
             Messenger.Send(new SendMessageMessage($"{msg.Author.Username}: {msg.Content}"));
         }
@@ -41,8 +41,8 @@ public class TurbulenceWindowViewModel : ViewModelBase, IRecipient<SetCurrentCha
 
     public void Receive(SetCurrentChannel m)
     {
-        CurrentChannel = m.Id;
+        CurrentChannel = m.Channel;
     }
 }
 
-public record SetCurrentChannel(Snowflake Id);
+public record SetCurrentChannel(Channel Channel);
