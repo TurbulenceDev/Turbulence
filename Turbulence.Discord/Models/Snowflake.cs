@@ -6,7 +6,7 @@ namespace Turbulence.Discord.Models;
 [JsonConverter(typeof(SnowflakeConverter))]
 public record Snowflake(ulong Id) : IComparable<Snowflake>
 {
-    public DateTimeOffset Timestamp { get; init; } = DateTimeOffset.FromUnixTimeMilliseconds((long)((Id >> 22) + DiscordEpoch));
+    public DateTimeOffset Timestamp { get; } = DateTimeOffset.FromUnixTimeMilliseconds((long)((Id >> 22) + DiscordEpoch));
     public const ulong DiscordEpoch = 1420070400000;
 
     public static implicit operator ulong(Snowflake snowflake) => snowflake.Id;
