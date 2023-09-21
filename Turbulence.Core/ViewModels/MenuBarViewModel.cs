@@ -3,15 +3,15 @@ using CommunityToolkit.Mvvm.Messaging;
 
 namespace Turbulence.Core.ViewModels;
 
-public partial class MenuBarViewModel : ViewModelBase, IRecipient<SetStatusMessage>
+public partial class MenuBarViewModel : ViewModelBase, IRecipient<SetStatusMsg>
 {
     [ObservableProperty]
     private string? _status = "Status";
     
-    public void Receive(SetStatusMessage m)
+    public void Receive(SetStatusMsg message)
     {
-        Status = m.Status;
+        Status = message.Status;
     }
 }
 
-public record SetStatusMessage(string Status);
+public record SetStatusMsg(string Status);

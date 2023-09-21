@@ -4,16 +4,16 @@ using Turbulence.TGUI.Views;
 
 namespace Turbulence.TGUI;
 
-public sealed class TurbulenceWindow : Window
+public sealed class MainWindow : Window
 {
-    public TurbulenceWindow()
+    public MainWindow()
     {
         Title = "Turbulence";
         Border.BorderStyle = BorderStyle.Rounded;
         Width = Dim.Fill();
         Height = Dim.Fill();
 
-        var vm = new TurbulenceWindowViewModel();
+        var vm = new MainWindowViewModel();
 
         Add(new MenuBarView());
         Add(new TextInputView(vm));

@@ -3,10 +3,11 @@ using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
 using static Turbulence.Discord.Models.DiscordChannel.ChannelType;
+using static Turbulence.Discord.Models.DiscordChannel.MessageType;
 
 namespace Turbulence.Core.ViewModels;
 
-public partial class MessagesViewModel : ViewModelBase, IRecipient<ShowChannelMessage>, IRecipient<SendMessageMessage>
+public partial class MessagesViewModel : ViewModelBase, IRecipient<ShowChannelMsg>, IRecipient<SendMessageMsg>
 {
     [ObservableProperty]
     private List<string> _currentMessages = new();
@@ -14,43 +15,43 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<ShowChannelMe
     [ObservableProperty]
     private string _title = "";
 
-    private readonly TurbulenceWindowViewModel _parentVm;
+    private readonly MainWindowViewModel _parentVm;
 
     public event EventHandler? ShowNewChannel; 
     
-    public MessagesViewModel(TurbulenceWindowViewModel parentVm)
+    public MessagesViewModel(MainWindowViewModel parentVm)
     {
         _parentVm = parentVm;
     }
 
-    public async void Receive(ShowChannelMessage m)
+    public async void Receive(ShowChannelMsg message)
     {
-        Title = m.Channel.Type switch
+        Title = message.Channel.Type switch
         {
-            DM => $"Messages: {(m.Channel.Recipients is { } recipients
+            DM => $"Messages: {(message.Channel.Recipients is { } recipients
                 ? recipients.First().Username
-                : (await Api.GetChannel(Client.HttpClient, m.Channel.Id)).Recipients?.First().Username) ?? "unknown"}",
-            _ => $"Messages: {m.Channel.Name}",
+                : (await Api.GetChannel(Client.HttpClient, message.Channel.Id)).Recipients?.First().Username) ?? "unknown"}",
+            _ => $"Messages: {message.Channel.Name}",
         };
 
-        var msgs = await _parentVm.Client.GetMessages(m.Channel.Id);
+        var channelMessages = await _parentVm.Client.GetMessages(message.Channel.Id);
         CurrentMessages.Clear();
-        foreach (var msg in msgs.Reverse())
+        foreach (var msg in channelMessages.Reverse())
         {
-            //TODO: let view handle the actual frontend stuff and only give it the messages?
-            var message = msg.Type switch
+            // TODO: let view handle the actual frontend stuff and only give it the messages?
+            var messageType = msg.Type switch
             {
-                MessageType.THREAD_CREATED => $"{msg.Author.Username} created Thread \"{msg.Content}\"",
-                MessageType.CALL => $"{msg.Author.Username} called",
-                _ => $"{msg.Author.Username}: {msg.Content}"
+                THREAD_CREATED => $"{msg.Author.Username} created Thread \"{msg.Content}\"",
+                CALL => $"{msg.Author.Username} called",
+                _ => $"{msg.Author.Username}: {msg.Content}",
             };
-            CurrentMessages.Add(message);
+            CurrentMessages.Add(messageType);
         }
         
         ShowNewChannel?.Invoke(this, EventArgs.Empty);
     }
 
-    public void Receive(SendMessageMessage message)
+    public void Receive(SendMessageMsg message)
     {
         CurrentMessages.Add(message.Message);
         
@@ -60,5 +61,5 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<ShowChannelMe
     }
 }
 
-public record ShowChannelMessage(Channel Channel);
-public record SendMessageMessage(string Message);
+public record ShowChannelMsg(Channel Channel);
+public record SendMessageMsg(string Message);

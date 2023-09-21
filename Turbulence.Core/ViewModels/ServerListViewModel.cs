@@ -7,7 +7,7 @@ using Turbulence.Discord.Models.DiscordUser;
 
 namespace Turbulence.Core.ViewModels;
 
-public partial class ServerListViewModel : ViewModelBase, IRecipient<SetServersMessage>
+public partial class ServerListViewModel : ViewModelBase, IRecipient<SetServersMsg>
 {
     public List<Channel> PrivateChannels = new();
     public List<User> Users = new();
@@ -20,16 +20,18 @@ public partial class ServerListViewModel : ViewModelBase, IRecipient<SetServersM
     [RelayCommand]
     private void SelectionChanged(Channel channel)
     {
-        Messenger.Send(new SetCurrentChannel(channel));
-        Messenger.Send(new ShowChannelMessage(channel));
+        Messenger.Send(new SelectChannelMsg(channel));
+        Messenger.Send(new ShowChannelMsg(channel));
     }
 
-    public void Receive(SetServersMessage m)
+    public void Receive(SetServersMsg message)
     {
-        (PrivateChannels, Users, Servers) = (m.PrivateChannels, m.Users, m.Guilds);
+        (PrivateChannels, Users, Servers) = (message.PrivateChannels, message.Users, message.Guilds);
         
         TreeUpdated?.Invoke(null, EventArgs.Empty);
+
+        Messenger.Send(new SetChannelsMsg(Servers.First().Channels.ToList()));
     }
 }
 
-public record SetServersMessage(List<Channel> PrivateChannels, List<User> Users, List<Guild> Guilds);
+public record SetServersMsg(List<Channel> PrivateChannels, List<User> Users, List<Guild> Guilds);

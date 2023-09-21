@@ -18,9 +18,9 @@ public sealed class TextInputView : FrameView
     };
 
     private readonly TextInputViewModel _vm = new();
-    private readonly TurbulenceWindowViewModel _parentVm; // TODO: This should probably not be necessary
+    private readonly MainWindowViewModel _parentVm; // TODO: This should probably not be necessary
 
-    public TextInputView(TurbulenceWindowViewModel parentVm)
+    public TextInputView(MainWindowViewModel parentVm)
     {
         _parentVm = parentVm;
         
@@ -44,7 +44,7 @@ public sealed class TextInputView : FrameView
         if (string.IsNullOrWhiteSpace(message))
             return;
 
-        _vm.SendMessageCommand.Execute(new Message(message, _parentVm.CurrentChannel!));
+        _vm.SendMessageCommand.Execute(new Message(message, _parentVm.SelectedChannel!));
 
         _textInput.Text = string.Empty;
         // TODO: Refresh messages?

@@ -5,7 +5,7 @@ Application.Init();
 
 try
 {
-    Application.Run(new TurbulenceWindow());
+    Application.Run(new MainWindow());
 }
 finally
 {

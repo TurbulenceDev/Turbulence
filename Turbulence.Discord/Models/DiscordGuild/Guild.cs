@@ -84,7 +84,7 @@ public record Guild {
 
 	[Obsolete("Use Channel.RtcRegion instead")]
 	[JsonPropertyName("region")]
-	public required string? Region { get; init; }
+	public string? Region { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of AFK channel.
