@@ -11,7 +11,7 @@ public record Error {
     /// The <a href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#json">JSON error code</a>.
     /// </summary>
     [JsonPropertyName("code")]
-    public required int Code { get; init; }
+    public int? Code { get; init; }
 
     /// <summary>
     /// The error message.

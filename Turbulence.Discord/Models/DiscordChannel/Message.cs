@@ -309,3 +309,11 @@ public enum MessageType
 	STAGE_TOPIC = 31,
 	GUILD_APPLICATION_PREMIUM_SUBSCRIPTION = 32,
 }
+
+public static class MessageExtensions {
+	public static string GetBestAuthorName(this Message message)
+	{
+		// TODO: message.Member is null for some reason
+		return message.Member?.Nick ?? message.Author.GlobalName ?? message.Author.Username;
+	}
+}

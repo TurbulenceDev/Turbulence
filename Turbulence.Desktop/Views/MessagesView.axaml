@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+             xmlns:v="clr-namespace:Turbulence.Desktop.Views"
+             x:Class="Turbulence.Desktop.Views.MessagesView">
+    <UserControl.DataContext>
+        <vm:MessagesViewModel />
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <v:MessageConverter x:Key="MessageConverter"/>
+    </UserControl.Resources>
+    <ScrollViewer Name="Scroll">
+        <ItemsControl ItemsSource="{Binding CurrentMessages}"
+                      Background="#313338"
+                      Padding="8"> 
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Converter={StaticResource MessageConverter}}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+</UserControl>

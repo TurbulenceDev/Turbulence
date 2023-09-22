@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+        xmlns:v="clr-namespace:Turbulence.Desktop.Views"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="Turbulence.Desktop.MainWindow"
+        Width="1200" Height="700"
+        MinWidth="600" MinHeight="400"
+        Title="Turbulence">
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+    <Grid Name="Viewss" ColumnDefinitions="75,200,*">
+        <v:ServerListView />
+        <v:ChannelListView Grid.Column="1" />
+        <DockPanel Grid.Column="2">
+            <DockPanel DockPanel.Dock="Bottom" Background="#313338">
+                <Button DockPanel.Dock="Right"
+                        Margin="0 5 5 5"
+                        Background="#383A40">
+                    Send
+                </Button>
+                <TextBox BorderThickness="0"
+                         Background="#383A40"
+                         Margin="5"
+                         Watermark="Message" />
+            </DockPanel>
+            <v:MessagesView />
+        </DockPanel>
+    </Grid>
+</Window>

@@ -60,7 +60,7 @@ public record Role {
 	/// Permission bit set.
 	/// </summary>
 	[JsonPropertyName("permissions")]
-	public required string Permissions { get; init; }
+	public required string Permissions { get; init; } // TODO: Enum
 
 	/// <summary>
 	/// Whether this role is managed by an integration.

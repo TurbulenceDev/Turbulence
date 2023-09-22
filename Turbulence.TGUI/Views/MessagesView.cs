@@ -1,5 +1,7 @@
 using Terminal.Gui;
 using Turbulence.Core.ViewModels;
+using Turbulence.Discord.Models.DiscordChannel;
+using static Turbulence.Discord.Models.DiscordChannel.MessageType;
 
 namespace Turbulence.TGUI.Views;
 
@@ -11,13 +13,12 @@ public sealed class MessagesView : FrameView
         Height = Dim.Fill(),
     };
 
-    private readonly MessagesViewModel _vm;
+    private readonly MessagesViewModel _vm = new();
     private readonly ScrollBarView _scrollbar;
+    private readonly List<string> _currentMessagesProcessed = new(); // TODO: Implement IListDataSource?
 
-    public MessagesView(MessagesViewModel vm)
+    public MessagesView()
     {
-        _vm = vm;
-        
         Title = "Messages";
         X = 25;
         Y = 1;
@@ -26,7 +27,7 @@ public sealed class MessagesView : FrameView
         Border = new Border { BorderStyle = BorderStyle.Rounded };
 
         Add(_messagesListView);
-        _messagesListView.SetSource(_vm.CurrentMessages);
+        _messagesListView.SetSource(_currentMessagesProcessed);
         _scrollbar = new ScrollBarView(_messagesListView, true);
 
         // Draw scrollbar on
@@ -76,6 +77,22 @@ public sealed class MessagesView : FrameView
                     _messagesListView.SetNeedsDisplay();
                     break;
             }
+        };
+
+        _vm.CurrentMessages.CollectionChanged += (_, _) =>
+        {
+            _currentMessagesProcessed.Clear();
+            _currentMessagesProcessed.AddRange(_vm.CurrentMessages.Select(m =>
+            {
+                var author = m.GetBestAuthorName();
+                return m.Type switch
+                {
+                    THREAD_CREATED => $"{author} created thread \"{m.Content}\"",
+                    CALL => $"{author} started voice message",
+                    _ => $"{author}: {m.Content}",
+                };
+            }));
+            SetNeedsDisplay();
         };
     }
 }

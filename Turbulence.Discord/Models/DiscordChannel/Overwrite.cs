@@ -17,7 +17,7 @@ public record Overwrite {
 	/// Either 0 (role) or 1 (member).
 	/// </summary>
 	[JsonPropertyName("type")]
-	public required int Type { get; init; }
+	public required int Type { get; init; } // TODO: Enum
 
 	/// <summary>
 	/// Permission bit set.

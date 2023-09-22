@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -13,20 +14,29 @@ public partial class ServerListViewModel : ViewModelBase, IRecipient<SetServersM
     public List<User> Users = new();
     
     [ObservableProperty]
-    private List<Guild> _servers = new();
+    private ObservableCollection<Guild> _servers = new();
+
+    [ObservableProperty]
+    private Guild? _selectedServer;
 
     public event EventHandler? TreeUpdated;
 
-    [RelayCommand]
-    private void SelectionChanged(Channel channel)
+    public ServerListViewModel()
     {
-        Messenger.Send(new SelectChannelMsg(channel));
-        Messenger.Send(new ShowChannelMsg(channel));
+        PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(SelectedServer) && SelectedServer is { } server)
+                Messenger.Send(new ServerSelectedMsg(server));
+        };
     }
+    
+    [RelayCommand]
+    private void SelectionChanged(Channel channel) => Messenger.Send(new ChannelSelectedMsg(channel));
 
     public void Receive(SetServersMsg message)
     {
-        (PrivateChannels, Users, Servers) = (message.PrivateChannels, message.Users, message.Guilds);
+        (PrivateChannels, Users) = (message.PrivateChannels, message.Users);
+        Servers = new ObservableCollection<Guild>(message.Guilds);
         
         TreeUpdated?.Invoke(null, EventArgs.Empty);
 
@@ -35,3 +45,4 @@ public partial class ServerListViewModel : ViewModelBase, IRecipient<SetServersM
 }
 
 public record SetServersMsg(List<Channel> PrivateChannels, List<User> Users, List<Guild> Guilds);
+public record ServerSelectedMsg(Guild Server);

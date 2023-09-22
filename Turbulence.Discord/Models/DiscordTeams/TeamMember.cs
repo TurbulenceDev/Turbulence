@@ -21,7 +21,7 @@ public record TeamMember {
 	/// Will always be <c>["*"]</c>.
 	/// </summary>
 	[JsonPropertyName("permissions")]
-	public required string[] Permissions { get; init; }
+	public required string[] Permissions { get; init; } // TODO: Enum
 
 	/// <summary>
 	/// The snowflake ID of the parent team of which they are a member.

@@ -20,5 +20,5 @@ public record InstallParams {
 	/// The <a href="https://discord.com/developers/docs/topics/permissions">permissions</a> to request for the bot role.
 	/// </summary>
 	[JsonPropertyName("permissions")]
-	public required string Permissions { get; init; }
+	public required string Permissions { get; init; } // TODO: Enum
 }

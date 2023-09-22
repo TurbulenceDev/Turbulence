@@ -29,7 +29,7 @@ public record RoleTags {
 	/// </summary>
 	[JsonPropertyName("premium_subscriber")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public bool? PremiumSubscriber => throw new NotImplementedException();
+	public bool? PremiumSubscriber => false; // TODO: discord bs https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
 
 	/// <summary>
 	/// The snowflake ID of this role's subscription sku and listing.
@@ -43,12 +43,12 @@ public record RoleTags {
 	/// </summary>
 	[JsonPropertyName("available_for_purchase")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public bool? AvailableForPurchase => throw new NotImplementedException();
+	public bool? AvailableForPurchase => false; // TODO: discord bs https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
 
 	/// <summary>
 	/// Whether this role is a guild's linked role.
 	/// </summary>
 	[JsonPropertyName("guild_connections")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public bool? GuildConnections => throw new NotImplementedException();
+	public bool? GuildConnections => false; // TODO: discord bs https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
 }

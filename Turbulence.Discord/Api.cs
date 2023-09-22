@@ -31,10 +31,10 @@ public static class Api
 
             if (error.Errors == null)
             {
-                throw new ApiException($"API responded with error: {error.Message} ({error.Code})");
+                throw new ApiException($"API responded with error: {error.Message} ({error.Code?.ToString() ?? "no error code"})");
             }
 
-            throw new ApiException($@"{error.Message} ({error.Code}):
+            throw new ApiException($@"{error.Message} ({error.Code?.ToString() ?? "no error code"}):
 {JsonSerializer.Serialize(error.Errors, new { WriteIndented = true })}");
 
         }
@@ -48,7 +48,7 @@ public static class Api
     {
         var req = new HttpRequestMessage(HttpMethod.Post, $"{ApiRoot}{endpoint}")
         {
-            Content = new StringContent(body, Encoding.UTF8, "application/json")
+            Content = new StringContent(body, Encoding.UTF8, "application/json"),
         };
         var response = await client.SendAsync(req);
 
@@ -63,10 +63,10 @@ public static class Api
 
             if (error.Errors == null)
             {
-                throw new ApiException($"API responded with error: {error.Message} ({error.Code})");
+                throw new ApiException($"API responded with error: {error.Message} ({error.Code?.ToString() ?? "no error code"})");
             }
 
-            throw new ApiException($@"{error.Message} ({error.Code}):
+            throw new ApiException($@"{error.Message} ({error.Code?.ToString() ?? "no error code"}):
 {JsonSerializer.Serialize(error.Errors, new { WriteIndented = true })}");
 
         }

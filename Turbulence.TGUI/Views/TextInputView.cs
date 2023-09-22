@@ -1,6 +1,5 @@
 using Terminal.Gui;
 using Turbulence.Core.ViewModels;
-using Message = Turbulence.Core.ViewModels.Message;
 
 namespace Turbulence.TGUI.Views;
 
@@ -44,7 +43,7 @@ public sealed class TextInputView : FrameView
         if (string.IsNullOrWhiteSpace(message))
             return;
 
-        _vm.SendMessageCommand.Execute(new Message(message, _parentVm.SelectedChannel!));
+        _vm.SendMessageCommand.Execute(new ChatMessage(message, _parentVm.SelectedChannel!));
 
         _textInput.Text = string.Empty;
         // TODO: Refresh messages?

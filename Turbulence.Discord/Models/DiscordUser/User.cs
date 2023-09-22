@@ -29,7 +29,7 @@ public record User {
 	/// The user's display name, if it is set. For bots, this is the application name.
 	/// </summary>
 	[JsonPropertyName("global_name")]
-	public required string? GlobalName { get; init; }
+	public string? GlobalName { get; init; }
 
 	/// <summary>
 	/// The user's <a href="https://discord.com/developers/docs/reference#image-formatting">avatar hash</a>.

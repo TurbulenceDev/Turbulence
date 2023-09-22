@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordEmoji;
 using Turbulence.Discord.Models.DiscordPermissions;
 using Turbulence.Discord.Models.DiscordSticker;
@@ -80,7 +81,7 @@ public record Guild {
 	/// </summary>
 	[JsonPropertyName("permissions")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public string? Permissions { get; init; }
+	public string? Permissions { get; init; } // TODO: Enum
 
 	[Obsolete("Use Channel.RtcRegion instead")]
 	[JsonPropertyName("region")]
@@ -317,5 +318,5 @@ public record Guild {
 	public required Snowflake? SafetyAlertsChannelId { get; init; }
 
 	[JsonPropertyName("channels")]
-    public required DiscordChannel.Channel[] Channels { get; init; }
+    public required Channel[] Channels { get; init; }
 }

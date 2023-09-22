@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+             x:Class="Turbulence.Desktop.Views.ServerListView">
+    <UserControl.DataContext>
+        <vm:ServerListViewModel />
+    </UserControl.DataContext>
+    <ListBox ItemsSource="{Binding Servers}"
+             Background="#1E1F22"
+             SelectedValue="{Binding SelectedServer}">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Name}" />
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>

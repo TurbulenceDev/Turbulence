@@ -209,7 +209,7 @@ public record Channel : IComparable<Channel> {
 	/// </summary>
 	[JsonPropertyName("permissions")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public string? Permissions { get; init; }
+	public string? Permissions { get; init; } // TODO: Enum
 
 	// TODO: Make enum
 	/// <summary>
@@ -289,6 +289,15 @@ public record Channel : IComparable<Channel> {
 	    // INFO: https://github.com/Rapptz/discord.py/issues/2392#issuecomment-707455919
 	    if (other == null)
 		    return -1;
+
+	    if (ParentId == null && other.ParentId != null)
+		    return -1;
+	    else if (ParentId != null && other.ParentId == null)
+		    return 1;
+
+	    // TODO: Temporary while parent channel is not accessible without API call, doesn't actually work but unclutters
+	    if (ParentId is { } p1 && other.ParentId is { } p2 && p1 != p2)
+		    return p1 > p2 ? 1 : -1;
 
 	    if (Type.ComparePositionTo(other.Type) is var t and not 0)
 		    return t;

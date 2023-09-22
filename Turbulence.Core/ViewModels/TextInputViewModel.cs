@@ -7,10 +7,10 @@ namespace Turbulence.Core.ViewModels;
 public partial class TextInputViewModel : ViewModelBase
 {
     [RelayCommand]
-    private static async Task SendMessage(Message message)
+    private static async Task SendMessage(ChatMessage chatMessage)
     {
-        await new Client().SendMessage(message.Content, message.Channel);
+        await Api.CreateAndSendMessage(Client.HttpClient, chatMessage.Channel, chatMessage.Content);
     }
 }
 
-public record Message(string Content, Channel Channel);
+public record ChatMessage(string Content, Channel Channel);

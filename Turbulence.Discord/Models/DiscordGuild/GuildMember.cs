@@ -84,7 +84,7 @@ public record GuildMember {
 	/// </summary>
 	[JsonPropertyName("permissions")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public string? Permissions { get; init; }
+	public string? Permissions { get; init; } // TODO: Enum
 
 	/// <summary>
 	/// When the user's <a href="https://support.discord.com/hc/en-us/articles/4413305239191-Time-Out-FAQ">timeout</a>

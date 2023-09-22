@@ -17,7 +17,7 @@ public sealed class MainWindow : Window
 
         Add(new MenuBarView());
         Add(new TextInputView(vm));
-        Add(new MessagesView(new MessagesViewModel(vm)));
+        Add(new MessagesView());
         Add(new ServerListView());
     }
 }
