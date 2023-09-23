@@ -6,14 +6,18 @@ using Turbulence.Discord.Models.DiscordGuild;
 
 namespace Turbulence.Core.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase, IRecipient<ServerSelectedMsg>, IRecipient<ChannelSelectedMsg>
+public class MainWindowViewModel : ViewModelBase,
+    IRecipient<ServerSelectedMsg>,
+    IRecipient<ChannelSelectedMsg>,
+    IRecipient<SendMessageMsg>
 {
     public static readonly Client Client = new(); // TODO: Move this to model or something I guess
-    public Guild? SelectedServer;
-    public Channel? SelectedChannel;
+    public static Guild? SelectedServer { get; private set; }
+    public static Channel? SelectedChannel { get; private set; }
 
     public MainWindowViewModel()
     {
+        // TODO: Move all this somewhere else
         Messenger.Send(new SetStatusMsg("Not connected"));
         Task.Run(Client.Start);
         Messenger.Send(new SetStatusMsg("Connecting..."));
@@ -42,4 +46,11 @@ public class MainWindowViewModel : ViewModelBase, IRecipient<ServerSelectedMsg>,
 
     public void Receive(ChannelSelectedMsg message) => SelectedChannel = message.Channel;
     public void Receive(ServerSelectedMsg message) => SelectedServer = message.Server;
+    public async void Receive(SendMessageMsg message) =>
+        await Api.CreateAndSendMessage(Client.HttpClient, SelectedChannel!, message.Message);
 }
+
+/// <summary>
+/// Send a message in the currently selected channel
+/// </summary>
+public record SendMessageMsg(string Message);

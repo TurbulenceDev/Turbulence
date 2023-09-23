@@ -1,16 +1,13 @@
 using CommunityToolkit.Mvvm.Input;
-using Turbulence.Discord;
-using Turbulence.Discord.Models.DiscordChannel;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Turbulence.Core.ViewModels;
 
 public partial class TextInputViewModel : ViewModelBase
 {
     [RelayCommand]
-    private static async Task SendMessage(ChatMessage chatMessage)
+    private void SendMessage(string message)
     {
-        await Api.CreateAndSendMessage(Client.HttpClient, chatMessage.Channel, chatMessage.Content);
+        Messenger.Send(new SendMessageMsg(message));
     }
 }
-
-public record ChatMessage(string Content, Channel Channel);

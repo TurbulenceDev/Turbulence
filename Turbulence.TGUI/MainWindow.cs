@@ -13,10 +13,10 @@ public sealed class MainWindow : Window
         Width = Dim.Fill();
         Height = Dim.Fill();
 
-        var vm = new MainWindowViewModel();
+        _ = new MainWindowViewModel();
 
         Add(new MenuBarView());
-        Add(new TextInputView(vm));
+        Add(new TextInputView());
         Add(new MessagesView());
         Add(new ServerListView());
     }

@@ -17,12 +17,9 @@ public sealed class TextInputView : FrameView
     };
 
     private readonly TextInputViewModel _vm = new();
-    private readonly MainWindowViewModel _parentVm; // TODO: This should probably not be necessary
 
-    public TextInputView(MainWindowViewModel parentVm)
+    public TextInputView()
     {
-        _parentVm = parentVm;
-        
         Title = "Write Message";
         Y = 25;
         X = 25;
@@ -43,7 +40,7 @@ public sealed class TextInputView : FrameView
         if (string.IsNullOrWhiteSpace(message))
             return;
 
-        _vm.SendMessageCommand.Execute(new ChatMessage(message, _parentVm.SelectedChannel!));
+        _vm.SendMessageCommand.Execute(message);
 
         _textInput.Text = string.Empty;
         // TODO: Refresh messages?
