@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+             x:Class="Turbulence.Desktop.Views.TextInputView">
+    <UserControl.DataContext>
+        <vm:TextInputViewModel />
+    </UserControl.DataContext>
+    <DockPanel Background="#313338">
+        <Button DockPanel.Dock="Right"
+                Margin="0 5 5 5"
+                Background="#383A40"
+                Click="OnSend">
+            Send
+        </Button>
+        <TextBox Name="TextInput" 
+                 BorderThickness="0"
+                 Background="#383A40"
+                 Margin="5"
+                 Watermark="Message" />
+    </DockPanel>
+</UserControl>

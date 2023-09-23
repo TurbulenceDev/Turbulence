@@ -12,21 +12,11 @@
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
-    <Grid Name="Viewss" ColumnDefinitions="75,200,*">
+    <Grid ColumnDefinitions="75,200,*">
         <v:ServerListView />
         <v:ChannelListView Grid.Column="1" />
         <DockPanel Grid.Column="2">
-            <DockPanel DockPanel.Dock="Bottom" Background="#313338">
-                <Button DockPanel.Dock="Right"
-                        Margin="0 5 5 5"
-                        Background="#383A40">
-                    Send
-                </Button>
-                <TextBox BorderThickness="0"
-                         Background="#383A40"
-                         Margin="5"
-                         Watermark="Message" />
-            </DockPanel>
+            <v:TextInputView DockPanel.Dock="Bottom" />
             <v:MessagesView />
         </DockPanel>
     </Grid>
