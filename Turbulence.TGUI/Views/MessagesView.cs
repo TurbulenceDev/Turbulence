@@ -61,22 +61,15 @@ public sealed class MessagesView : FrameView
 
         _vm.ShowNewChannel += (sender, _) =>
         {
-            // scroll down to the bottom (also refreshes)
-            _messagesListView.SelectedItem = ((MessagesViewModel)sender!).CurrentMessages.Count - 1; // else mouse scrolling will start at the beginning
+            // Scroll down to the bottom (also refreshes)
+            _messagesListView.SelectedItem = ((MessagesViewModel)sender!).CurrentMessages.Count - 1; // Else mouse scrolling will start at the beginning
             _messagesListView.ScrollDown(((MessagesViewModel)sender).CurrentMessages.Count);
         };
 
         _vm.PropertyChanged += (_, args) =>
         {
-            switch (args.PropertyName)
-            {
-                case nameof(MessagesViewModel.Title):
-                    Title = _vm.Title;
-                    break;
-                case nameof(MessagesViewModel.CurrentMessages):
-                    _messagesListView.SetNeedsDisplay();
-                    break;
-            }
+            if (args.PropertyName == nameof(MessagesViewModel.Title))
+                Title = _vm.Title;
         };
 
         _vm.CurrentMessages.CollectionChanged += (_, _) =>
@@ -92,7 +85,8 @@ public sealed class MessagesView : FrameView
                     _ => $"{author}: {m.Content}",
                 };
             }));
-            SetNeedsDisplay();
+            _messagesListView.ScrollDown(1);
+            _messagesListView.SetNeedsDisplay();
         };
     }
 }

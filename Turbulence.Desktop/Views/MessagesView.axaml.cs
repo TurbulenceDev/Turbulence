@@ -10,15 +10,24 @@ namespace Turbulence.Desktop.Views;
 
 public partial class MessagesView : UserControl
 {
+    private readonly MessagesViewModel _vm;
+
     public MessagesView()
     {
         InitializeComponent();
-        
-        ((MessagesViewModel)DataContext!).CurrentMessages.CollectionChanged += (_, _) =>
+        _vm = (MessagesViewModel)DataContext!;
+
+        _vm.CurrentMessages.CollectionChanged += (_, _) =>
         {
-            // TODO: Requires sleep to scroll to end properly, probably because otherwise it scrolls to end before message is fully added to the control. Can we do without?
-            // Thread.Sleep(10); // Can't use this anyways since CollectionChanged is called every time a message is added to the ObservableCollection
-            Dispatcher.UIThread.Invoke(Scroll.ScrollToEnd);
+            // TODO: This whole thing could use improvement
+            // TODO: Is Dispatcher.UIThread.Invoke really necessary?
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                if (Math.Abs(Scroll.Offset.Y - Scroll.ScrollBarMaximum.Y) < 0.05)
+                    Scroll.ScrollToEnd();
+                else
+                    Scroll.LineDown();
+            });
         }; 
     }
 }
