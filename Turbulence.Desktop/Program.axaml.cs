@@ -26,14 +26,9 @@ internal class Program : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new ServerListViewModel(),
-            };
+            desktop.MainWindow = new MainWindow();
         }
 
-        _ = new MainWindowViewModel();
-        
         base.OnFrameworkInitializationCompleted();
     }
 }

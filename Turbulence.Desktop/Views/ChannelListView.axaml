@@ -1,16 +1,14 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
-             x:Class="Turbulence.Desktop.Views.ChannelListView">
+             x:Class="Turbulence.Desktop.Views.ChannelListView"
+             x:DataType="vm:ChannelListViewModel">
     <UserControl.DataContext>
         <vm:ChannelListViewModel />
     </UserControl.DataContext>
     <ListBox ItemsSource="{Binding Channels}"
              Background="#2B2D31"
              SelectedValue="{Binding SelectedChannel}">
-        <Design.DataContext>
-            <vm:ChannelListViewModel />
-        </Design.DataContext>
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <TextBlock Text="{Binding Name}" />
