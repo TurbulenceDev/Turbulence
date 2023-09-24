@@ -9,9 +9,9 @@
         Width="1200" Height="700"
         MinWidth="600" MinHeight="400"
         Title="Turbulence">
-    <Design.DataContext>
+    <Window.DataContext>
         <vm:MainWindowViewModel />
-    </Design.DataContext>
+    </Window.DataContext>
     <Grid ColumnDefinitions="75,200,*">
         <v:ServerListView />
         <v:ChannelListView Grid.Column="1" />
