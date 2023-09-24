@@ -9,8 +9,7 @@ namespace Turbulence.Core.ViewModels;
 
 public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannelsMsg>, IRecipient<ServerSelectedMsg>
 {
-    [ObservableProperty]
-    private ObservableCollection<Channel> _channels = new();
+    public ObservableList<Channel> Channels { get; } = new();
 
     [ObservableProperty]
     private Channel? _selectedChannel;
@@ -24,7 +23,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
         };
     }
     
-    public void Receive(SetChannelsMsg m) => Channels = new ObservableCollection<Channel>(m.Channels);
+    public void Receive(SetChannelsMsg m) => Channels.ReplaceAll(m.Channels);
     
     public async void Receive(ServerSelectedMsg m)
     {
@@ -33,7 +32,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
         // TODO: Move this to its own method
         if (m.Server.OwnerId == Client.User.Id)
         {
-            Channels = new ObservableCollection<Channel>(m.Server.Channels);
+            Channels.ReplaceAll(m.Server.Channels);
         }
         else
         {

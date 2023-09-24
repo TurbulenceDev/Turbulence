@@ -12,9 +12,7 @@ public partial class ServerListViewModel : ViewModelBase, IRecipient<SetServersM
 {
     public List<Channel> PrivateChannels = new();
     public List<User> Users = new();
-    
-    [ObservableProperty]
-    private ObservableCollection<Guild> _servers = new();
+    public ObservableList<Guild> Servers { get; } = new();
 
     [ObservableProperty]
     private Guild? _selectedServer;
@@ -36,7 +34,7 @@ public partial class ServerListViewModel : ViewModelBase, IRecipient<SetServersM
     public void Receive(SetServersMsg message)
     {
         (PrivateChannels, Users) = (message.PrivateChannels, message.Users);
-        Servers = new ObservableCollection<Guild>(message.Guilds);
+        Servers.ReplaceAll(message.Guilds);
         
         TreeUpdated?.Invoke(null, EventArgs.Empty);
 

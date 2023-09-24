@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
@@ -9,8 +8,7 @@ namespace Turbulence.Core.ViewModels;
 
 public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreatedMsg>, IRecipient<ChannelSelectedMsg>
 {
-    [ObservableProperty]
-    private ObservableCollection<Message> _currentMessages = new();
+    public ObservableList<Message> CurrentMessages { get; } = new();
     
     [ObservableProperty]
     private string _title = "";
