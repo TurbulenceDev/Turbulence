@@ -102,4 +102,10 @@ public enum GatewayOpcode
 	/// Sent in response to receiving a heartbeat to acknowledge that it has been received. Receive only.
 	/// </summary>
 	HEARTBEAT_ACK = 11,
+
+    /// <summary>
+    /// Sent to request guild members and threads. Send only?
+    /// https://luna.gitlab.io/discord-unofficial-docs/lazy_guilds.html#op-14-lazy-request
+    /// </summary>
+    LAZY_REQUEST = 14,
 }

@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Turbulence.API.Discord.Models.DiscordGatewayEvents;
 using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordGateway;
@@ -57,7 +58,8 @@ namespace Turbulence.Discord
             await SendIdentify();
             // Start the tasks // TODO: save the tasks?
             _ = Task.Run(ReceiveTask);
-            _ = Task.Run(HeartbeatTask); // TODO: implement a send queue, to issue gateway commands async
+            _ = Task.Run(HeartbeatTask); 
+            // TODO: implement a send queue, to issue gateway commands async
         }
 
         public void SetWebsocketHeaders()
@@ -129,10 +131,11 @@ namespace Turbulence.Discord
             return WebSocket.SendAsync(Encoding.UTF8.GetBytes(seri), default, true, default);
         }
 
-        // TODO: move these cached objects into 1. their own classes (more efficient than keeping json stuff around) 2. into the api
+        // TODO: move these cached objects into the api? or keep them here?
+        // TODO: probably shouldnt be static?
         public static User User = null!;
         //public static List<dynamic> MemberInfos = new(); // TODO: should we like put the roles into a simple array?
-        public static List<Guild> Guilds = new();
+        public static Dictionary<Snowflake, Guild> Guilds = new();
         //public static List<dynamic> ServerSettings = new(); // TODO: listen to the guild settings update event
         private static async Task<bool> IsMentioned(Message message)
         {
@@ -375,7 +378,7 @@ namespace Turbulence.Discord
 
                                 // Cache that shit // TODO: cache more/all. probably also need like private channels etc
                                 foreach (var guild in ready.Guilds)
-                                    Guilds.Add(guild);
+                                    Guilds.Add(guild.Id, guild);
                                 // foreach (var guildSetting in ready.user_guild_settings.entries)
                                 //     ServerSettings.Add(guildSetting);
                                 User = ready.User;
@@ -388,6 +391,14 @@ namespace Turbulence.Discord
                                 foreach (var guild in Guilds)
                                     Console.WriteLine($"-{guild.Name} (ID: {guild.Id})");*/
                                 Ready?.Invoke(null, new Event<Ready>(ready));
+                                break;
+                            case "THREAD_LIST_SYNC":
+                                if (msg.Data.Deserialize<ThreadListSyncEvent>() is not { } threadSync)
+                                {
+                                    Console.WriteLine("Invalid message received on THREAD_LIST_SYNC");
+                                    return;
+                                }
+                                //TODO: thread list sync event + add data to guilds
                                 break;
                             default:
                                 Console.WriteLine($"[Event: {msg.EventName}] Data: {msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true })}");
@@ -436,6 +447,11 @@ namespace Turbulence.Discord
         public async Task<Message> SendMessage(string content, Channel channel)
         {
             return await Api.CreateAndSendMessage(HttpClient, channel, content);
+        }
+
+        public async Task<Guild> GetGuild(Snowflake guild)
+        {
+            return Guilds.TryGetValue(guild, out var ret) ? ret : await Api.GetGuild(HttpClient, guild);
         }
     }
 }
