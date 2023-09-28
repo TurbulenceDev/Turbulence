@@ -23,7 +23,8 @@
                       Padding="8">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock FontWeight="Bold" Text="{Binding Author.Username}" />
                         <TextBlock Text="{Binding Converter={StaticResource MessageConverter}}" />
                     </StackPanel>
                 </DataTemplate>

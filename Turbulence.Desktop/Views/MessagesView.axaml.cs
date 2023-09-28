@@ -48,8 +48,8 @@ public class MessageConverter : IValueConverter
         return message.Type switch
         {
             THREAD_CREATED => $"{author} created thread \"{message.Content}\"",
-            CALL => $"{author} started voice message",
-            _ => $"{author}: {message.Content}",
+            CALL => $"{author} started a voice call",
+            _ => message.Content,
         };
     }
 
