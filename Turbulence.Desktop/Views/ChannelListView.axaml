@@ -1,18 +1,34 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+			 xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
+			 xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
              x:Class="Turbulence.Desktop.Views.ChannelListView"
              x:DataType="vm:ChannelListViewModel">
-    <UserControl.DataContext>
-        <vm:ChannelListViewModel />
-    </UserControl.DataContext>
-    <ListBox ItemsSource="{Binding Channels}"
+	<UserControl.DataContext>
+		<vm:ChannelListViewModel />
+	</UserControl.DataContext>
+	<ListBox ItemsSource="{Binding Channels}"
              Background="#2B2D31"
              SelectedValue="{Binding SelectedChannel}">
-        <ListBox.ItemTemplate>
-            <DataTemplate>
-                <TextBlock Text="{Binding Name}" />
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+		<ListBox.DataTemplates>
+			<dataTemplates:ChannelTemplateSelector>
+				<DataTemplate x:Key="GUILD_TEXT" x:DataType="channel:Channel">
+					<TextBlock Text="{Binding Name, StringFormat='#{0}'}"/>
+				</DataTemplate>
+				<DataTemplate x:Key="GUILD_VOICE" x:DataType="channel:Channel">
+					<TextBlock Text="{Binding Name, StringFormat='&#x1F50A;{0}'}"/>
+				</DataTemplate>
+				<DataTemplate x:Key="GUILD_CATEGORY" x:DataType="channel:Channel">
+					<TextBlock Text="{Binding Name, StringFormat='&#x23F7;{0}'}"/>
+				</DataTemplate>
+				<DataTemplate x:Key="GUILD_ANNOUNCEMENT" x:DataType="channel:Channel">
+					<TextBlock Text="{Binding Name, StringFormat='&#x1F4E3;{0}'}"/>
+				</DataTemplate>
+				<DataTemplate x:Key="unknown" x:DataType="channel:Channel">
+					<TextBlock Background="Red" Text="{Binding Name, StringFormat='Unknown: {0}'}"/>
+				</DataTemplate>
+			</dataTemplates:ChannelTemplateSelector>
+		</ListBox.DataTemplates>
+	</ListBox>
 </UserControl>
