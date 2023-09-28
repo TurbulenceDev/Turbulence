@@ -21,7 +21,7 @@ public class MainWindowViewModel : ViewModelBase,
         Messenger.Send(new SetStatusMsg("Not connected"));
         Task.Run(Client.Start);
         Messenger.Send(new SetStatusMsg("Connecting..."));
-        
+
         Client.Ready += OnReady;
         Client.MessageCreated += OnMessageCreated;
     }
@@ -45,9 +45,21 @@ public class MainWindowViewModel : ViewModelBase,
     }
 
     public void Receive(ChannelSelectedMsg message) => SelectedChannel = message.Channel;
-    public void Receive(ServerSelectedMsg message) => SelectedServer = message.Server;
-    public async void Receive(SendMessageMsg message) =>
-        await Api.CreateAndSendMessage(Client.HttpClient, SelectedChannel!, message.Message);
+    public void Receive(ServerSelectedMsg message)
+    {
+        SelectedServer = message.Server;
+        //TODO: only send if not cached already
+        Client.SendGatewayMessage(GatewayOpcode.LAZY_REQUEST, new LazyRequest() 
+        { 
+            Guild = message.Server.Id, 
+            Activities = false, 
+            Threads = true, 
+            Typing = false 
+        });
+    }
+
+public async void Receive(SendMessageMsg message) =>
+    await Api.CreateAndSendMessage(Client.HttpClient, SelectedChannel!, message.Message);
 }
 
 /// <summary>

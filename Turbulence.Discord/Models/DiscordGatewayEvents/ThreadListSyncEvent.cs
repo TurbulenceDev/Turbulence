@@ -31,5 +31,5 @@ public record ThreadListSyncEvent {
 	/// All thread member objects from the synced threads for the current user, indicating which threads the current user has been added to.
 	/// </summary>
 	[JsonPropertyName("members")]
-	public required ThreadMember[] Members { get; init; }
+	public ThreadMember[]? Members { get; init; }
 }

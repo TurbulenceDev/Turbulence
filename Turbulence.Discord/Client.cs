@@ -1,4 +1,7 @@
-﻿using System.Net.WebSockets;
+﻿using System.Collections.Concurrent;
+using System.Linq;
+using System.Net.WebSockets;
+using System.Reflection.Emit;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
@@ -58,7 +61,8 @@ namespace Turbulence.Discord
             await SendIdentify();
             // Start the tasks // TODO: save the tasks?
             _ = Task.Run(ReceiveTask);
-            _ = Task.Run(HeartbeatTask); 
+            _ = Task.Run(HeartbeatTask);
+            _ = Task.Run(SendTask);
             // TODO: implement a send queue, to issue gateway commands async
         }
 
@@ -252,6 +256,29 @@ namespace Turbulence.Discord
             }
         }
 
+        BlockingCollection<GatewayPayload> SendQueue = new();
+        private static readonly CancellationTokenSource SendQueueToken = new();
+        private async Task SendTask()
+        {
+            while (WebSocket.State == WebSocketState.Open)
+            {
+                try
+                {
+                    // waits till a message is available and sends it
+                    var msg = SendQueue.Take(SendQueueToken.Token);
+                    await WebSocket.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg)), default, true, default);
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"WS Send: OP: {msg.Opcode}, Event: {msg.EventName}");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                catch (TaskCanceledException)
+                {
+                    // done?
+                    return;
+                }
+            }
+        }
+
         private async Task ReceiveTask()
         {
             // TODO: something here takes up a lot of ram. may be the json stuff not being gc'ed
@@ -426,6 +453,16 @@ namespace Turbulence.Discord
                     Console.WriteLine($"[OP: {msg.Opcode}] Data: {msg.Data}");
                     break;
             }
+        }
+
+        public bool SendGatewayMessage<T>(GatewayOpcode opcode, T data)
+        {
+            var payload = new GatewayPayload()
+            {
+                Opcode = opcode,
+                Data = JsonSerializer.SerializeToNode(data),
+            };
+            return SendQueue.TryAdd(payload);
         }
 
         public async Task<User> GetCurrentUser()
