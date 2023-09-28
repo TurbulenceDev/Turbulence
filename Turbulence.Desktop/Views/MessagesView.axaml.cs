@@ -15,6 +15,11 @@ public partial class MessagesView : UserControl
     public MessagesView()
     {
         InitializeComponent();
+        if (Design.IsDesignMode)
+        {
+            // Workaround to fix design data context getting overwritten
+            DataContext = Design.GetDataContext(this);
+        }
         _vm = (MessagesViewModel)DataContext!;
 
         _vm.CurrentMessages.CollectionChanged += (_, _) =>
