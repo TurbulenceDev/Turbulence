@@ -1,34 +1,41 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
-			 xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
-			 xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
+             xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
+             xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
+             xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
              x:Class="Turbulence.Desktop.Views.ChannelListView"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="500"
              x:DataType="vm:ChannelListViewModel">
-	<UserControl.DataContext>
-		<vm:ChannelListViewModel />
-	</UserControl.DataContext>
-	<ListBox ItemsSource="{Binding Channels}"
+    <UserControl.DataContext>
+        <vm:ChannelListViewModel />
+    </UserControl.DataContext>
+    <Design.DataContext>
+        <dvm:DesignChannelListViewModel/>
+    </Design.DataContext>
+    <ListBox ItemsSource="{Binding Channels}"
              Background="#2B2D31"
              SelectedValue="{Binding SelectedChannel}">
-		<ListBox.DataTemplates>
-			<dataTemplates:ChannelTemplateSelector>
-				<DataTemplate x:Key="GUILD_TEXT" x:DataType="channel:Channel">
-					<TextBlock Text="{Binding Name, StringFormat='#{0}'}"/>
-				</DataTemplate>
-				<DataTemplate x:Key="GUILD_VOICE" x:DataType="channel:Channel">
-					<TextBlock Text="{Binding Name, StringFormat='&#x1F50A;{0}'}"/>
-				</DataTemplate>
-				<DataTemplate x:Key="GUILD_CATEGORY" x:DataType="channel:Channel">
-					<TextBlock Text="{Binding Name, StringFormat='&#x23F7;{0}'}"/>
-				</DataTemplate>
-				<DataTemplate x:Key="GUILD_ANNOUNCEMENT" x:DataType="channel:Channel">
-					<TextBlock Text="{Binding Name, StringFormat='&#x1F4E3;{0}'}"/>
-				</DataTemplate>
-				<DataTemplate x:Key="unknown" x:DataType="channel:Channel">
-					<TextBlock Background="Red" Text="{Binding Name, StringFormat='Unknown: {0}'}"/>
-				</DataTemplate>
-			</dataTemplates:ChannelTemplateSelector>
-		</ListBox.DataTemplates>
-	</ListBox>
+        <ListBox.DataTemplates>
+            <dataTemplates:ChannelTemplateSelector>
+                <DataTemplate x:Key="GUILD_TEXT" x:DataType="channel:Channel">
+                    <TextBlock Text="{Binding Name, StringFormat='#{0}'}"/>
+                </DataTemplate>
+                <DataTemplate x:Key="GUILD_VOICE" x:DataType="channel:Channel">
+                    <TextBlock Text="{Binding Name, StringFormat='&#x1F50A;{0}'}"/>
+                </DataTemplate>
+                <DataTemplate x:Key="GUILD_CATEGORY" x:DataType="channel:Channel">
+                    <TextBlock Text="{Binding Name, StringFormat='&#x23F7;{0}'}"/>
+                </DataTemplate>
+                <DataTemplate x:Key="GUILD_ANNOUNCEMENT" x:DataType="channel:Channel">
+                    <TextBlock Text="{Binding Name, StringFormat='&#x1F4E3;{0}'}"/>
+                </DataTemplate>
+                <DataTemplate x:Key="unknown" x:DataType="channel:Channel">
+                    <TextBlock Background="Red" Text="{Binding Name, StringFormat='Unknown: {0}'}"/>
+                </DataTemplate>
+            </dataTemplates:ChannelTemplateSelector>
+        </ListBox.DataTemplates>
+    </ListBox>
 </UserControl>
