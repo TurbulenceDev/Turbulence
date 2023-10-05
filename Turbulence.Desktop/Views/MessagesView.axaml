@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
              xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              xmlns:v="clr-namespace:Turbulence.Desktop.Views"
+             xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
              x:Class="Turbulence.Desktop.Views.MessagesView"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
              x:DataType="vm:MessagesViewModel">
@@ -22,12 +23,7 @@
                       Background="#313338"
                       Padding="8">
             <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock FontWeight="Bold" Text="{Binding Author.Username}" />
-                        <TextBlock Text="{Binding Converter={StaticResource MessageConverter}}" />
-                    </StackPanel>
-                </DataTemplate>
+                <dataTemplates:MessageTemplate />
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </ScrollViewer>
