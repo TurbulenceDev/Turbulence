@@ -28,6 +28,8 @@
             <Setter Property="FontSize" Value="10"/>
             <Setter Property="FontWeight" Value="SemiLight"/>
             <Setter Property="Margin" Value="5,0"/>
+            <Setter Property="ToolTip.Placement" Value="Center"/>
+            <Setter Property="ToolTip.VerticalOffset" Value="-25"/>
         </Style>
         <Style Selector="Border.Image">
             <Setter Property="Height" Value="40"/>

@@ -35,11 +35,13 @@ public class MessageTemplate : IDataTemplate
             Text = message.GetBestAuthorName()
         };
         author.Classes.Add("Author");
+        var localTime = message.Timestamp.ToLocalTime();
         var timestamp = new TextBlock()
         {
-            Text = message.Timestamp.ToString()
+            Text = localTime.ToString("G") // TODO: make timestamp relative?
         };
         timestamp.Classes.Add("Timestamp");
+        timestamp.SetValue(ToolTip.TipProperty, localTime.ToString("F")); // shows detailed time as tooltip
         header.Children.Add(author);
         header.Children.Add(timestamp);
         parent.Children.Add(header);
