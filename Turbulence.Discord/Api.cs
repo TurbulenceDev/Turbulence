@@ -14,6 +14,7 @@ public static class Api
     public const string Version = "9";
     private const string RootAdress = "https://discord.com/api";
     private const string ApiRoot = $"{RootAdress}/v{Version}";
+    private const string CdnRoot = "https://cdn.discordapp.com/";
 
     private static async Task<T> Get<T>(HttpClient client, string endpoint)
     {
@@ -76,6 +77,17 @@ public static class Api
         return await response.Content.ReadFromJsonAsync<T>() ?? throw new ApiException($"ApiCall to {endpoint} failed");
     }
 
+    private static async Task<byte[]> CdnGet(HttpClient client, string endpoint)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"{ApiRoot}{endpoint}");
+        var response = await client.SendAsync(req);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new ApiException($"Got CDN Error: {response.StatusCode}, {response.ReasonPhrase}");
+        }
+        return await response.Content.ReadAsByteArrayAsync();
+    }
+
     // Implements https://discord.com/developers/docs/topics/gateway#get-gateway
     public static async Task<Uri> GetGateway(HttpClient client)
     {
@@ -131,5 +143,15 @@ public static class Api
             Flags = 0, // TODO: silent
         };
         return await Post<Message>(client, $"/channels/{channel.Id}/messages", JsonSerializer.Serialize(obj));
+    }
+
+    public static async Task<byte[]> GetAvatar(HttpClient client, Snowflake user, string avatar, int size = 32)
+    {
+        return await CdnGet(client, $"avatars/{user}/{avatar}.webp?size={size}");
+    }
+
+    public static async Task<byte[]> GetDefaultAvatar(HttpClient client, int index)
+    {
+        return await CdnGet(client, $"embed/avatars/{index}.png");
     }
 }

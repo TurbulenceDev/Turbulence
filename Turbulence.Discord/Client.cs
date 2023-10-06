@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using System.Linq;
 using System.Net.WebSockets;
-using System.Reflection.Emit;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
@@ -36,11 +34,13 @@ namespace Turbulence.Discord
         // idk where to move this
         private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
         public static HttpClient HttpClient = new();
+        public static HttpClient CdnClient = new();
         ClientWebSocket WebSocket { get; set; }
         public Client()
         {
             // Set up http client
             HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
+            CdnClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
             // WS
             WebSocket = new();
             // Token
@@ -403,6 +403,19 @@ namespace Turbulence.Discord
         public async Task<Guild> GetGuild(Snowflake guild)
         {
             return Guilds.TryGetValue(guild, out var ret) ? ret : await Api.GetGuild(HttpClient, guild);
+        }
+
+        public async Task<byte[]> GetAvatar(User user, int size = 32)
+        {
+            // https://discord.com/developers/docs/reference#image-formatting
+            if (user.Avatar == null)
+            {
+                // index depends on whether the user switched to new username system
+                // users with a username have a Discriminator of "0"
+                var index = user.Discriminator == "0" ? (int)(user.Id >> 22) % 6 : int.Parse(user.Discriminator) % 5;
+                return await Api.GetDefaultAvatar(CdnClient, index);
+            }
+            return await Api.GetAvatar(CdnClient, user.Id, user.Avatar!, size);
         }
     }
 }
