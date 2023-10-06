@@ -54,7 +54,7 @@ public class MainWindowViewModel : ViewModelBase,
             Guild = message.Server.Id, 
             Activities = false, 
             Threads = true, 
-            Typing = false 
+            Typing = true 
         });
     }
 

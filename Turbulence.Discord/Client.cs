@@ -141,77 +141,6 @@ namespace Turbulence.Discord
         //public static List<dynamic> MemberInfos = new(); // TODO: should we like put the roles into a simple array?
         public static Dictionary<Snowflake, Guild> Guilds = new();
         //public static List<dynamic> ServerSettings = new(); // TODO: listen to the guild settings update event
-        private static async Task<bool> IsMentioned(Message message)
-        {
-            // Was everyone pinged?
-            if (message.MentionEveryone)
-                return true;
-
-            // Were we directly pinged (this also handles replies)?
-            if (message.Mentions.Any(m => m.Id == User.Id))
-                return true;
-
-            // Was our role pinged?
-            if (message.GuildId is not { } guildId)
-            {
-                // Not a guild
-                return false;
-            }
-
-            var member = await Api.GetCurrentUserGuildMember(Client.HttpClient, guildId);
-            return member.Roles.Any(r => message.MentionRoles.Any(m => m.Id == r.Id));
-        }
-
-        // checks if a message should trigger a notification
-        // TODO: fix
-        private static async Task<bool> ShouldNotify(Message message, bool mentioned)
-        {
-            //flow:
-            // msg comes in
-            // is server muted? notif depending on mention
-            // if channelOverride exists
-            //  is channel muted? no notif
-            //  notif depending on channel message notification settings
-            // notif depending on server message notification settings
-
-            // each setting can contain guild wide settings and specific channel overrides
-            // TODO: make message_notifications (0 = all, 1 = only mention, 2 = none, 3 = inherit server) into a enum
-            // TODO: also check ignore @everyone/@here/roles if we disabled it; probably need a MentionType enum instead of a bool
-            // foreach (var setting in ServerSettings)
-            // {
-            //     // is server muted? no ping if not mentioned
-            //     if (setting.guild_id == message.guild_id && setting.muted == true)
-            //         return mentioned; // mentions still go through mutes // TODO: can we set "ignore @everyone" here?
-            //
-            //     // check channel specific
-            //     foreach (var channelOverride in setting.channel_overrides)
-            //     {
-            //         if (channelOverride.channel_id == message.ChannelId)
-            //         {
-            //             // channel muted
-            //             if (channelOverride.muted == true)
-            //                 return false;
-            //
-            //             var notification = channelOverride.message_notifications;
-            //             if (notification == 3) //inherit from server
-            //                 notification = setting.message_notifications;
-            //
-            //             return notification == 0 || // notify all
-            //                 (notification == 1 && mentioned); // only mention
-            //         }
-            //     }
-            //
-            //     // then check server wide mute/notif settings
-            //     if (setting.guild_id == message.guild_id)
-            //     {
-            //         return setting.message_notifications == 0 || // notify all
-            //                 (setting.message_notifications == 1 && mentioned); // only mention
-            //     }
-            // }
-
-            // if there is no entry/we are here, it should probably notify
-            return false;
-        }
 
         // TODO: move these into a gateway class thingy?
         private static int? _heartbeatInterval; // Time between heartbeats
@@ -269,6 +198,8 @@ namespace Turbulence.Discord
                     await WebSocket.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg)), default, true, default);
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"WS Send: OP: {msg.Opcode}, Event: {msg.EventName}");
+                    if (msg.Data != null)
+                        Console.WriteLine(msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
                     Console.ForegroundColor = ConsoleColor.White;
                 }
                 catch (TaskCanceledException)
@@ -368,32 +299,12 @@ namespace Turbulence.Discord
                         {
                             // TODO: enumify these (nuts), https://discord.com/developers/docs/topics/rpc#commands-and-events-rpc-events
                             case "MESSAGE_CREATE":
-                                //Console.WriteLine(msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
-
                                 if (msg.Data.Deserialize<Message>() is not { } message)
                                 {
                                     Console.WriteLine("Invalid message received on MESSAGE_CREATE");
                                     return;
                                 }
 
-                                /*var mentioned = await IsMentioned(message);
-                                if (mentioned)
-                                {
-                                    Console.ForegroundColor = ConsoleColor.Red;
-                                    Console.Write("[PING] ");
-                                    Console.ForegroundColor = ConsoleColor.White;
-                                }
-                                // check if we should get a notification
-                                if (await ShouldNotify(message, mentioned))
-                                {
-                                    Console.ForegroundColor = ConsoleColor.Yellow;
-                                    Console.Write("[NOTIF] ");
-                                    Console.ForegroundColor = ConsoleColor.White;
-                                }
-                                // TODO: edit the msg content with mentioned role/user names as well as making it a reply
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine($"{message.Author.Username}: {message.Content}");
-                                Console.ForegroundColor = ConsoleColor.White;*/
                                 MessageCreated?.Invoke(null, new Event<Message>(message));
                                 break;
                             case "READY":
@@ -412,11 +323,6 @@ namespace Turbulence.Discord
                                 // foreach (var member in ready.)
                                 //     MemberInfos.Add(member);
 
-                                /*Console.WriteLine("READY");
-                                Console.WriteLine($"Current User: {User.GlobalName} ({User.Username})");
-                                Console.WriteLine("Servers:");
-                                foreach (var guild in Guilds)
-                                    Console.WriteLine($"-{guild.Name} (ID: {guild.Id})");*/
                                 Ready?.Invoke(null, new Event<Ready>(ready));
                                 break;
                             case "THREAD_LIST_SYNC":
@@ -426,6 +332,14 @@ namespace Turbulence.Discord
                                     return;
                                 }
                                 //TODO: thread list sync event + add data to guilds
+                                break;
+                            case "TYPING_START":
+                                if (msg.Data.Deserialize<TypingStartEvent>() is not { } typingStart)
+                                {
+                                    Console.WriteLine("Invalid message received on TYPING_START");
+                                    return;
+                                }
+                                //TODO: add user to a list of users typing in that channel, then either wait 8/10(?) seconds or for a message create and delete the user from that list
                                 break;
                             default:
                                 Console.WriteLine($"[Event: {msg.EventName}] Data: {msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true })}");
