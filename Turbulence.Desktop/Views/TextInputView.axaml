@@ -3,22 +3,38 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="40"
+             x:DataType="vm:TextInputViewModel"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="64"
              x:Class="Turbulence.Desktop.Views.TextInputView">
     <UserControl.DataContext>
         <vm:TextInputViewModel />
     </UserControl.DataContext>
-    <DockPanel Background="#313338">
-        <Button DockPanel.Dock="Right"
-                Margin="0 5 5 5"
-                Background="#383A40"
-                Click="OnSend">
-            Send
-        </Button>
-        <TextBox Name="TextInput" 
-                 BorderThickness="0"
-                 Background="#383A40"
-                 Margin="5"
-                 Watermark="Message" />
-    </DockPanel>
+    <UserControl.Styles>
+        <Style Selector="Grid.TextInput">
+            <Setter Property="Background" Value="#313338"/>
+        </Style>
+        <Style Selector="TextBlock.Status">
+            <Setter Property="Margin" Value="5,0"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style Selector="TextBox#TextInput">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Background" Value="#383A40"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style Selector="Button#SendButton">
+            <Setter Property="Background" Value="#383A40"/>
+            <Setter Property="Margin" Value="0,5,5,5"/>
+        </Style>
+    </UserControl.Styles>
+    <Grid Classes="TextInput" RowDefinitions="Auto, 24">
+        <DockPanel>
+            <Button Name="SendButton" DockPanel.Dock="Right" Click="OnSend">
+                Send
+            </Button>
+            <TextBox Name="TextInput" Watermark="Message" />
+        </DockPanel>
+        <TextBlock Classes="Status" Text="{Binding TypingStatus}" Grid.Row="1"/>
+    </Grid>
 </UserControl>
