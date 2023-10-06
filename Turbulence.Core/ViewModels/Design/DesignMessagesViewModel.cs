@@ -23,20 +23,21 @@ public class DesignMessagesViewModel : MessagesViewModel
             Discriminator = "0",
             Avatar = ""
         };
+        var now = DateTimeOffset.Now;
         CurrentMessages.AddRange(new List<Message> {
-            CreateMessage("hello", MessageType.DEFAULT, user1),
-            CreateMessage("no", MessageType.DEFAULT, user2)
+            CreateMessage("hello", MessageType.DEFAULT, user1, now - new TimeSpan(24, 0, 0)),
+            CreateMessage("no", MessageType.DEFAULT, user2, now - new TimeSpan(0, 1, 0)),
         });
     }
 
-    private static Message CreateMessage(string content, MessageType type, User author) => new Message()
+    private static Message CreateMessage(string content, MessageType type, User author, DateTimeOffset timestamp) => new Message()
     {
         Content = content,
         Type = type,
         Author = author,
         Id = new(0),
         ChannelId = new(0),
-        Timestamp = DateTime.UnixEpoch,
+        Timestamp = timestamp,
         EditedTimestamp = null,
         Tts = false,
         MentionEveryone = false,
