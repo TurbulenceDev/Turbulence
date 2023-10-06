@@ -7,7 +7,7 @@
              xmlns:v="clr-namespace:Turbulence.Desktop.Views"
              xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
              x:Class="Turbulence.Desktop.Views.MessagesView"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
              x:DataType="vm:MessagesViewModel">
     <UserControl.DataContext>
         <vm:MessagesViewModel />
@@ -18,12 +18,36 @@
     <UserControl.Resources>
         <v:MessageConverter x:Key="MessageConverter"/>
     </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="TextBlock.Author">
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="TextBlock.Timestamp">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="Gray"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="SemiLight"/>
+            <Setter Property="Margin" Value="5,0"/>
+        </Style>
+        <Style Selector="Border.Image">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Grid.Message">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+        <Style Selector="StackPanel.MessageContent">
+            <Setter Property="Margin" Value="5,0"/>
+        </Style>
+    </UserControl.Styles>
     <ScrollViewer Name="Scroll">
         <ItemsControl ItemsSource="{Binding CurrentMessages}"
                       Background="#313338"
                       Padding="8">
             <ItemsControl.ItemTemplate>
-                <dataTemplates:MessageTemplate />
+                <dataTemplates:MessageTemplate/>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </ScrollViewer>

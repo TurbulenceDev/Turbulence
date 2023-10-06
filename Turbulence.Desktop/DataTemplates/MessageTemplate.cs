@@ -15,13 +15,38 @@ public class MessageTemplate : IDataTemplate
         if (param is not Message message)
             return new TextBlock() { Text = "Error" };
 
+        var grid = new Grid()
+        {
+            ColumnDefinitions = new("Auto,*")
+        };
+        grid.Classes.Add("Message");
+        // Avatar //TODO: actually use images
+        var image = new Border();
+        image.Classes.Add("Image");
+        grid.Children.Add(image);
+        // Message
         var parent = new StackPanel() { Orientation = Orientation.Vertical };
-        parent.Children.Add(new TextBlock() 
-        { 
-            FontWeight = FontWeight.Bold, 
-            Text = message.GetBestAuthorName() 
-        });
+        parent.Classes.Add("MessageContent");
+        parent.SetValue(Grid.ColumnProperty, 1);
+        // Header
+        var header = new StackPanel() { Orientation = Orientation.Horizontal };
+        var author = new TextBlock()
+        {
+            Text = message.GetBestAuthorName()
+        };
+        author.Classes.Add("Author");
+        var timestamp = new TextBlock()
+        {
+            Text = message.Timestamp.ToString()
+        };
+        timestamp.Classes.Add("Timestamp");
+        header.Children.Add(author);
+        header.Children.Add(timestamp);
+        parent.Children.Add(header);
+        // Content
         parent.Children.Add(new TextBlock() { Text = message.Content });
-        return parent;
+        // TODO: reactions?
+        grid.Children.Add(parent);
+        return grid;
     }
 }
