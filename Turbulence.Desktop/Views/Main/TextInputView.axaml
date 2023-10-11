@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
              x:DataType="vm:TextInputViewModel"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="64"
-             x:Class="Turbulence.Desktop.Views.TextInputView">
+             x:Class="Turbulence.Desktop.Views.Main.TextInputView">
     <UserControl.DataContext>
         <vm:TextInputViewModel />
     </UserControl.DataContext>

@@ -6,7 +6,7 @@
              xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
              xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
-             x:Class="Turbulence.Desktop.Views.ChannelListView"
+             x:Class="Turbulence.Desktop.Views.Main.ChannelListView"
              mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="500"
              x:DataType="vm:ChannelListViewModel">
     <UserControl.DataContext>

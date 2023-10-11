@@ -2,11 +2,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+        xmlns:v="clr-namespace:Turbulence.Desktop.Views.Settings"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
 		Width="600" Height="500"
 		MinWidth="600" MinHeight="500"
 		WindowStartupLocation="CenterOwner"
         x:Class="Turbulence.Desktop.SettingsWindow"
         Title="Settings">
-  Welcome to Avalonia!
+	<TabControl TabStripPlacement="Left" Background="#313338" Padding="10,10">
+		<TabItem Header="General">
+			<v:GeneralSettingsView/>
+		</TabItem>
+		<TabItem Header="Account">
+			<v:AccountSettingsView/>
+		</TabItem>
+	</TabControl>
 </Window>

@@ -6,7 +6,7 @@ using Turbulence.Core.ViewModels;
 using Turbulence.Discord.Models.DiscordChannel;
 using static Turbulence.Discord.Models.DiscordChannel.MessageType;
 
-namespace Turbulence.Desktop.Views;
+namespace Turbulence.Desktop.Views.Main;
 
 public partial class MessagesView : UserControl
 {

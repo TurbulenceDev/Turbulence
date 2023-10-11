@@ -1,10 +1,10 @@
 using Avalonia.Controls;
 
-namespace Turbulence.Desktop.Views;
+namespace Turbulence.Desktop.Views.Main;
 
-public partial class ChannelListView : UserControl
+public partial class ServerListView : UserControl
 {
-    public ChannelListView()
+    public ServerListView()
     {
         InitializeComponent();
         if (Design.IsDesignMode)
