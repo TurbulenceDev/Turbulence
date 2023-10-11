@@ -12,12 +12,21 @@
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
-    <Grid ColumnDefinitions="75,200,*">
-        <v:ServerListView />
-        <v:ChannelListView Grid.Column="1" />
-        <DockPanel Grid.Column="2">
-            <v:TextInputView DockPanel.Dock="Bottom" />
-            <v:MessagesView />
-        </DockPanel>
-    </Grid>
+	<DockPanel>
+		<Menu DockPanel.Dock="Top" Background="#23272a">
+			<MenuItem Header="_File">
+				<MenuItem Header="_Settings" Click="OnSettings"/>
+				<Separator/>
+				<MenuItem Header="_Exit" Click="OnExit"/>
+			</MenuItem>
+		</Menu>
+		<Grid ColumnDefinitions="75,200,*">
+			<v:ServerListView />
+			<v:ChannelListView Grid.Column="1" />
+			<DockPanel Grid.Column="2">
+				<v:TextInputView DockPanel.Dock="Bottom" />
+				<v:MessagesView />
+			</DockPanel>
+		</Grid>
+	</DockPanel>
 </Window>

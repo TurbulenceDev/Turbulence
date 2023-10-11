@@ -63,7 +63,6 @@ namespace Turbulence.Discord
             _ = Task.Run(ReceiveTask);
             _ = Task.Run(HeartbeatTask);
             _ = Task.Run(SendTask);
-            // TODO: implement a send queue, to issue gateway commands async
         }
 
         public void SetWebsocketHeaders()

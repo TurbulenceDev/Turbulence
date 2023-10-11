@@ -7,7 +7,7 @@ namespace Turbulence.Core.ViewModels;
 public partial class TextInputViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private string? _typingStatus;
+    private string? _typingStatus = "";
 
     [RelayCommand]
     private void SendMessage(string message)
