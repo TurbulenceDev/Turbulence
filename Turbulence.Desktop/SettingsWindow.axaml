@@ -10,6 +10,9 @@
 		WindowStartupLocation="CenterOwner"
         x:Class="Turbulence.Desktop.SettingsWindow"
         Title="Settings">
+	<Window.DataContext>
+		<vm:SettingsViewModel />
+	</Window.DataContext>
 	<TabControl TabStripPlacement="Left" Background="#313338" Padding="10,10">
 		<TabItem Header="General">
 			<v:GeneralSettingsView/>

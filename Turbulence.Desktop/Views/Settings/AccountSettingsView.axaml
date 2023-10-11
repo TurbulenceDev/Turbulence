@@ -5,5 +5,11 @@
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
              x:Class="Turbulence.Desktop.Views.Settings.AccountSettingsView"
 			 Background="#313338">
-  Account
+	<StackPanel Orientation="Vertical">
+		<Grid ColumnDefinitions="*,auto,auto">
+			<TextBox Name="Token" Watermark="Token" PasswordChar="*" Grid.Column="0"/>
+			<Button Click="OnSetToken" Grid.Column="1">Set Token</Button>
+			<CheckBox Checked="OnTokenShow" Grid.Column="2">Show</CheckBox>
+		</Grid>
+	</StackPanel>
 </UserControl>
