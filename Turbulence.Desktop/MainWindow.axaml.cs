@@ -7,7 +7,7 @@ namespace Turbulence.Desktop;
 
 public partial class MainWindow : Window
 {
-    SettingsWindow? _settingsWindow;
+    private SettingsWindow? _settingsWindow;
     public MainWindow()
     {
         InitializeComponent();
@@ -15,19 +15,14 @@ public partial class MainWindow : Window
 
     public async void OnSettings(object? _1, RoutedEventArgs _2)
     {
-        //TODO: instead show as a independent window?
-        _settingsWindow = new();
+        // TODO: instead show as a independent window?
+        _settingsWindow = new SettingsWindow();
         await _settingsWindow.ShowDialog(this);
     }
 
     public void OnExit(object? _1, RoutedEventArgs _2)
     {
-        var current = Application.Current;
-        if (current == null)
-            return;
-
-        var lifetime = current.ApplicationLifetime;
-        if (lifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             desktop.Shutdown();
     }
 }
