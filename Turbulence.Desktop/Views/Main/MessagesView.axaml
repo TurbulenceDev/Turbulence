@@ -15,9 +15,6 @@
     <Design.DataContext>
         <dvm:DesignMessagesViewModel/>
     </Design.DataContext>
-    <UserControl.Resources>
-        <v:MessageConverter x:Key="MessageConverter"/>
-    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="TextBlock.Author">
             <Setter Property="FontWeight" Value="Bold"/>

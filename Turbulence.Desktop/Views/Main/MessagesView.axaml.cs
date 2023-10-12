@@ -1,10 +1,6 @@
-using System.Globalization;
 using Avalonia.Controls;
-using Avalonia.Data.Converters;
 using Avalonia.Threading;
 using Turbulence.Core.ViewModels;
-using Turbulence.Discord.Models.DiscordChannel;
-using static Turbulence.Discord.Models.DiscordChannel.MessageType;
 
 namespace Turbulence.Desktop.Views.Main;
 
@@ -35,24 +31,4 @@ public partial class MessagesView : UserControl
             });
         }; 
     }
-}
-
-public class MessageConverter : IValueConverter
-{
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        if (targetType != typeof(string) || value is not Message message)
-            throw new NotSupportedException();
-        
-        var author = message.GetBestAuthorName();
-        return message.Type switch
-        {
-            THREAD_CREATED => $"{author} created thread \"{message.Content}\"",
-            CALL => $"{author} started a voice call",
-            _ => message.Content,
-        };
-    }
-
-    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
-        throw new NotSupportedException();
 }

@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Turbulence.Desktop.Views.Main.MessageView">
+    <Grid ColumnDefinitions="Auto,*" Classes="Message">
+        <Border Name="Image"  Classes="Image" />
+        <StackPanel Grid.Column="1"
+                    Orientation="Vertical"
+                    Classes="MessageContent">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Name="Author" Classes="Author" />
+                <TextBlock Name="Timestamp" Classes="Timestamp" />
+            </StackPanel>
+            <TextBlock Name="Content" />
+        </StackPanel>
+    </Grid>
+</UserControl>
