@@ -4,5 +4,6 @@
              RequestedThemeVariant="Dark">
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="Style/Style.axaml" />
     </Application.Styles>
 </Application>
