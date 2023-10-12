@@ -15,6 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbulence.Core", "Turbulen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbulence.Desktop", "Turbulence.Desktop\Turbulence.Desktop.csproj", "{EE593AB4-B2BA-4872-A33B-E695BBF2B232}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{83FBB5FD-A549-4A21-A5D4-E68F027A0DD1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{47047DC2-0CF4-4ECA-B5A7-A536F3EDEFA4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{C0D654EF-8CDC-4090-B40C-485E645355E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,5 +57,12 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {80B3CED7-2126-4425-A0E4-833CCC5F9649}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{615DD5FC-B1EE-4132-BA29-02EE988C59BB} = {47047DC2-0CF4-4ECA-B5A7-A536F3EDEFA4}
+		{5C9C116F-CC5F-4FCD-BE4C-BC5DCA992B87} = {C0D654EF-8CDC-4090-B40C-485E645355E1}
+		{EE593AB4-B2BA-4872-A33B-E695BBF2B232} = {C0D654EF-8CDC-4090-B40C-485E645355E1}
+		{03A741E6-770F-4013-A26D-1CC2FB7BF9CC} = {83FBB5FD-A549-4A21-A5D4-E68F027A0DD1}
+		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD} = {C0D654EF-8CDC-4090-B40C-485E645355E1}
 	EndGlobalSection
 EndGlobal
