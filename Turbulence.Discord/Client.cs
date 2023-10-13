@@ -33,8 +33,8 @@ namespace Turbulence.Discord
 
         // idk where to move this
         private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
-        public static HttpClient HttpClient = new();
-        public static HttpClient CdnClient = new();
+        public static readonly HttpClient HttpClient = new();
+        public static readonly HttpClient CdnClient = new();
         ClientWebSocket WebSocket { get; set; }
         public Client()
         {
@@ -67,7 +67,8 @@ namespace Turbulence.Discord
 
         public void SetWebsocketHeaders()
         {
-            // TODO: implement zlib (de)compression // TODO: additional headers like Accept-Language etc? (also doesnt contain Connection: keep-alive); enable deflate extension (not used)?
+            // TODO: implement zlib (de)compression
+            // TODO: additional headers like Accept-Language etc? (also doesnt contain Connection: keep-alive); enable deflate extension (not used)?
             WebSocket.Options.SetRequestHeader("User-Agent", UserAgent);
             WebSocket.Options.SetRequestHeader("Origin", "https://discord.com");
             WebSocket.Options.SetRequestHeader("Accept", "*/*");

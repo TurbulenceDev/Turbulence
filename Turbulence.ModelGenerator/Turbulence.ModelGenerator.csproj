@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="Out\**" />
-      <EmbeddedResource Remove="Out\**" />
-      <None Remove="Out\**" />
+        <Compile Remove="Out\**" />
+        <EmbeddedResource Remove="Out\**" />
+        <None Remove="Out\**" />
     </ItemGroup>
 </Project>

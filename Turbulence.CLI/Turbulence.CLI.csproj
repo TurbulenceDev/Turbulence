@@ -1,23 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <WarningsAsErrors>nullable</WarningsAsErrors>
-    <UserSecretsId>18d7090e-dbad-4896-a6bf-8cc781e827f1</UserSecretsId>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+        <UserSecretsId>18d7090e-dbad-4896-a6bf-8cc781e827f1</UserSecretsId>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0"/>
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Turbulence.Discord\Turbulence.Discord.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Turbulence.Discord\Turbulence.Discord.csproj"/>
+    </ItemGroup>
 
 </Project>

@@ -11,26 +11,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.0.4" />
-      <PackageReference Include="Avalonia.Desktop" Version="11.0.4" />
-      <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4" />
+        <PackageReference Include="Avalonia" Version="11.0.4"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.4"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4"/>
     </ItemGroup>
 
     <ItemGroup Condition="$(Configuration) == Debug">
-      <PackageReference Include="Avalonia.Diagnostics" Version="11.0.4" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.0.4"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Turbulence.Core\Turbulence.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Views\Settings\AccountSettingsView.axaml.cs">
-        <DependentUpon>AccountSettingsView.axaml</DependentUpon>
-      </Compile>
-      <Compile Update="Views\Settings\GeneralSettingsView.axaml.cs">
-        <DependentUpon>GeneralSettingsView.axaml</DependentUpon>
-      </Compile>
+        <ProjectReference Include="..\Turbulence.Core\Turbulence.Core.csproj"/>
     </ItemGroup>
 
 </Project>
