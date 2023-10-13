@@ -1,12 +1,12 @@
 <Styles xmlns="https://github.com/avaloniaui">
     <Style Selector="TextBlock.Author">
-        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontWeight" Value="Medium"/>
     </Style>
     <Style Selector="TextBlock.Timestamp">
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="Gray"/>
         <Setter Property="FontSize" Value="10"/>
-        <Setter Property="FontWeight" Value="SemiLight"/>
+        <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Margin" Value="5,0"/>
         <Setter Property="ToolTip.Placement" Value="Center"/>
         <Setter Property="ToolTip.VerticalOffset" Value="-25"/>
@@ -22,5 +22,8 @@
     </Style>
     <Style Selector="StackPanel.MessageContent">
         <Setter Property="Margin" Value="5,0"/>
+    </Style>
+    <Style Selector="TextBlock.MessageContent">
+        <Setter Property="FontWeight" Value="SemiLight" />
     </Style>
 </Styles>
