@@ -1,6 +1,6 @@
-using System.Collections.ObjectModel;
 using System.Numerics;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
@@ -10,6 +10,7 @@ namespace Turbulence.Core.ViewModels;
 public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannelsMsg>, IRecipient<ServerSelectedMsg>
 {
     public ObservableList<Channel> Channels { get; } = new();
+    private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
 
     [ObservableProperty]
     private Channel? _selectedChannel;
@@ -30,7 +31,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
         Channels.Clear();
         
         // TODO: Move this to its own method
-        if (m.Server.OwnerId == Client.User.Id)
+        if (m.Server.OwnerId == _client.CurrentUser?.Id)
         {
             Channels.ReplaceAll(m.Server.Channels);
         }
@@ -38,7 +39,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
         {
             var everyoneRole = m.Server.Roles.First(r => r.Id == m.Server.Id);
             // TODO: Get rid of API call
-            var myGuildMember = await Api.GetCurrentUserGuildMember(Client.HttpClient, m.Server.Id);
+            var myGuildMember = await Api.GetCurrentUserGuildMember(_client.HttpClient, m.Server.Id);
             var myRoles = m.Server.Roles.Where(r => myGuildMember.Roles.Contains(r.Id)).ToList();
 
             var perms = BigInteger.Parse(everyoneRole.Permissions);
@@ -60,7 +61,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
                     // Add overwrites for my roles
                     toApply.AddRange(overwrites.Where(o => o.Type == 0 && myRoles.Exists(r => r.Id == o.Id))); 
                     // Add overwrites for me specifically
-                    toApply.AddRange(overwrites.Where(o => o.Type == 1 && o.Id == Client.User.Id));
+                    toApply.AddRange(overwrites.Where(o => o.Type == 1 && o.Id == _client.CurrentUser?.Id));
 
                     // Then apply
                     foreach (var overwrite in toApply)

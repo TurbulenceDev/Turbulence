@@ -2,6 +2,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Turbulence.Discord;
 
 namespace Turbulence.Desktop;
 
@@ -9,6 +12,11 @@ internal class Program : Application
 {
     public static void Main(string[] args)
     {
+        var provider = new ServiceCollection()
+            .AddSingleton<IPlatformClient, Client>()
+            .BuildServiceProvider();
+        Ioc.Default.ConfigureServices(provider);
+    
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, ShutdownMode.OnMainWindowClose);
     }
 
@@ -16,12 +24,12 @@ internal class Program : Application
     {
         return AppBuilder.Configure<Program>().UsePlatformDetect();
     }
-    
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
     }
-    
+
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

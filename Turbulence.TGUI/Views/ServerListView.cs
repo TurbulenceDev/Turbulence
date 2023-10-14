@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
 using Turbulence.Core.ViewModels;
@@ -54,6 +55,7 @@ public class ServerTreeBuilder : ITreeBuilder<ServerTreeNode>
 {
     public bool SupportsCanExpand => true;
     private readonly ServerListViewModel _vm;
+    private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
 
     public ServerTreeBuilder(ServerListViewModel vm)
     {
@@ -99,7 +101,7 @@ public class ServerTreeBuilder : ITreeBuilder<ServerTreeNode>
                 {
                     // Failed to find guild, probably because the guild was from a gateway event. Get it from the API directly
                     // TODO: Can we do this another way?
-                    var channel = Task.Run(() => Api.GetChannel(Client.HttpClient, categoryNode.Channel.Id)).GetAwaiter().GetResult();
+                    var channel = Task.Run(() => Api.GetChannel(_client.HttpClient, categoryNode.Channel.Id)).GetAwaiter().GetResult();
 
                     if (_vm.Servers.FirstOrDefault(g => g.Id == channel.GuildId) is not { } retryGuild)
                         throw new Exception("Can't find guild associated with channel");

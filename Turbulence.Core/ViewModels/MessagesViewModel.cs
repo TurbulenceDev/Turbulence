@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
@@ -9,6 +10,8 @@ namespace Turbulence.Core.ViewModels;
 public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreatedMsg>, IRecipient<ChannelSelectedMsg>
 {
     public ObservableList<Message> CurrentMessages { get; } = new();
+    
+    private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
     
     [ObservableProperty]
     private string _title = "";
@@ -21,11 +24,11 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
         {
             DM => $"Messages: {(message.Channel.Recipients is { } recipients
                 ? recipients.First().Username
-                : (await Api.GetChannel(Client.HttpClient, message.Channel.Id)).Recipients?.First().Username) ?? "unknown"}",
+                : (await _client.GetChannel(message.Channel.Id)).Recipients?.First().Username) ?? "unknown"}",
             _ => $"Messages: {message.Channel.Name}",
         };
 
-        var channelMessages = await MainWindowViewModel.Client.GetMessages(message.Channel.Id);
+        var channelMessages = await _client.GetMessages(message.Channel.Id);
         CurrentMessages.Clear();
          foreach (var channelMessage in channelMessages.Reverse())
          {

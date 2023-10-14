@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
@@ -11,19 +12,20 @@ public class MainWindowViewModel : ViewModelBase,
     IRecipient<ChannelSelectedMsg>,
     IRecipient<SendMessageMsg>
 {
-    public static readonly Client Client = new(); // TODO: Move this to model or something I guess
     public static Guild? SelectedServer { get; private set; }
     public static Channel? SelectedChannel { get; private set; }
+    
+    private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
 
     public MainWindowViewModel()
     {
         // TODO: Move all this somewhere else
         Messenger.Send(new SetStatusMsg("Not connected"));
-        Task.Run(Client.Start);
+        Task.Run(_client.Start);
         Messenger.Send(new SetStatusMsg("Connecting..."));
 
-        Client.Ready += OnReady;
-        Client.MessageCreated += OnMessageCreated;
+        _client.Ready += OnReady;
+        _client.MessageCreated += OnMessageCreated;
     }
 
     private void OnReady(object? sender, Event<Ready> e)
@@ -49,17 +51,17 @@ public class MainWindowViewModel : ViewModelBase,
     {
         SelectedServer = message.Server;
         //TODO: only send if not cached already
-        Client.SendGatewayMessage(GatewayOpcode.LAZY_REQUEST, new LazyRequest() 
-        { 
-            Guild = message.Server.Id, 
-            Activities = false, 
-            Threads = true, 
-            Typing = true 
+        _client.SendGatewayMessage(GatewayOpcode.LAZY_REQUEST, new LazyRequest() 
+        {
+            Guild = message.Server.Id,
+            Activities = false,
+            Threads = true,
+            Typing = true,
         });
     }
 
-public async void Receive(SendMessageMsg message) =>
-    await Api.CreateAndSendMessage(Client.HttpClient, SelectedChannel!, message.Message);
+    public async void Receive(SendMessageMsg message) =>
+        await Api.CreateAndSendMessage(_client.HttpClient, SelectedChannel!, message.Message);
 }
 
 /// <summary>

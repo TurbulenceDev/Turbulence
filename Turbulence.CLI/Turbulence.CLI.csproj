@@ -6,7 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
-        <UserSecretsId>18d7090e-dbad-4896-a6bf-8cc781e827f1</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,6 +17,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Turbulence.Discord\Turbulence.Discord.csproj"/>
+        <ProjectReference Include="..\Turbulence.Core\Turbulence.Core.csproj"/>
     </ItemGroup>
 
 </Project>

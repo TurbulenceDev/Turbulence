@@ -22,6 +22,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Turbulence.Core\Turbulence.Core.csproj"/>
+        <ProjectReference Include="..\Turbulence.Discord\Turbulence.Discord.csproj"/>
     </ItemGroup>
 
 </Project>

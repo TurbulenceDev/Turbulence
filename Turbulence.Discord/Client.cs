@@ -23,19 +23,19 @@ namespace Turbulence.Discord
         public T Data { get; set; }
     }
 
-    public class Client
+    public class Client : IPlatformClient
     {
-        // TODO: should this class contain the token?
-        private string Token;
+        // TODO: should this class contain the token? probably but maybe make it a SecureString or something
+        private readonly string _token;
         // Events
-        public static event EventHandler<Event<Ready>>? Ready;
-        public static event EventHandler<Event<Message>>? MessageCreated;
+        public event EventHandler<Event<Ready>>? Ready;
+        public event EventHandler<Event<Message>>? MessageCreated;
 
         // idk where to move this
         private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
-        public static readonly HttpClient HttpClient = new();
+        public HttpClient HttpClient { get; } = new();
         public static readonly HttpClient CdnClient = new();
-        ClientWebSocket WebSocket { get; set; }
+        private ClientWebSocket WebSocket { get; set; }
         public Client()
         {
             // Set up http client
@@ -44,8 +44,8 @@ namespace Turbulence.Discord
             // WS
             WebSocket = new();
             // Token
-            Token = new ConfigurationManager().AddUserSecrets<Client>().Build()["token"]!; // TODO: BAD, move out of client
-            if (Token == null)
+            _token = new ConfigurationManager().AddUserSecrets<Client>().Build()["token"]!; // TODO: BAD, move out of client
+            if (_token == null)
                 throw new Exception("No token set");
         }
 
@@ -54,7 +54,7 @@ namespace Turbulence.Discord
             // TODO: according to the docs this should be cached and only re-requested if the cached version doesnt exist/is not reachable
             var gateway = await Api.GetGateway(HttpClient);
 
-            HttpClient.DefaultRequestHeaders.Add("Authorization", Token);
+            HttpClient.DefaultRequestHeaders.Add("Authorization", _token);
 
             SetWebsocketHeaders();
             await WebSocket.ConnectAsync(new Uri($"{gateway.AbsoluteUri}/?encoding=json&v={Api.Version}"), default);
@@ -87,7 +87,7 @@ namespace Turbulence.Discord
                 Opcode = GatewayOpcode.IDENTIFY,
                 Data = JsonSerializer.SerializeToNode(new Identify
                 {
-                    Token = Token,
+                    Token = _token,
                     // TODO: turn into an bitfield enum
                     Capabilities = 0b11101111111101, // TODO: use official caps, which probably require other models
                     Properties = new IdentifyConnectionProperties
@@ -137,7 +137,7 @@ namespace Turbulence.Discord
 
         // TODO: move these cached objects into the api? or keep them here?
         // TODO: probably shouldnt be static?
-        public static User User = null!;
+        public User? CurrentUser { get; set; }
         //public static List<dynamic> MemberInfos = new(); // TODO: should we like put the roles into a simple array?
         public static Dictionary<Snowflake, Guild> Guilds = new();
         //public static List<dynamic> ServerSettings = new(); // TODO: listen to the guild settings update event
@@ -185,7 +185,7 @@ namespace Turbulence.Discord
             }
         }
 
-        BlockingCollection<GatewayPayload> SendQueue = new();
+        private readonly BlockingCollection<GatewayPayload> _sendQueue = new();
         private static readonly CancellationTokenSource SendQueueToken = new();
         private async Task SendTask()
         {
@@ -194,7 +194,7 @@ namespace Turbulence.Discord
                 try
                 {
                     // waits till a message is available and sends it
-                    var msg = SendQueue.Take(SendQueueToken.Token);
+                    var msg = _sendQueue.Take(SendQueueToken.Token);
                     await WebSocket.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(msg)), default, true, default);
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"WS Send: OP: {msg.Opcode}, Event: {msg.EventName}");
@@ -279,7 +279,7 @@ namespace Turbulence.Discord
             }
         }
 
-        public static async void HandleGatewayMessage(GatewayPayload msg)
+        public async void HandleGatewayMessage(GatewayPayload msg)
         {
             //Console.WriteLine($"WS Receive: {msg.Opcode}");
             switch (msg.Opcode)
@@ -319,7 +319,7 @@ namespace Turbulence.Discord
                                     Guilds.Add(guild.Id, guild);
                                 // foreach (var guildSetting in ready.user_guild_settings.entries)
                                 //     ServerSettings.Add(guildSetting);
-                                User = ready.User;
+                                CurrentUser = ready.User;
                                 // foreach (var member in ready.)
                                 //     MemberInfos.Add(member);
 
@@ -376,23 +376,18 @@ namespace Turbulence.Discord
                 Opcode = opcode,
                 Data = JsonSerializer.SerializeToNode(data),
             };
-            return SendQueue.TryAdd(payload);
+            return _sendQueue.TryAdd(payload);
         }
 
         public async Task<User> GetCurrentUser()
         {
-            return User ?? await Api.GetCurrentUser(HttpClient);
+            return CurrentUser ?? await Api.GetCurrentUser(HttpClient);
         }
 
         // TODO: cache this or smth
-        public async Task<Message[]> GetMessages(ulong channelID)
+        public async Task<Message[]> GetMessages(Snowflake channelId)
         {
-            return await Api.GetChannelMessages(HttpClient, channelID);
-        }
-
-        public async Task<Channel[]> GetGuildChannels(Snowflake guild)
-        {
-            return await Api.GetGuildChannels(HttpClient, guild);
+            return await Api.GetChannelMessages(HttpClient, channelId);
         }
 
         public async Task<Message> SendMessage(string content, Channel channel)
@@ -416,6 +411,11 @@ namespace Turbulence.Discord
                 return await Api.GetDefaultAvatar(CdnClient, index);
             }
             return await Api.GetAvatar(CdnClient, user.Id, user.Avatar!, size);
+        }
+
+        public async Task<Channel> GetChannel(Snowflake channelId)
+        {
+            return await Api.GetChannel(HttpClient, channelId);
         }
     }
 }

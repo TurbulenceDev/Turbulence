@@ -125,11 +125,6 @@ public static class Api
     {
         return await Get<Message[]>(client, $"/channels/{channelId}/messages?limit={limit}");
     }
-    // https://discord.com/developers/docs/resources/guild#get-guild-channels
-    public static async Task<Channel[]> GetGuildChannels(HttpClient client, Snowflake guild)
-    {
-        return await Get<Channel[]>(client, $"/guilds/{guild}/channels");
-    }
 
     // https://discord.com/developers/docs/resources/channel#create-message
     public static async Task<Message> CreateAndSendMessage(HttpClient client, Channel channel, string content)
