@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Web;
 using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordGateway;
@@ -154,5 +155,23 @@ public static class Api
     public static async Task<Message[]> GetPinnedMessages(HttpClient client, Snowflake channelId)
     {
         return await Get<Message[]>(client, $"/channels/{channelId}/pins");
+    }
+
+    public static async Task<SearchResult> SearchMessage(HttpClient client, Snowflake guild, string? message = null, User? author = null, User? mentions = null, string? contains = null, Snowflake? maxId = null, Snowflake? minId = null, Snowflake? channel = null, bool? pinned = null)
+    {
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        // null elements arent added to the final query string
+        query.Add("content", message);
+        query.Add("author_id", author?.Id.ToString());
+        query.Add("mentions", mentions?.Id.ToString());
+        query.Add("has", contains); //TODO: enum-ify this? "link", "embed", "file", "video", "image", "sound", "sticker"
+        query.Add("max_id", maxId?.ToString()); // INFO: these are timestamps converted to snowflakes. "during" is handled by both parameters
+        query.Add("min_id", minId?.ToString());
+        query.Add("channel_id", channel?.ToString());
+        query.Add("pinned", pinned?.ToString().ToLowerInvariant());
+        var q = query.ToString();
+        if (string.IsNullOrEmpty(q))
+            throw new Exception("Search has no parameters!");
+        return await Get<SearchResult>(client, $"/guilds/{guild}/messages/search?{q}&include_nsfw=true"); //TODO: what sets the nsfw flag?
     }
 }
