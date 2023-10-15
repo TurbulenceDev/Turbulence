@@ -10,16 +10,21 @@ public record Snowflake(ulong Id) : IComparable<Snowflake>
     public const ulong DiscordEpoch = 1420070400000;
 
     public static implicit operator ulong(Snowflake snowflake) => snowflake.Id;
+    public static Snowflake operator |(Snowflake s, ulong i) => new(s.Id | i);
 
     private static ulong _counter = 0;
+
+    public static Snowflake FromTimestamp(DateTimeOffset time)
+    {
+        var millis = (ulong)time.ToUnixTimeMilliseconds();
+        var epoch = millis - DiscordEpoch;
+        return new(epoch << 22);
+    }
 
     public static Snowflake Now()
     {
         // https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right
-        var now = DateTimeOffset.UtcNow;
-        var millis = (ulong)now.ToUnixTimeMilliseconds();
-        var epoch = millis - DiscordEpoch;
-        var snowflake = epoch << 22;
+        var snowflake = FromTimestamp(DateTimeOffset.UtcNow);
         // could also add the worker and process ids here
         snowflake |= _counter++ % 4096; // add the increment
         return new Snowflake(snowflake);
