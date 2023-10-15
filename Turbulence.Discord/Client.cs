@@ -417,5 +417,10 @@ namespace Turbulence.Discord
         {
             return await Api.GetChannel(HttpClient, channelId);
         }
+
+        public async Task<Message[]> GetPinnedMessages(Snowflake channelId)
+        {
+            return await Api.GetPinnedMessages(HttpClient, channelId);
+        }
     }
 }

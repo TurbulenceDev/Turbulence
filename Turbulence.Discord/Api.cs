@@ -149,4 +149,10 @@ public static class Api
     {
         return await CdnGet(client, $"embed/avatars/{index}.png");
     }
+
+    // https://discord.com/developers/docs/resources/channel#get-pinned-messages
+    public static async Task<Message[]> GetPinnedMessages(HttpClient client, Snowflake channelId)
+    {
+        return await Get<Message[]>(client, $"/channels/{channelId}/pins");
+    }
 }
