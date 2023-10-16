@@ -15,9 +15,9 @@
 	<DockPanel>
 		<Menu DockPanel.Dock="Top" Background="#23272a">
 			<MenuItem Header="_File">
-				<MenuItem Header="_Settings" Click="OnSettings"/>
-				<Separator/>
-				<MenuItem Header="_Exit" Click="OnExit"/>
+				<MenuItem Header="_Settings" Click="OnSettings" />
+				<Separator />
+				<MenuItem Header="_Exit" Click="OnExit" />
 			</MenuItem>
 		</Menu>
 		<Grid ColumnDefinitions="75,200,*">

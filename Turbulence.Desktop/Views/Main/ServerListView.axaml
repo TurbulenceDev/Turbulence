@@ -11,7 +11,7 @@
         <vm:ServerListViewModel />
     </UserControl.DataContext>
     <Design.DataContext>
-        <dvm:DesignServerListViewModel/>
+        <dvm:DesignServerListViewModel />
     </Design.DataContext>
     <ListBox ItemsSource="{Binding Servers}"
              Background="#1E1F22"

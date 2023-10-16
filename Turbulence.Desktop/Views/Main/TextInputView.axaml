@@ -11,21 +11,21 @@
     </UserControl.DataContext>
     <UserControl.Styles>
         <Style Selector="Grid.TextInput">
-            <Setter Property="Background" Value="#313338"/>
+            <Setter Property="Background" Value="#313338" />
         </Style>
         <Style Selector="TextBlock.Status">
-            <Setter Property="Margin" Value="5,0"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="FontSize" Value="12" />
         </Style>
         <Style Selector="TextBox#TextInput">
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Background" Value="#383A40"/>
-            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Background" Value="#383A40" />
+            <Setter Property="Margin" Value="5" />
         </Style>
         <Style Selector="Button#SendButton">
-            <Setter Property="Background" Value="#383A40"/>
-            <Setter Property="Margin" Value="0,5,5,5"/>
+            <Setter Property="Background" Value="#383A40" />
+            <Setter Property="Margin" Value="0,5,5,5" />
         </Style>
     </UserControl.Styles>
     <Grid Classes="TextInput" RowDefinitions="Auto, 24">
@@ -35,6 +35,6 @@
             </Button>
             <TextBox Name="TextInput" Watermark="Message" />
         </DockPanel>
-        <TextBlock Classes="Status" Text="{Binding TypingStatus}" Grid.Row="1"/>
+        <TextBlock Classes="Status" Text="{Binding TypingStatus}" Grid.Row="1" />
     </Grid>
 </UserControl>

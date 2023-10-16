@@ -7,7 +7,7 @@
 			 Background="#313338">
 	<StackPanel Orientation="Vertical">
 		<Grid ColumnDefinitions="*,auto,auto">
-			<TextBox Name="Token" Watermark="Token" PasswordChar="*" Grid.Column="0"/>
+			<TextBox Name="Token" Watermark="Token" PasswordChar="*" Grid.Column="0" />
 			<Button Click="OnSetToken" Grid.Column="1">Set Token</Button>
 			<CheckBox Checked="OnTokenShow" Grid.Column="2">Show</CheckBox>
 		</Grid>

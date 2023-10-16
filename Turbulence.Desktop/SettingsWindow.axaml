@@ -15,10 +15,10 @@
 	</Window.DataContext>
 	<TabControl TabStripPlacement="Left" Background="#313338" Padding="10,10">
 		<TabItem Header="General">
-			<v:GeneralSettingsView/>
+			<v:GeneralSettingsView />
 		</TabItem>
 		<TabItem Header="Account">
-			<v:AccountSettingsView/>
+			<v:AccountSettingsView />
 		</TabItem>
 	</TabControl>
 </Window>

@@ -13,14 +13,14 @@
         <vm:MessagesViewModel />
     </UserControl.DataContext>
     <Design.DataContext>
-        <dvm:DesignMessagesViewModel/>
+        <dvm:DesignMessagesViewModel />
     </Design.DataContext>
     <ScrollViewer Name="Scroll">
         <ItemsControl ItemsSource="{Binding CurrentMessages}"
                       Background="#313338"
                       Padding="8">
             <ItemsControl.ItemTemplate>
-                <dataTemplates:MessageTemplate/>
+                <dataTemplates:MessageTemplate />
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </ScrollViewer>
