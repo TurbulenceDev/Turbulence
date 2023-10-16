@@ -8,13 +8,14 @@ namespace Turbulence.Discord;
 
 public interface IPlatformClient
 {
-    public Task<Channel> GetChannel(Snowflake channelId);
+    public Task<Channel> GetChannel(Snowflake id);
     public Task Start();
-    public Task<Message[]> GetMessages(Snowflake channelId);
-    public Task<Guild> GetGuild(Snowflake guildId);
+    public Task<List<Message>> GetMessages(Snowflake id);
+    public Task<Guild> GetGuild(Snowflake id);
     public event EventHandler<Event<Ready>>? Ready;
     public event EventHandler<Event<Message>>? MessageCreated;
     public User? CurrentUser { get; set; }
+    public Task<Image> GetAvatar(User user, int size = 128);
     
     #region Discord specific shit that should not be here
 

@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Turbulence.Discord.Models;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordUser;
 using static Turbulence.Discord.Models.DiscordChannel.MessageType;
@@ -10,20 +12,22 @@ namespace Turbulence.Desktop.Views.Main;
 
 public partial class MessageView : UserControl
 {
+    private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
+
     [Obsolete("Design Time Constructor only. Call MessageView(Message) instead.", true)]
     public MessageView()
     {
         InitializeComponent();
         if (Design.IsDesignMode)
         {
-            var user = new User()
+            var user = new User
             {
                 Id = new(0),
                 Username = "User",
                 Discriminator = "0",
-                Avatar = ""
+                Avatar = "",
             };
-            Init(new Message()
+            Init(new Message
             {
                 Content = "This is a test message",
                 Type = DEFAULT,
@@ -69,7 +73,7 @@ public partial class MessageView : UserControl
             Image.Source = Task.Run(async () =>
                 await LoadFromWeb(new Uri($"https://cdn.discordapp.com/embed/avatars/{(message.Author.Id >> 22) % 6}.png"))).Result!.CreateScaledBitmap(new PixelSize(80, 80));
         }
-
+        // Image.Source = new Bitmap(new MemoryStream(await _client.GetAvatar(message.Author)));
 
         // TODO: make timestamp relative?
         var localTime = message.Timestamp.ToLocalTime();

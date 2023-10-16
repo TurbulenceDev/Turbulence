@@ -33,7 +33,7 @@ namespace Turbulence.Discord
         public event EventHandler<Event<Message>>? MessageCreated;
 
         public HttpClient HttpClient { get; } = new();
-        public static readonly HttpClient CdnClient = new();
+        private static readonly HttpClient CdnClient = new();
 
         private readonly ICache _cache = Ioc.Default.GetService<ICache>()!;
         private ClientWebSocket WebSocket { get; set; }
@@ -388,9 +388,9 @@ namespace Turbulence.Discord
         }
 
         // TODO: cache this or smth
-        public async Task<Message[]> GetMessages(Snowflake channelId)
+        public async Task<List<Message>> GetMessages(Snowflake id)
         {
-            return await Api.GetChannelMessages(HttpClient, channelId);
+            return await Api.GetChannelMessages(HttpClient, id);
         }
 
         public async Task<Message> SendMessage(string content, Channel channel)
@@ -398,13 +398,16 @@ namespace Turbulence.Discord
             return await Api.CreateAndSendMessage(HttpClient, channel, content);
         }
 
-        public async Task<Guild> GetGuild(Snowflake guild)
+        public async Task<Guild> GetGuild(Snowflake id)
         {
-            return Guilds.TryGetValue(guild, out var ret) ? ret : await Api.GetGuild(HttpClient, guild);
+            return Guilds.TryGetValue(id, out var ret) ? ret : await Api.GetGuild(HttpClient, id);
         }
 
-        public async Task<byte[]> GetAvatar(User user, int size = 32)
+        public async Task<Image> GetAvatar(User user, int size = 128)
         {
+            if (_cache.GetAvatar(user.Id) is { } avatar)
+                return avatar;
+
             // https://discord.com/developers/docs/reference#image-formatting
             if (user.Avatar == null)
             {
@@ -416,9 +419,9 @@ namespace Turbulence.Discord
             return await Api.GetAvatar(CdnClient, user.Id, user.Avatar!, size);
         }
 
-        public async Task<Channel> GetChannel(Snowflake channelId)
+        public async Task<Channel> GetChannel(Snowflake id)
         {
-            return await Api.GetChannel(HttpClient, channelId);
+            return await Api.GetChannel(HttpClient, id);
         }
 
         public async Task<Message[]> GetPinnedMessages(Snowflake channelId)

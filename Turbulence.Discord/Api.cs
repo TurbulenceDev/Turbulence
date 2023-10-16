@@ -122,9 +122,9 @@ public static class Api
     }
 
     // https://discord.com/developers/docs/resources/channel#get-channel-messages
-    public static async Task<Message[]> GetChannelMessages(HttpClient client, ulong channelId, int limit = 50)
+    public static async Task<List<Message>> GetChannelMessages(HttpClient client, ulong channelId, int limit = 50)
     {
-        return await Get<Message[]>(client, $"/channels/{channelId}/messages?limit={limit}");
+        return await Get<List<Message>>(client, $"/channels/{channelId}/messages?limit={limit}");
     }
 
     // https://discord.com/developers/docs/resources/channel#create-message
@@ -141,14 +141,16 @@ public static class Api
         return await Post<Message>(client, $"/channels/{channel.Id}/messages", JsonSerializer.Serialize(obj));
     }
 
-    public static async Task<byte[]> GetAvatar(HttpClient client, Snowflake user, string avatar, int size = 32)
+    public static async Task<Image> GetAvatar(HttpClient client, Snowflake user, string avatar, int size = 32)
     {
-        return await CdnGet(client, $"avatars/{user}/{avatar}.webp?size={size}");
+        var data = await CdnGet(client, $"avatars/{user}/{avatar}.png?size={size}");
+        return new Image(data, size); // TODO: Size could easily be a lie, as the API will just send the largest available instead of given size
     }
 
-    public static async Task<byte[]> GetDefaultAvatar(HttpClient client, int index)
+    public static async Task<Image> GetDefaultAvatar(HttpClient client, int index)
     {
-        return await CdnGet(client, $"embed/avatars/{index}.png");
+        var data = await CdnGet(client, $"embed/avatars/{index}.png"); // TODO: Doesn't work
+        return new Image(data, 256);
     }
 
     // https://discord.com/developers/docs/resources/channel#get-pinned-messages

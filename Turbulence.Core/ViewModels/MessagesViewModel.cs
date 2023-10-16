@@ -29,8 +29,9 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
         };
 
         var channelMessages = await _client.GetMessages(message.Channel.Id);
+        channelMessages.Reverse();
         CurrentMessages.Clear();
-         foreach (var channelMessage in channelMessages.Reverse())
+         foreach (var channelMessage in channelMessages)
          {
              // TODO: Generates a collection changed notification on each Add(), fix?
              CurrentMessages.Add(channelMessage);
