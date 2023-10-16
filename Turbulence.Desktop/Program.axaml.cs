@@ -12,17 +12,26 @@ internal class Program : Application
 {
     public static void Main(string[] args)
     {
-        var provider = new ServiceCollection()
-            .AddSingleton<IPlatformClient, Client>()
-            .AddSingleton<ICache, Cache>()
-            .BuildServiceProvider();
-        Ioc.Default.ConfigureServices(provider);
-    
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, ShutdownMode.OnMainWindowClose);
+        try
+        {
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, ShutdownMode.OnMainWindowClose);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception during Main: {e}");
+        }
     }
 
+    // INFO: designer directly calls this and not main
     private static AppBuilder BuildAvaloniaApp()
     {
+        // Init IoC
+        var provider = new ServiceCollection()
+                .AddSingleton<IPlatformClient, Client>()
+                .AddSingleton<ICache, Cache>()
+                .BuildServiceProvider();
+        Ioc.Default.ConfigureServices(provider);
+
         return AppBuilder.Configure<Program>().UsePlatformDetect();
     }
 
