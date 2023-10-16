@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
              xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              x:DataType="vm:ChannelBarViewModel"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="40"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
              Height="40"
              x:Class="Turbulence.Desktop.Views.Main.ChannelBarView">
     <UserControl.DataContext>
@@ -21,14 +21,39 @@
         <Style Selector="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
+        <Style Selector="FlyoutPresenter">
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style Selector="Grid.Pins">
+            <Setter Property="Width" Value="300" />
+            <Setter Property="Background" Value="#1E1F22" />
+        </Style>
+        <Style Selector="TextBlock.PinHeader">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="10,0" />
+        </Style>
     </UserControl.Styles>
     <Grid RowDefinitions="*,auto">
-        <DockPanel>
-            <StackPanel Margin="20,0" Orientation="Horizontal" DockPanel.Dock="Left" IsVisible="{Binding !!Channel}">
+        <DockPanel IsVisible="{Binding !!Channel}" LastChildFill="False">
+            <StackPanel Margin="20,0" Orientation="Horizontal" DockPanel.Dock="Left">
                 <TextBlock FontWeight="SemiBold" Text="{Binding Channel.Name}" />
                 <Separator Height="20" Width="1" IsVisible="{Binding !!Channel.Topic}" />
                 <TextBlock Text="{Binding Channel.Topic}" />
             </StackPanel>
+            <Button Margin="5,0" Content="Pins" Click="OnPins" DockPanel.Dock="Right">
+                <Button.Flyout>
+                    <Flyout Placement="BottomEdgeAlignedRight" VerticalOffset="1">
+                        <Grid Classes="Pins" RowDefinitions="50,*">
+                            <TextBlock Classes="PinHeader" Text="Pinned Messages" />
+                            <StackPanel Background="#2B2D31" Orientation="Vertical" Grid.Row="1">
+                                <TextBlock>Message 1</TextBlock>
+                                <TextBlock>Message 2</TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
         </DockPanel>
         <Separator Margin="0" Grid.Row="1" />
     </Grid>
