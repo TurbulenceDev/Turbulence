@@ -1,19 +1,62 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
+using Turbulence.Discord.Models.DiscordUser;
 using static Turbulence.Discord.Models.DiscordChannel.MessageType;
 
 namespace Turbulence.Desktop.Views.Main;
 
 public partial class MessageView : UserControl
 {
+    [Obsolete("Design Time Constructor only. Call MessageView(Message) instead.", true)]
+    public MessageView()
+    {
+        InitializeComponent();
+        if (Design.IsDesignMode)
+        {
+            var user = new User()
+            {
+                Id = new(0),
+                Username = "User",
+                Discriminator = "0",
+                Avatar = ""
+            };
+            Init(new Message()
+            {
+                Content = "This is a test message",
+                Type = DEFAULT,
+                Author = user,
+                Id = new(0),
+                ChannelId = new(0),
+                Timestamp = DateTimeOffset.Now,
+                EditedTimestamp = null,
+                Tts = false,
+                MentionEveryone = false,
+                Mentions = Array.Empty<User>(),
+                MentionRoles = Array.Empty<Snowflake>(),
+                Attachments = Array.Empty<Attachment>(),
+                Embeds = Array.Empty<Embed>(),
+                Pinned = false,
+            });
+        }
+        else
+        {
+            throw new Exception("Call MessageView(Message) instead.");
+        }
+    }
+
     public MessageView(Message message)
     {
         InitializeComponent();
-
-        // TODO: Profile picture
         
+        Init(message);
+    }
+
+    private void Init(Message message)
+    {
+        // TODO: Profile picture
         Author.Text = message.GetBestAuthorName();
 
         if (message.Author.Avatar is { } avatar)
@@ -26,8 +69,8 @@ public partial class MessageView : UserControl
             Image.Source = Task.Run(async () =>
                 await LoadFromWeb(new Uri($"https://cdn.discordapp.com/embed/avatars/{(message.Author.Id >> 22) % 6}.png"))).Result!.CreateScaledBitmap(new PixelSize(80, 80));
         }
-        
-        
+
+
         // TODO: make timestamp relative?
         var localTime = message.Timestamp.ToLocalTime();
         Timestamp.Text = localTime.ToString("G");
