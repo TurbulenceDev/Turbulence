@@ -24,6 +24,7 @@
 			<v:ServerListView />
 			<v:ChannelListView Grid.Column="1" />
 			<DockPanel Grid.Column="2">
+				<v:ChannelBarView DockPanel.Dock="Top"/>
 				<v:TextInputView DockPanel.Dock="Bottom" />
 				<v:MessagesView />
 			</DockPanel>
