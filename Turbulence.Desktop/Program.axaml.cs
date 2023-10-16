@@ -14,6 +14,7 @@ internal class Program : Application
     {
         var provider = new ServiceCollection()
             .AddSingleton<IPlatformClient, Client>()
+            .AddSingleton<ICache, Cache>()
             .BuildServiceProvider();
         Ioc.Default.ConfigureServices(provider);
     

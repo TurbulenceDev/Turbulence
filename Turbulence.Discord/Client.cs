@@ -2,6 +2,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Turbulence.API.Discord.Models.DiscordGatewayEvents;
 using Turbulence.Discord.Models;
@@ -31,11 +32,13 @@ namespace Turbulence.Discord
         public event EventHandler<Event<Ready>>? Ready;
         public event EventHandler<Event<Message>>? MessageCreated;
 
-        // idk where to move this
-        private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
         public HttpClient HttpClient { get; } = new();
         public static readonly HttpClient CdnClient = new();
+
+        private readonly ICache _cache = Ioc.Default.GetService<ICache>()!;
         private ClientWebSocket WebSocket { get; set; }
+        private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"; // idk where to move this
+        
         public Client()
         {
             // Set up http client
