@@ -8,26 +8,28 @@
         x:Class="Turbulence.Desktop.MainWindow"
         Width="1200" Height="700"
         MinWidth="600" MinHeight="400"
+        x:DataType="vm:MainWindowViewModel"
         Title="Turbulence">
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
-	<DockPanel>
-		<Menu DockPanel.Dock="Top" Background="#23272a">
-			<MenuItem Header="_File">
-				<MenuItem Header="_Settings" Click="OnSettings" />
-				<Separator />
-				<MenuItem Header="_Exit" Click="OnExit" />
-			</MenuItem>
-		</Menu>
-		<Grid ColumnDefinitions="75,200,*">
-			<v:ServerListView />
-			<v:ChannelListView Grid.Column="1" />
-			<DockPanel Grid.Column="2">
-				<v:ChannelBarView DockPanel.Dock="Top" />
-				<v:TextInputView DockPanel.Dock="Bottom" />
-				<v:MessagesView />
-			</DockPanel>
-		</Grid>
-	</DockPanel>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="#23272a">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Settings" Click="OnSettings" />
+                <MenuItem Header="_Open Dev Tools" Click="OnDevTools" IsVisible="{Binding IsDebug}" />
+                <Separator />
+                <MenuItem Header="_Exit" Click="OnExit" />
+            </MenuItem>
+        </Menu>
+        <Grid ColumnDefinitions="75,200,*">
+            <v:ServerListView />
+            <v:ChannelListView Grid.Column="1" />
+            <DockPanel Grid.Column="2">
+                <v:ChannelBarView DockPanel.Dock="Top" />
+                <v:TextInputView DockPanel.Dock="Bottom" />
+                <v:MessagesView />
+            </DockPanel>
+        </Grid>
+    </DockPanel>
 </Window>

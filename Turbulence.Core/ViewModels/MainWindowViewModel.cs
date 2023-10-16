@@ -12,6 +12,7 @@ public class MainWindowViewModel : ViewModelBase,
     IRecipient<ChannelSelectedMsg>,
     IRecipient<SendMessageMsg>
 {
+    public static bool IsDebug { get; private set; }
     public static Guild? SelectedServer { get; private set; }
     public static Channel? SelectedChannel { get; private set; }
     
@@ -19,6 +20,9 @@ public class MainWindowViewModel : ViewModelBase,
 
     public MainWindowViewModel()
     {
+#if DEBUG
+        IsDebug = true;
+#endif
         // TODO: Move all this somewhere else
         Messenger.Send(new SetStatusMsg("Not connected"));
         Task.Run(_client.Start);
