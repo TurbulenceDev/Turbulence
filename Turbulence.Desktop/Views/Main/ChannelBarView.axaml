@@ -3,33 +3,33 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
-			 xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
+             xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              x:DataType="vm:ChannelBarViewModel"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="40"
-			 Height="40"
+             Height="40"
              x:Class="Turbulence.Desktop.Views.Main.ChannelBarView">
-	<UserControl.DataContext>
-		<vm:ChannelBarViewModel />
-	</UserControl.DataContext>
+    <UserControl.DataContext>
+        <vm:ChannelBarViewModel />
+    </UserControl.DataContext>
     <Design.DataContext>
-        <dvm:DesignChannelBarViewModel/>
+        <dvm:DesignChannelBarViewModel />
     </Design.DataContext>
-	<UserControl.Styles>
-		<Style Selector="Grid">
-			<Setter Property="Background" Value="#313338"/>
-		</Style>
-		<Style Selector="TextBlock">
-			<Setter Property="VerticalAlignment" Value="Center"/>
-		</Style>
-	</UserControl.Styles>
-	<Grid RowDefinitions="*,auto">
-		<DockPanel>
-			<StackPanel Margin="20,0" Orientation="Horizontal" DockPanel.Dock="Left" IsVisible="{Binding !!Channel}">
-				<TextBlock FontWeight="SemiBold" Text="{Binding Channel.Name}" />
-				<Separator Height="20" Width="1" IsVisible="{Binding !!Channel.Topic}"/>
-				<TextBlock Text="{Binding Channel.Topic}" />
-			</StackPanel>
-		</DockPanel>
-		<Separator Margin="0" Grid.Row="1"/>
-	</Grid>
+    <UserControl.Styles>
+        <Style Selector="Grid">
+            <Setter Property="Background" Value="#313338" />
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Styles>
+    <Grid RowDefinitions="*,auto">
+        <DockPanel>
+            <StackPanel Margin="20,0" Orientation="Horizontal" DockPanel.Dock="Left" IsVisible="{Binding !!Channel}">
+                <TextBlock FontWeight="SemiBold" Text="{Binding Channel.Name}" />
+                <Separator Height="20" Width="1" IsVisible="{Binding !!Channel.Topic}" />
+                <TextBlock Text="{Binding Channel.Topic}" />
+            </StackPanel>
+        </DockPanel>
+        <Separator Margin="0" Grid.Row="1" />
+    </Grid>
 </UserControl>
