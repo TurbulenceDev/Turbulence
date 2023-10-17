@@ -20,7 +20,9 @@
                       Background="#313338"
                       Padding="8">
             <ItemsControl.ItemTemplate>
-                <dataTemplates:MessageTemplate />
+				<DataTemplate>
+					<v:MessageView />
+				</DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </ScrollViewer>

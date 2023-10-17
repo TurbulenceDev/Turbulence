@@ -2,20 +2,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
+             xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
+             xmlns:converters="clr-namespace:Turbulence.Desktop.Converters"
              mc:Ignorable="d" d:DesignWidth="500"
+             x:DataType="channel:Message"
              x:Class="Turbulence.Desktop.Views.Main.MessageView">
+    <Design.DataContext>
+        <dvm:DesignMessage />
+    </Design.DataContext>
+    <UserControl.Resources>
+        <converters:MessageAuthorNameConverter x:Key="AuthorConverter" />
+        <converters:MessageContentConverter x:Key="MessageConverter" />
+        <converters:UserAvatarConverter x:Key="AvatarConverter" />
+    </UserControl.Resources>
     <Grid ColumnDefinitions="Auto,*" Classes="Message">
         <Border CornerRadius="50" ClipToBounds="True" Width="40" Height="40" Margin="5 0 10 0">
-            <Image Name="Image" UseLayoutRounding="False" />
+            <Image Name="Image" UseLayoutRounding="False" Source="{Binding Author, Converter={StaticResource AvatarConverter}}" />
         </Border>
         <StackPanel Grid.Column="1"
                     Orientation="Vertical"
                     Classes="MessageContent">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Name="Author" Classes="Author" />
-                <TextBlock Name="Timestamp" Classes="Timestamp" />
+                <TextBlock Name="Author" Classes="Author" Text="{Binding, Converter={StaticResource AuthorConverter}}" />
+                <TextBlock Name="Timestamp" Classes="Timestamp" Text="{Binding Timestamp, StringFormat='G'}">
+                    <ToolTip.Tip>
+                        <Label Content="{Binding Timestamp, StringFormat='F'}" />
+                    </ToolTip.Tip>
+                </TextBlock>
             </StackPanel>
-            <TextBlock Name="Content" Classes="MessageContent" />
+            <TextBlock Name="Content" TextWrapping="WrapWithOverflow" Classes="MessageContent" Text="{Binding, Converter={StaticResource MessageConverter}}" />
         </StackPanel>
     </Grid>
 </UserControl>

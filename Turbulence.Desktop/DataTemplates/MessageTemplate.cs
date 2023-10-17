@@ -13,7 +13,10 @@ public class MessageTemplate : IDataTemplate
     {
         if (param is not Message message)
             return new TextBlock { Text = $"Error: Provided object was not {nameof(Message)}" };
-        
-        return new MessageView(message);
+
+        return new MessageView()
+        {
+            DataContext = message
+        };
     }
 }
