@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:v="clr-namespace:Turbulence.Desktop.Views.Main"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
              xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              x:DataType="vm:ChannelBarViewModel"
@@ -24,15 +25,6 @@
         <Style Selector="FlyoutPresenter">
             <Setter Property="Padding" Value="0" />
         </Style>
-        <Style Selector="Grid.Pins">
-            <Setter Property="Width" Value="300" />
-            <Setter Property="Background" Value="#1E1F22" />
-        </Style>
-        <Style Selector="TextBlock.PinHeader">
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="10,0" />
-        </Style>
     </UserControl.Styles>
     <Grid RowDefinitions="*,auto">
         <DockPanel IsVisible="{Binding !!Channel}" LastChildFill="False">
@@ -44,13 +36,7 @@
             <Button Margin="5,0" Content="Pins" Click="OnPins" DockPanel.Dock="Right">
                 <Button.Flyout>
                     <Flyout Placement="BottomEdgeAlignedRight" VerticalOffset="1">
-                        <Grid Classes="Pins" RowDefinitions="50,*">
-                            <TextBlock Classes="PinHeader" Text="Pinned Messages" />
-                            <StackPanel Background="#2B2D31" Orientation="Vertical" Grid.Row="1">
-                                <TextBlock>Message 1</TextBlock>
-                                <TextBlock>Message 2</TextBlock>
-                            </StackPanel>
-                        </Grid>
+                        <v:PinnedMessagesView />
                     </Flyout>
                 </Button.Flyout>
             </Button>

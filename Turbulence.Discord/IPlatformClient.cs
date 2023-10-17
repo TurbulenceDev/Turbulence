@@ -11,6 +11,7 @@ public interface IPlatformClient
     public Task<Channel> GetChannel(Snowflake id);
     public Task Start();
     public Task<List<Message>> GetMessages(Snowflake id);
+    public Task<Message[]> GetPinnedMessages(Snowflake id);
     public Task<Guild> GetGuild(Snowflake id);
     public event EventHandler<Event<Ready>>? Ready;
     public event EventHandler<Event<Message>>? MessageCreated;
