@@ -9,9 +9,16 @@ public partial class TextInputViewModel : ViewModelBase
     [ObservableProperty]
     private string? _typingStatus = "";
 
+    [ObservableProperty]
+    private string? _input = "";
+
     [RelayCommand]
-    private void SendMessage(string message)
+    private void SendMessage()
     {
-        Messenger.Send(new SendMessageMsg(message));
+        if (string.IsNullOrWhiteSpace(Input))
+            return;
+
+        Messenger.Send(new SendMessageMsg(Input));
+        Input = "";
     }
 }

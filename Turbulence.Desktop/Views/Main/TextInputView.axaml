@@ -30,10 +30,10 @@
     </UserControl.Styles>
     <Grid Classes="TextInput" RowDefinitions="Auto, 24">
         <DockPanel>
-            <Button Name="SendButton" DockPanel.Dock="Right" Click="OnSend">
+            <Button IsDefault="True" Name="SendButton" DockPanel.Dock="Right" Command="{Binding SendMessageCommand}">
                 Send
             </Button>
-            <TextBox Name="TextInput" Watermark="Message" />
+            <TextBox Name="TextInput" Watermark="Message" Text="{Binding Input}" />
         </DockPanel>
         <TextBlock Classes="Status" Text="{Binding TypingStatus}" Grid.Row="1" />
     </Grid>
