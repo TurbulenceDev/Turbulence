@@ -17,6 +17,7 @@ public class MessageContentConverter : IValueConverter
         {
             THREAD_CREATED => $"{author} created thread \"{message.Content}\"",
             CALL => $"{author} started a voice call",
+            CHANNEL_PINNED_MESSAGE => $"{author} pinned a message.",
             _ => message.Content,
         };
     }

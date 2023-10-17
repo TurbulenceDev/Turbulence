@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Turbulence.Core.ViewModels;
 
 namespace Turbulence.Desktop.Views.Main
 {
@@ -21,6 +22,8 @@ namespace Turbulence.Desktop.Views.Main
             if (sender is Control control)
             {
                 FlyoutBase.ShowAttachedFlyout(control);
+                if (!Design.IsDesignMode)
+                    ((PinnedMessagesViewModel)Pins.DataContext!).FetchPinnedMessages();
             }
         }
     }

@@ -36,7 +36,7 @@
             <Button Margin="5,0" Content="Pins" Click="OnPins" DockPanel.Dock="Right">
                 <Button.Flyout>
                     <Flyout Placement="BottomEdgeAlignedRight" VerticalOffset="1">
-                        <v:PinnedMessagesView />
+                        <v:PinnedMessagesView Name="Pins"/>
                     </Flyout>
                 </Button.Flyout>
             </Button>

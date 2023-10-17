@@ -7,7 +7,8 @@
              xmlns:v="clr-namespace:Turbulence.Desktop.Views.Main"
              xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
              x:Class="Turbulence.Desktop.Views.Main.PinnedMessagesView"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="300"
+			 MinHeight="200"
              x:DataType="vm:PinnedMessagesViewModel">
     <UserControl.DataContext>
 		<vm:PinnedMessagesViewModel />
@@ -27,6 +28,8 @@
 		</Style>
 		<Style Selector="ScrollViewer#Scroll">
 			<Setter Property="Background" Value="#2B2D31" />
+		</Style>
+		<Style Selector="ItemsControl">
 			<Setter Property="Padding" Value="0,6,0,0" />
 		</Style>
 		<Style Selector="Border.Pin">
