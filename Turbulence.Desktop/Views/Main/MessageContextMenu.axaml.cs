@@ -1,0 +1,44 @@
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
+using Turbulence.Core.ViewModels;
+using Turbulence.Discord.Models.DiscordChannel;
+
+namespace Turbulence.Desktop.Views.Main
+{
+    public partial class MessageContextMenu : MenuFlyout
+    {
+        private MessageContextMenuViewModel viewModel = new();
+        public MessageContextMenu()
+        {
+            InitializeComponent();
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+
+        public void Copy(object? sender, RoutedEventArgs? args)
+        {
+            if (sender is not Control control)
+                return;
+
+            if (control.DataContext is not Message message)
+                return;
+
+            viewModel.CopyCommand.Execute(message);
+        }
+
+        public void Reply(object? sender, RoutedEventArgs? args)
+        {
+            if (sender is not Control control)
+                return;
+
+            if (control.DataContext is not Message message)
+                return;
+
+            viewModel.ReplyCommand.Execute(message);
+        }
+    }
+}
