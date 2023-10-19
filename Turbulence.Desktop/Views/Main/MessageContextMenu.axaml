@@ -4,6 +4,6 @@
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
              x:DataType="vm:MessageContextMenuViewModel"
              x:Class="Turbulence.Desktop.Views.Main.MessageContextMenu">
-    <MenuItem Header="Copy" Click="Copy" />
+    <MenuItem Header="Copy Text" Click="Copy" />
     <MenuItem Header="Reply" Click="Reply" />
 </MenuFlyout>

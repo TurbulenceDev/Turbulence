@@ -1,4 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Turbulence.Core.ViewModels;
@@ -27,7 +30,14 @@ namespace Turbulence.Desktop.Views.Main
             if (control.DataContext is not Message message)
                 return;
 
-            viewModel.CopyCommand.Execute(message);
+            if (string.IsNullOrEmpty(message.Content))
+                return;
+
+            var toplevel = TopLevel.GetTopLevel(control);
+            if (toplevel == null || toplevel.Clipboard is not IClipboard clipboard)
+                return;
+
+            clipboard.SetTextAsync(message.Content);
         }
 
         public void Reply(object? sender, RoutedEventArgs? args)

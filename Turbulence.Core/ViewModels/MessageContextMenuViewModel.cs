@@ -7,13 +7,6 @@ namespace Turbulence.Core.ViewModels;
 public partial class MessageContextMenuViewModel : ViewModelBase
 {
     [RelayCommand]
-    public void Copy(Message message)
-    {
-        Console.WriteLine(message);
-        // TODO: copy
-    }
-
-    [RelayCommand]
     public void Reply(Message message)
     {
         Messenger.Send(new ReplyToMessage(message));
