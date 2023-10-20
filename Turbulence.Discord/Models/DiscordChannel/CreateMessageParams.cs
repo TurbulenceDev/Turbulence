@@ -46,7 +46,7 @@ public record CreateMessageParams {
 	/// </summary>
 	[JsonPropertyName("message_reference")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public MessageReference? MessageReference { get; init; }
+	public MessageReference? MessageReference { get; set; }
 
 	/// <summary>
 	/// Components to include with the message.
@@ -83,4 +83,11 @@ public record CreateMessageParams {
 	[JsonPropertyName("flags")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? Flags { get; init; }
+
+    /// <summary>
+    /// <a href="https://discord.com/developers/docs/resources/channel#allowed-mentions-object">Allowed Mentions</a>
+    /// </summary>
+    [JsonPropertyName("allowed_mentions")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public AllowedMentions? AllowedMentions { get; set; }
 }

@@ -3,12 +3,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+             xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
+             xmlns:converters="clr-namespace:Turbulence.Desktop.Converters"
              x:DataType="vm:TextInputViewModel"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="64"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="79"
              x:Class="Turbulence.Desktop.Views.Main.TextInputView">
     <UserControl.DataContext>
         <vm:TextInputViewModel />
     </UserControl.DataContext>
+    <Design.DataContext>
+        <dvm:DesignTextInputViewModel />
+    </Design.DataContext>
+    <UserControl.Resources>
+        <converters:MessageAuthorNameConverter x:Key="AuthorConverter" />
+    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="Grid.TextInput">
             <Setter Property="Background" Value="#313338" />
@@ -27,14 +35,34 @@
             <Setter Property="Background" Value="#383A40" />
             <Setter Property="Margin" Value="0,5,5,5" />
         </Style>
+        <Style Selector="DockPanel.Clip">
+            <Setter Property="Background" Value="#2B2D31" />
+        </Style>
+        <Style Selector="ToggleButton.ReplyPing">
+            <Setter Property="Content" Value="OFF" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ToggleButton.ReplyPing:checked">
+            <Setter Property="Content" Value="ON" />
+        </Style>
     </UserControl.Styles>
-    <Grid Classes="TextInput" RowDefinitions="Auto, 24">
-        <DockPanel>
-            <Button IsDefault="True" Name="SendButton" DockPanel.Dock="Right" Command="{Binding SendMessageCommand}">
-                Send
-            </Button>
-            <TextBox Name="TextInput" Watermark="Message" Text="{Binding Input}" />
+    <DockPanel>
+        <DockPanel Classes="Clip" DockPanel.Dock="Top" Height="35" IsVisible="{Binding !!ReplyingMessage}">
+            <Button Margin="0,5,5,5" VerticalContentAlignment="Center" BorderThickness="0" Content="X" Command="{Binding ReplyCancelCommand}" DockPanel.Dock="Right" />
+            <Separator Height="20" Width="1" DockPanel.Dock="Right" />
+            <ToggleButton Classes="ReplyPing" IsChecked="{Binding ReplyPing}" DockPanel.Dock="Right" />
+            <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="Replying to " />
+            <TextBlock FontWeight="SemiBold" VerticalAlignment="Center" Text="{Binding ReplyingMessage, Converter={StaticResource AuthorConverter}}" />
         </DockPanel>
-        <TextBlock Classes="Status" Text="{Binding TypingStatus}" Grid.Row="1" />
-    </Grid>
+        <Grid Classes="TextInput" RowDefinitions="Auto, 24">
+            <DockPanel>
+                <Button IsDefault="True" Name="SendButton" DockPanel.Dock="Right" Command="{Binding SendMessageCommand}">
+                    Send
+                </Button>
+                <TextBox Name="TextInput" Watermark="Message" Text="{Binding Input}" />
+            </DockPanel>
+            <TextBlock Classes="Status" Text="{Binding TypingStatus}" Grid.Row="1" />
+        </Grid>
+    </DockPanel>
 </UserControl>

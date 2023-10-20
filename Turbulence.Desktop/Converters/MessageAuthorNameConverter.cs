@@ -8,6 +8,9 @@ public class MessageAuthorNameConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
+        if (value == null)
+            return null;
+
         if (value is not Message msg)
             throw new Exception("Not a message.");
 

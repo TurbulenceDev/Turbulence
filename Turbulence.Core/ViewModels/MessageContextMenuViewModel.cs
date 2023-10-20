@@ -13,4 +13,4 @@ public partial class MessageContextMenuViewModel : ViewModelBase
     }
 }
 
-public record ReplyToMessage(Message message);
+public record ReplyToMessage(Message Message);

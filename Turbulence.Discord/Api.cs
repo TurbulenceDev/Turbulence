@@ -128,7 +128,7 @@ public static class Api
     }
 
     // https://discord.com/developers/docs/resources/channel#create-message
-    public static async Task<Message> CreateAndSendMessage(HttpClient client, Channel channel, string content)
+    public static async Task<Message> CreateAndSendMessage(HttpClient client, Channel channel, string content, Message? reply = null, bool shouldPing = false)
     {
         var nonce = Snowflake.Now().ToString();
         CreateMessageParams obj = new()
@@ -138,6 +138,26 @@ public static class Api
             Tts = false,
             Flags = 0, // TODO: silent
         };
+        if (reply != null)
+        {
+            obj.MessageReference = new()
+            {
+                GuildId = reply.GuildId, //TODO: null on the message and channel object, get otherwise?
+                ChannelId = reply.ChannelId,
+                MessageId = reply.Id
+            };
+            if (!shouldPing)
+            {
+                obj.AllowedMentions = new()
+                {
+                    Parse = new string[]
+                    {
+                        "roles", "users", "everyone"
+                    },
+                    RepliedUser = false,
+                };
+            }
+        }
         return await Post<Message>(client, $"/channels/{channel.Id}/messages", JsonSerializer.Serialize(obj));
     }
 

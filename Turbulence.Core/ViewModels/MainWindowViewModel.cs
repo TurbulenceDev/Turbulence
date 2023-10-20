@@ -65,10 +65,10 @@ public class MainWindowViewModel : ViewModelBase,
     }
 
     public async void Receive(SendMessageMsg message) =>
-        await Api.CreateAndSendMessage(_client.HttpClient, SelectedChannel!, message.Message);
+        await Api.CreateAndSendMessage(_client.HttpClient, SelectedChannel!, message.Message, message.Reply, message.ShouldPing);
 }
 
 /// <summary>
 /// Send a message in the currently selected channel
 /// </summary>
-public record SendMessageMsg(string Message);
+public record SendMessageMsg(string Message, Message? Reply = null, bool ShouldPing = false);
