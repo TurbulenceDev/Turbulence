@@ -11,22 +11,25 @@ public partial class PinnedMessagesViewModel : ViewModelBase, IRecipient<Channel
     public ObservableList<Message> PinnedMessages { get; } = new();
     private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
     private Snowflake? _currentChannel = null;
+    private bool _fetched = false;
 
     public void Receive(ChannelSelectedMsg message)
     {
         PinnedMessages.Clear(); // TODO: cache?
         _currentChannel = message.Channel.Id;
+        _fetched = false;
     }
 
     public async void FetchPinnedMessages()
     {
         if (_currentChannel == null)
             return;
-        // Dont double fetch //FIXME: still fetches when no pins exist
-        if (PinnedMessages.Count > 0) 
+        // Dont double fetch
+        if (_fetched) 
             return;
 
         var messages = await _client.GetPinnedMessages(_currentChannel);
         PinnedMessages.ReplaceAll(messages);
+        _fetched = true;
     }
 }

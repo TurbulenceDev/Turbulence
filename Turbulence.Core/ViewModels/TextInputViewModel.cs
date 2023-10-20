@@ -31,7 +31,7 @@ public partial class TextInputViewModel : ViewModelBase, IRecipient<ReplyToMessa
     {
         // unset command
         ReplyingMessage = null;
-        //TODO: send message
+        //TODO: send message to other vms
     }
 
     [RelayCommand]
