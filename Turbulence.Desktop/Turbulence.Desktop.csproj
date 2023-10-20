@@ -11,18 +11,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.0.4"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.0.4"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4"/>
+        <PackageReference Include="Avalonia" Version="11.0.4" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.4" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4" />
     </ItemGroup>
 
     <ItemGroup Condition="$(Configuration) == Debug">
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.0.4"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.0.4" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Turbulence.Core\Turbulence.Core.csproj"/>
-        <ProjectReference Include="..\Turbulence.Discord\Turbulence.Discord.csproj"/>
+        <ProjectReference Include="..\Turbulence.Core\Turbulence.Core.csproj" />
+        <ProjectReference Include="..\Turbulence.Discord\Turbulence.Discord.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EditorConfigFiles Remove="E:\D\Visual Studio\Projects\Turbulence\Turbulence.Desktop\.editorconfig" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="E:\D\Visual Studio\Projects\Turbulence\Turbulence.Desktop\.editorconfig" />
     </ItemGroup>
 
 </Project>

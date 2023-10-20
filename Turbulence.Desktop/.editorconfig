@@ -1,0 +1,2 @@
+[*.{xaml,axaml}]
+indent_style = space
