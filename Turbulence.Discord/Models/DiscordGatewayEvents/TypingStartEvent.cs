@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordGuild;
 
-namespace Turbulence.API.Discord.Models.DiscordGatewayEvents;
+namespace Turbulence.Discord.Models.DiscordGatewayEvents;
 
 /// <summary>
 /// See the <a href="https://discord.com/developers/docs/topics/gateway-events">Discord API documentation</a> or <a href="https://github.com/discord/discord-api-docs/blob/main/docs/topics/Gateway_Events.md">GitHub</a>.

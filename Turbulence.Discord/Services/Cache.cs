@@ -1,6 +1,6 @@
 using Turbulence.Discord.Models;
 
-namespace Turbulence.Discord;
+namespace Turbulence.Discord.Services;
 
 public interface ICache
 {

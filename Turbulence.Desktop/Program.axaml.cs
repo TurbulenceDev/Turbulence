@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Turbulence.Discord;
+using Turbulence.Discord.Services;
 
 namespace Turbulence.Desktop;
 
@@ -29,6 +30,7 @@ internal class Program : Application
         var provider = new ServiceCollection()
                 .AddSingleton<IPlatformClient, Client>()
                 .AddSingleton<ICache, Cache>()
+                .AddSingleton<ITypingStorage, TypingStorage>()
                 .BuildServiceProvider();
         Ioc.Default.ConfigureServices(provider);
 

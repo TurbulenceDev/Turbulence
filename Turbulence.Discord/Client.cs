@@ -4,13 +4,13 @@ using System.Text;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Turbulence.API.Discord.Models.DiscordGatewayEvents;
+using Turbulence.Discord.Models.DiscordGatewayEvents;
 using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordGateway;
-using Turbulence.Discord.Models.DiscordGatewayEvents;
 using Turbulence.Discord.Models.DiscordGuild;
 using Turbulence.Discord.Models.DiscordUser;
+using Turbulence.Discord.Services;
 
 namespace Turbulence.Discord
 {
@@ -31,6 +31,7 @@ namespace Turbulence.Discord
         // Events
         public event EventHandler<Event<Ready>>? Ready;
         public event EventHandler<Event<Message>>? MessageCreated;
+        public event EventHandler<Event<TypingStartEvent>>? TypingStart;
 
         public HttpClient HttpClient { get; } = new();
         private static readonly HttpClient CdnClient = new();
@@ -308,7 +309,7 @@ namespace Turbulence.Discord
                                     return;
                                 }
 
-                                MessageCreated?.Invoke(null, new Event<Message>(message));
+                                MessageCreated?.Invoke(this, new Event<Message>(message));
                                 break;
                             case "READY":
                                 if (msg.Data.Deserialize<Ready>() is not { } ready)
@@ -326,7 +327,7 @@ namespace Turbulence.Discord
                                 // foreach (var member in ready.)
                                 //     MemberInfos.Add(member);
 
-                                Ready?.Invoke(null, new Event<Ready>(ready));
+                                Ready?.Invoke(this, new Event<Ready>(ready));
                                 break;
                             case "THREAD_LIST_SYNC":
                                 if (msg.Data.Deserialize<ThreadListSyncEvent>() is not { } threadSync)
@@ -342,7 +343,7 @@ namespace Turbulence.Discord
                                     Console.WriteLine("Invalid message received on TYPING_START");
                                     return;
                                 }
-                                //TODO: add user to a list of users typing in that channel, then either wait 8/10(?) seconds or for a message create and delete the user from that list
+                                TypingStart?.Invoke(this, new Event<TypingStartEvent>(typingStart));
                                 break;
                             default:
                                 Console.WriteLine($"[Event: {msg.EventName}] Data: {msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true })}");
