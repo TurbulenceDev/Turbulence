@@ -10,7 +10,9 @@ namespace Turbulence.Core.ViewModels;
 public class MainWindowViewModel : ViewModelBase,
     IRecipient<ServerSelectedMsg>,
     IRecipient<ChannelSelectedMsg>,
-    IRecipient<SendMessageMsg>
+    IRecipient<SendMessageMsg>,
+    IRecipient<EditMessageMsg>,
+    IRecipient<DeleteMessageMsg>
 {
     public static bool IsDebug { get; private set; }
     public static Guild? SelectedServer { get; private set; }
@@ -66,9 +68,17 @@ public class MainWindowViewModel : ViewModelBase,
 
     public async void Receive(SendMessageMsg message) =>
         await Api.CreateAndSendMessage(_client.HttpClient, SelectedChannel!, message.Message, message.Reply, message.ShouldPing);
+
+    public async void Receive(EditMessageMsg message) =>
+        await Api.EditMessage(_client.HttpClient, message.Message, message.Original);
+    
+    public async void Receive(DeleteMessageMsg message) =>
+        await Api.DeleteMessage(_client.HttpClient, message.Message);
 }
 
 /// <summary>
 /// Send a message in the currently selected channel
 /// </summary>
 public record SendMessageMsg(string Message, Message? Reply = null, bool ShouldPing = false);
+public record EditMessageMsg(string Message, Message Original);
+public record DeleteMessageMsg(Message Message);

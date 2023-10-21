@@ -6,7 +6,7 @@
              xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              xmlns:converters="clr-namespace:Turbulence.Desktop.Converters"
              x:DataType="vm:TextInputViewModel"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="79"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="116"
              x:Class="Turbulence.Desktop.Views.Main.TextInputView">
     <UserControl.DataContext>
         <vm:TextInputViewModel />
@@ -48,12 +48,16 @@
         </Style>
     </UserControl.Styles>
     <DockPanel>
-        <DockPanel Classes="Clip" DockPanel.Dock="Top" Height="35" IsVisible="{Binding !!ReplyingMessage}">
+        <DockPanel Name="ReplyClip" Classes="Clip" DockPanel.Dock="Top" Height="35" IsVisible="{Binding !!ReplyingMessage}">
             <Button Margin="0,5,5,5" VerticalContentAlignment="Center" BorderThickness="0" Content="X" Command="{Binding ReplyCancelCommand}" DockPanel.Dock="Right" />
             <Separator Height="20" Width="1" DockPanel.Dock="Right" />
             <ToggleButton Classes="ReplyPing" IsChecked="{Binding ReplyPing}" DockPanel.Dock="Right" />
             <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="Replying to " />
             <TextBlock FontWeight="SemiBold" VerticalAlignment="Center" Text="{Binding ReplyingMessage, Converter={StaticResource AuthorConverter}}" />
+        </DockPanel>
+        <DockPanel Name="EditClip" Classes="Clip" DockPanel.Dock="Top" Height="35" IsVisible="{Binding !!EditingMessage}">
+            <Button Margin="5" VerticalContentAlignment="Center" BorderThickness="0" Content="X" Command="{Binding EditCancelCommand}" DockPanel.Dock="Left" />
+            <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="Editing Message" />
         </DockPanel>
         <Grid Classes="TextInput" RowDefinitions="Auto, 24">
             <DockPanel>

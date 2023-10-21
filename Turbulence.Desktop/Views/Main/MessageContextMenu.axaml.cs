@@ -1,6 +1,4 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -49,6 +47,30 @@ namespace Turbulence.Desktop.Views.Main
                 return;
 
             viewModel.ReplyCommand.Execute(message);
+        }
+
+        public void Edit(object? sender, RoutedEventArgs? args)
+        {
+            //TODO: permission checks
+            if (sender is not Control control)
+                return;
+
+            if (control.DataContext is not Message message)
+                return;
+
+            viewModel.EditCommand.Execute(message);
+        }
+        
+        public void Delete(object? sender, RoutedEventArgs? args)
+        {
+            //TODO: permission checks
+            if (sender is not Control control)
+                return;
+
+            if (control.DataContext is not Message message)
+                return;
+
+            viewModel.DeleteCommand.Execute(message);
         }
     }
 }

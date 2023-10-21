@@ -11,6 +11,19 @@ public partial class MessageContextMenuViewModel : ViewModelBase
     {
         Messenger.Send(new ReplyToMessage(message));
     }
+
+    [RelayCommand]
+    public void Edit(Message message)
+    {
+        Messenger.Send(new EditMessage(message));
+    }
+
+    [RelayCommand]
+    public void Delete(Message message)
+    {
+        Messenger.Send(new DeleteMessageMsg(message));
+    }
 }
 
 public record ReplyToMessage(Message Message);
+public record EditMessage(Message Message);

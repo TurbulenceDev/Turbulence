@@ -9,7 +9,7 @@ using Turbulence.Discord.Services;
 
 namespace Turbulence.Core.ViewModels;
 
-public partial class TextInputViewModel : ViewModelBase, IRecipient<ReplyToMessage>, IRecipient<ChannelSelectedMsg>
+public partial class TextInputViewModel : ViewModelBase, IRecipient<ReplyToMessage>, IRecipient<ChannelSelectedMsg>, IRecipient<EditMessage>
 {
     [ObservableProperty]
     private string? _typingStatus = "";
@@ -22,6 +22,9 @@ public partial class TextInputViewModel : ViewModelBase, IRecipient<ReplyToMessa
 
     [ObservableProperty]
     private bool _replyPing = false;
+
+    [ObservableProperty]
+    private Message? _editingMessage = null;
 
     private readonly ITypingStorage _typing = Ioc.Default.GetService<ITypingStorage>()!;
     private Snowflake? _currentChannel;
@@ -70,6 +73,8 @@ public partial class TextInputViewModel : ViewModelBase, IRecipient<ReplyToMessa
         ReplyingMessage = msg.Message;
         ReplyPing = true; // TODO: get default ping from settings?
         // TODO: notify messagesview to refresh scroll?
+        // unset other messages so we only have one clip open
+        EditingMessage = null;
     }
 
     [RelayCommand]
@@ -86,14 +91,35 @@ public partial class TextInputViewModel : ViewModelBase, IRecipient<ReplyToMessa
         if (string.IsNullOrWhiteSpace(Input))
             return;
 
-        Messenger.Send(new SendMessageMsg(Input, ReplyingMessage, ReplyPing));
+        if (EditingMessage != null)
+            Messenger.Send(new EditMessageMsg(Input, EditingMessage));
+        else
+            Messenger.Send(new SendMessageMsg(Input, ReplyingMessage, ReplyPing));
         Input = "";
-        // unset reply
+        // unset clip messages
         ReplyingMessage = null;
+        EditingMessage = null;
     }
 
     public void Receive(ChannelSelectedMsg message)
     {
         _currentChannel = message.Channel.Id;
+    }
+
+    public void Receive(EditMessage message)
+    {
+        EditingMessage = message.Message;
+        Input = message.Message.Content;
+        // unset other messages so we only have one clip open
+        ReplyingMessage = null;
+    }
+
+    [RelayCommand]
+    public void EditCancel()
+    {
+        // unset message
+        EditingMessage = null;
+        Input = "";
+        //TODO: send message to other vms
     }
 }

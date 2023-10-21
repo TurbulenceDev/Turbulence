@@ -18,9 +18,8 @@ public static class Api
     private const string ApiRoot = $"{RootAdress}/v{Version}";
     private const string CdnRoot = "https://cdn.discordapp.com/";
 
-    private static async Task<T> Get<T>(HttpClient client, string endpoint)
+    private static async Task<HttpResponseMessage> SendRequest(HttpClient client, HttpRequestMessage req)
     {
-        var req = new HttpRequestMessage(HttpMethod.Get, $"{ApiRoot}{endpoint}");
         var response = await client.SendAsync(req);
 
         if (!response.IsSuccessStatusCode)
@@ -28,7 +27,7 @@ public static class Api
             if (await response.Content.ReadFromJsonAsync<Error>() is not { } error)
             {
                 throw new ApiException(
-                    $@"Failed to GET {typeof(T).FullName} with code {(int)response.StatusCode}:
+                    $@"Failed to {req.Method} with code {(int)response.StatusCode}:
 {await response.Content.ReadAsStringAsync()}");
             }
 
@@ -41,10 +40,23 @@ public static class Api
 {JsonSerializer.Serialize(error.Errors, new { WriteIndented = true })}");
 
         }
-        
-        //Console.WriteLine(await response.Content.ReadAsStringAsync());
 
-        return await response.Content.ReadFromJsonAsync<T>() ?? throw new ApiException($"ApiCall to {endpoint} failed");
+        //TODO: log
+        //Console.WriteLine(await response.Content.ReadAsStringAsync());
+        return response;
+    }
+
+    // Additionally parses the response content from json to the given type
+    private static async Task<T> SendRequest<T>(HttpClient client, HttpRequestMessage req)
+    {
+        var response = await SendRequest(client, req);
+        return await response.Content.ReadFromJsonAsync<T>() ?? throw new ApiException($"ApiCall to {req.RequestUri!.AbsolutePath} failed");
+    }
+
+    private static async Task<T> Get<T>(HttpClient client, string endpoint)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"{ApiRoot}{endpoint}");
+        return await SendRequest<T>(client, req);
     }
 
     private static async Task<T> Post<T>(HttpClient client, string endpoint, string body)
@@ -53,30 +65,27 @@ public static class Api
         {
             Content = new StringContent(body, Encoding.UTF8, "application/json"),
         };
-        var response = await client.SendAsync(req);
+        return await SendRequest<T>(client, req);
+    }
 
-        if (!response.IsSuccessStatusCode)
-        {
-            if (await response.Content.ReadFromJsonAsync<Error>() is not { } error)
-            {
-                throw new ApiException(
-                    $@"Failed to POST {typeof(T).FullName} with code {(int)response.StatusCode}:
-{await response.Content.ReadAsStringAsync()}");
-            }
+    private static async Task<T> Patch<T>(HttpClient client, string endpoint, string? body = null)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Patch, $"{ApiRoot}{endpoint}");
+        if (body != null)
+            req.Content = new StringContent(body, Encoding.UTF8, "application/json");
+        return await SendRequest<T>(client, req);
+    }
 
-            if (error.Errors == null)
-            {
-                throw new ApiException($"API responded with error: {error.Message} ({error.Code?.ToString() ?? "no error code"})");
-            }
+    private static async Task Delete(HttpClient client, string endpoint)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, $"{ApiRoot}{endpoint}");
+        await SendRequest(client, req);
+    }
 
-            throw new ApiException($@"{error.Message} ({error.Code?.ToString() ?? "no error code"}):
-{JsonSerializer.Serialize(error.Errors, new { WriteIndented = true })}");
-
-        }
-
-        //Console.WriteLine(await response.Content.ReadAsStringAsync());
-
-        return await response.Content.ReadFromJsonAsync<T>() ?? throw new ApiException($"ApiCall to {endpoint} failed");
+    private static async Task<T> Delete<T>(HttpClient client, string endpoint)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, $"{ApiRoot}{endpoint}");
+        return await SendRequest<T>(client, req);
     }
 
     private static async Task<byte[]> CdnGet(HttpClient client, string endpoint)
@@ -160,6 +169,22 @@ public static class Api
             }
         }
         return await Post<Message>(client, $"/channels/{channel.Id}/messages", JsonSerializer.Serialize(obj));
+    }
+
+    // https://discord.com/developers/docs/resources/channel#edit-message
+    public static async Task<Message> EditMessage(HttpClient client, string input, Message original)
+    {
+        EditMessageParams obj = new()
+        {
+            Content = input,
+        };
+        return await Patch<Message>(client, $"/channels/{original.ChannelId}/messages/{original.Id}", JsonSerializer.Serialize(obj));
+    }
+
+    // https://discord.com/developers/docs/resources/channel#delete-message
+    public static async Task DeleteMessage(HttpClient client, Message message)
+    {
+        await Delete(client, $"/channels/{message.ChannelId}/messages/{message.Id}");
     }
 
     public static async Task<Image> GetAvatar(HttpClient client, Snowflake user, string avatar, int size = 32)

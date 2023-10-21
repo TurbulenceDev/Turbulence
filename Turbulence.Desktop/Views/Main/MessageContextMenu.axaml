@@ -2,8 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:v="clr-namespace:Turbulence.Desktop.Views.Main"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
-             x:DataType="vm:MessageContextMenuViewModel"
+             xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
+             x:DataType="channel:Message"
              x:Class="Turbulence.Desktop.Views.Main.MessageContextMenu">
     <MenuItem Header="Copy Text" Click="Copy" />
     <MenuItem Header="Reply" Click="Reply" />
+    <MenuItem Header="Edit" Click="Edit" />
+    <MenuItem Header="Delete" Click="Delete" />
 </MenuFlyout>
