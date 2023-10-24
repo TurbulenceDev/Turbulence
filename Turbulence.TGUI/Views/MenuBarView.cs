@@ -10,7 +10,7 @@ public class MenuBarView : MenuBar
     public MenuBarView()
     {
         var statusMenu = new MenuBarItem { Title = _vm.Status };
-        
+
         Width = Dim.Fill();
         Height = 1;
         Menus = new[]
@@ -33,6 +33,11 @@ public class MenuBarView : MenuBar
                 Children = new[]
                 {
                     new MenuItem { Title = "_Set Token" },
+                    new MenuItem 
+                    { 
+                        Title = "_Connect",
+                        Action = _vm.Connect,
+                    },
                 },
             },
             statusMenu,

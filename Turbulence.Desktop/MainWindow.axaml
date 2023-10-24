@@ -16,6 +16,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#23272a">
             <MenuItem Header="_File">
+                <MenuItem Header="_Connect" Click="OnConnect" />
                 <MenuItem Header="_Settings" Click="OnSettings" />
                 <MenuItem Header="_Open Dev Tools" Click="OnDevTools" IsVisible="{Binding IsDebug}" />
                 <Separator />

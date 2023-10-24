@@ -35,6 +35,7 @@ namespace Turbulence.Discord
         public event EventHandler<Event<MessageDeleteEvent>>? MessageDeleted;
         public event EventHandler<Event<ThreadListSyncEvent>>? ThreadListSync;
 
+        public bool Connected => WebSocket.State == WebSocketState.Open;
         public HttpClient HttpClient { get; } = new();
         private static readonly HttpClient CdnClient = new();
 

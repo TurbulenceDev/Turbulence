@@ -13,7 +13,8 @@ public class MainWindowViewModel : ViewModelBase,
     IRecipient<ChannelSelectedMsg>,
     IRecipient<SendMessageMsg>,
     IRecipient<EditMessageMsg>,
-    IRecipient<DeleteMessageMsg>
+    IRecipient<DeleteMessageMsg>,
+    IRecipient<ConnectMsg>
 {
     public static bool IsDebug { get; private set; }
     public static Guild? SelectedServer { get; private set; }
@@ -27,14 +28,26 @@ public class MainWindowViewModel : ViewModelBase,
         IsDebug = true;
 #endif
         // TODO: Move all this somewhere else
-        Messenger.Send(new SetStatusMsg("Not connected"));
-        // Token
-        var token = new ConfigurationManager().AddUserSecrets<Client>().Build()["token"]! ?? throw new Exception("No token set"); // TODO: use other storage
-        Task.Run(() => _client.Start(token));
-        Messenger.Send(new SetStatusMsg("Connecting..."));
+        //Messenger.Send(new SetStatusMsg("Not connected"));
 
         _client.Ready += OnReady;
         _client.MessageCreated += OnMessageCreated;
+
+        if (!IsDebug) //TODO: check auto start config setting?
+        {
+            Connect();
+        }
+    }
+
+    public void Connect()
+    {
+        if (_client.Connected) //TODO: rather check if it's disconnected cause this could allow connecting while starting to connect
+            return;
+
+        // Get token
+        var token = new ConfigurationManager().AddUserSecrets<Client>().Build()["token"]! ?? throw new Exception("No token set"); // TODO: use other storage
+        Task.Run(() => _client.Start(token));
+        Messenger.Send(new SetStatusMsg("Connecting..."));
     }
 
     private void OnReady(object? sender, Event<Ready> e)
@@ -68,6 +81,8 @@ public class MainWindowViewModel : ViewModelBase,
             Typing = true,
         });
     }
+
+    public async void Receive(ConnectMsg message) => Connect();
 
     public async void Receive(SendMessageMsg message) =>
         await Api.CreateAndSendMessage(_client.HttpClient, SelectedChannel!, message.Message, message.Reply, message.ShouldPing);
