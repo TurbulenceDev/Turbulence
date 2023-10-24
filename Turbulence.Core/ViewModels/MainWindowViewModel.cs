@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Configuration;
@@ -8,19 +9,24 @@ using Turbulence.Discord.Models.DiscordGuild;
 
 namespace Turbulence.Core.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase,
+public partial class MainWindowViewModel : ViewModelBase,
     IRecipient<ServerSelectedMsg>,
     IRecipient<ChannelSelectedMsg>,
     IRecipient<SendMessageMsg>,
     IRecipient<EditMessageMsg>,
     IRecipient<DeleteMessageMsg>,
-    IRecipient<ConnectMsg>
+    IRecipient<ConnectMsg>,
+    IRecipient<SearchMsg>,
+    IRecipient<SearchClosedMsg>
 {
     public static bool IsDebug { get; private set; }
     public static Guild? SelectedServer { get; private set; }
     public static Channel? SelectedChannel { get; private set; }
     
     private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
+
+    [ObservableProperty]
+    public bool _searchOpen = false;
 
     public MainWindowViewModel()
     {
@@ -71,6 +77,9 @@ public class MainWindowViewModel : ViewModelBase,
     public void Receive(ChannelSelectedMsg message) => SelectedChannel = message.Channel;
     public void Receive(ServerSelectedMsg message)
     {
+        if (message.Server == SelectedServer) // probably not needed to do something then
+            return;
+
         SelectedServer = message.Server;
         //TODO: only send if not cached already
         _client.SendGatewayMessage(GatewayOpcode.LAZY_REQUEST, new LazyRequest() 
@@ -80,9 +89,13 @@ public class MainWindowViewModel : ViewModelBase,
             Threads = true,
             Typing = true,
         });
+        // Close the search
+        SearchOpen = false;
     }
 
-    public async void Receive(ConnectMsg message) => Connect();
+    public void Receive(ConnectMsg message) => Connect();
+    public void Receive(SearchMsg message) => SearchOpen = true;
+    public void Receive(SearchClosedMsg message) => SearchOpen = false;
 
     public async void Receive(SendMessageMsg message) =>
         await Api.CreateAndSendMessage(_client.HttpClient, SelectedChannel!, message.Message, message.Reply, message.ShouldPing);

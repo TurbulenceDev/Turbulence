@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="500"
+             x:DataType="vm:SearchViewModel"
+             x:Class="Turbulence.Desktop.Views.Main.SearchView">
+    <UserControl.DataContext>
+        <vm:SearchViewModel />
+    </UserControl.DataContext>
+    <Grid Classes="Pins" RowDefinitions="50,*">
+        <DockPanel>
+            <TextBlock Classes="PinHeader" Text="{Binding SearchResults.Count, StringFormat='{}{0} Results'}" />
+            <Button Command="{Binding CloseSearchCommand}">X</Button>
+        </DockPanel>
+        <ScrollViewer Grid.Row="1" Name="Scroll">
+            <ItemsControl ItemsSource="{Binding SearchResults}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Classes="Pin">
+                            <TextBlock Text="{Binding}" />
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

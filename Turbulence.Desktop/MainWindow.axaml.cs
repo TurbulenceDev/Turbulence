@@ -10,14 +10,16 @@ namespace Turbulence.Desktop;
 public partial class MainWindow : Window
 {
     private SettingsWindow? _settingsWindow;
+    private MainWindowViewModel _vm;
     public MainWindow()
     {
         InitializeComponent();
+        _vm = (MainWindowViewModel)DataContext!;
     }
 
     public async void OnConnect(object? _1, RoutedEventArgs? _2)
     {
-        (DataContext as MainWindowViewModel)!.Connect();
+        _vm.Connect();
     }
 
     public async void OnSettings(object? _1, RoutedEventArgs _2)
@@ -43,5 +45,17 @@ public partial class MainWindow : Window
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             desktop.Shutdown();
+    }
+
+    public void OnPaneClosing(object? sender, CancelRoutedEventArgs? args)
+    {
+        if (_vm == null) // why is this null on start??
+            return;
+
+        if (sender is not SplitView split)
+            return;
+
+        if (_vm.SearchOpen)
+            args!.Cancel = true;
     }
 }

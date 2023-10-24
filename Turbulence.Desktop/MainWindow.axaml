@@ -29,7 +29,12 @@
             <DockPanel Grid.Column="2">
                 <v:ChannelBarView DockPanel.Dock="Top" />
                 <v:TextInputView DockPanel.Dock="Bottom" />
-                <v:MessagesView />
+                <SplitView PaneClosing="OnPaneClosing" IsPaneOpen="{Binding SearchOpen}" DisplayMode="Overlay" PanePlacement="Right">
+                    <SplitView.Pane>
+                        <v:SearchView />
+                    </SplitView.Pane>
+                    <v:MessagesView />
+                </SplitView>
             </DockPanel>
         </Grid>
     </DockPanel>

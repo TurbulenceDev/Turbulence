@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord.Models.DiscordChannel;
 
@@ -13,4 +14,12 @@ public partial class ChannelBarViewModel : ViewModelBase, IRecipient<ChannelSele
     {
         Channel = message.Channel;
     }
+
+    [RelayCommand]
+    public void Search(string search)
+    {
+        Messenger.Send(new SearchMsg(search));
+    }
 }
+
+public record SearchMsg(string Search);

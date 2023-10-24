@@ -21,6 +21,19 @@
         <Style Selector="FlyoutPresenter">
             <Setter Property="Padding" Value="0" />
         </Style>
+        <Style Selector="TextBox">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="TextBox:focus">
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="TextBox Grid">
+            <Setter Property="Background">
+                <SolidColorBrush Color="#1E1F22"/>
+            </Setter>
+        </Style>
     </UserControl.Styles>
     <Grid RowDefinitions="*,auto">
         <DockPanel IsVisible="{Binding !!Channel}" LastChildFill="False">
@@ -29,6 +42,7 @@
                 <Separator Height="20" Width="1" IsVisible="{Binding !!Channel.Topic}" />
                 <TextBlock Text="{Binding Channel.Topic}" />
             </StackPanel>
+            <TextBox Name="Search" Margin="5,5" Watermark="Search" DockPanel.Dock="Right" KeyDown="OnSearchKey" />
             <Button Margin="5,0" Content="Pins" Click="OnPins" DockPanel.Dock="Right">
                 <Button.Flyout>
                     <Flyout Placement="BottomEdgeAlignedRight" VerticalOffset="1">
