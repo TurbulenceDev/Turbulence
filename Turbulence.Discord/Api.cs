@@ -205,7 +205,7 @@ public static class Api
         return await Get<Message[]>(client, $"/channels/{channelId}/pins");
     }
 
-    public static async Task<SearchResult> SearchMessage(HttpClient client, Snowflake guild, string? message = null, User? author = null, User? mentions = null, string? contains = null, Snowflake? maxId = null, Snowflake? minId = null, Snowflake? channel = null, bool? pinned = null, int offset = 0)
+    public static async Task<SearchResult> SearchMessage(HttpClient client, Snowflake guild, string? message = null, User? author = null, User? mentions = null, string? contains = null, Snowflake? maxId = null, Snowflake? minId = null, Snowflake? channel = null, bool? pinned = null, string? sort_by = null, string? sort_order = null, int offset = 0)
     {
         var query = HttpUtility.ParseQueryString(string.Empty);
         // null elements arent added to the final query string
@@ -217,14 +217,15 @@ public static class Api
         query.Add("min_id", minId?.ToString());
         query.Add("channel_id", channel?.ToString());
         query.Add("pinned", pinned?.ToString().ToLowerInvariant());
-        var q = query.ToString();
-        if (string.IsNullOrEmpty(q))
+        if (!query.HasKeys())
             throw new Exception("Search has no parameters!");
-        var url = $"/guilds/{guild}/messages/search?{q}&include_nsfw=true"; //TODO: what sets the nsfw flag?
-        if (offset > 0) // if we have an offset add it to the parameters
-        {
-            url += $"&offset={offset}";
-        }
+        query.Add("include_nsfw", "true"); //TODO: what sets the nsfw flag?
+        query.Add("sort_by", sort_by); // "timestamp", "relevance"
+        query.Add("sort_order", sort_order); // "desc"/"asc"
+        if (offset > 0)
+            query.Add("offset", offset.ToString());
+        var q = query.ToString();
+        var url = $"/guilds/{guild}/messages/search?{q}"; 
         return await Get<SearchResult>(client, url); 
     }
 }
