@@ -91,6 +91,9 @@ public partial class TextInputViewModel : ViewModelBase, IRecipient<ReplyToMessa
         if (string.IsNullOrWhiteSpace(Input))
             return;
 
+        if (_currentChannel == null)
+            return;
+
         if (EditingMessage != null)
             Messenger.Send(new EditMessageMsg(Input, EditingMessage));
         else
