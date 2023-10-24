@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
-             xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              xmlns:converters="clr-namespace:Turbulence.Desktop.Converters"
              x:DataType="vm:TextInputViewModel"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="116"
@@ -11,9 +10,6 @@
     <UserControl.DataContext>
         <vm:TextInputViewModel />
     </UserControl.DataContext>
-    <Design.DataContext>
-        <dvm:DesignTextInputViewModel />
-    </Design.DataContext>
     <UserControl.Resources>
         <converters:MessageAuthorNameConverter x:Key="AuthorConverter" />
     </UserControl.Resources>

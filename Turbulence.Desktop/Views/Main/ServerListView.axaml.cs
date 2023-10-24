@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Turbulence.Core.ViewModels.Design;
 
 namespace Turbulence.Desktop.Views.Main;
 
@@ -10,7 +11,7 @@ public partial class ServerListView : UserControl
         if (Design.IsDesignMode)
         {
             // Workaround to fix design data context getting overwritten
-            DataContext = Design.GetDataContext(this);
+            DataContext = new DesignServerListViewModel();
         }
     }
 }

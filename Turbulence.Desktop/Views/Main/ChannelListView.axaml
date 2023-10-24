@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
-             xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
              xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
              x:Class="Turbulence.Desktop.Views.Main.ChannelListView"
@@ -12,9 +11,6 @@
     <UserControl.DataContext>
         <vm:ChannelListViewModel />
     </UserControl.DataContext>
-    <Design.DataContext>
-        <dvm:DesignChannelListViewModel />
-    </Design.DataContext>
     <ListBox ItemsSource="{Binding Channels}"
              Background="#2B2D31"
              SelectedValue="{Binding SelectedChannel}">

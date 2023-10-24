@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Turbulence.Core.ViewModels;
+using Turbulence.Core.ViewModels.Design;
 
 namespace Turbulence.Desktop.Views.Main;
 
@@ -14,7 +15,7 @@ public partial class MessagesView : UserControl
         if (Design.IsDesignMode)
         {
             // Workaround to fix design data context getting overwritten
-            DataContext = Design.GetDataContext(this);
+            DataContext = new DesignMessagesViewModel();
         }
         _vm = (MessagesViewModel)DataContext!;
 

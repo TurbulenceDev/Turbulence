@@ -3,7 +3,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
-             xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              xmlns:v="clr-namespace:Turbulence.Desktop.Views.Main"
              xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
              x:Class="Turbulence.Desktop.Views.Main.PinnedMessagesView"
@@ -13,9 +12,6 @@
     <UserControl.DataContext>
 		<vm:PinnedMessagesViewModel />
     </UserControl.DataContext>
-    <Design.DataContext>
-        <dvm:DesignPinnedMessagesViewModel />
-    </Design.DataContext>
 	<UserControl.Styles>
 		<Style Selector="Grid.Pins">
 			<Setter Property="Width" Value="300" />

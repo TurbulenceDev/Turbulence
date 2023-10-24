@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Turbulence.Core.ViewModels;
 
 namespace Turbulence.Desktop;
 
@@ -12,6 +13,11 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    public async void OnConnect(object? _1, RoutedEventArgs? _2)
+    {
+        (DataContext as MainWindowViewModel)!.Connect();
     }
 
     public async void OnSettings(object? _1, RoutedEventArgs _2)

@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Turbulence.Core.ViewModels;
+using Turbulence.Core.ViewModels.Design;
 
 namespace Turbulence.Desktop.Views.Main
 {
@@ -13,7 +14,7 @@ namespace Turbulence.Desktop.Views.Main
             if (Design.IsDesignMode)
             {
                 // Workaround to fix design data context getting overwritten
-                DataContext = Design.GetDataContext(this);
+                DataContext = new DesignChannelBarViewModel();
             }
         }
 
