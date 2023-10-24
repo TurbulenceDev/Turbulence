@@ -21,7 +21,7 @@ try
     }
 
     var discord = Ioc.Default.GetService<IPlatformClient>()!;
-    await discord.Start();
+    await discord.Start(token);
     discord.Ready += async (_, msg) =>
     {
         Console.WriteLine("Ready");

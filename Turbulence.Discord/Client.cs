@@ -26,8 +26,6 @@ namespace Turbulence.Discord
 
     public class Client : IPlatformClient
     {
-        // TODO: should this class contain the token? probably but maybe make it a SecureString or something
-        private readonly string _token;
         // Events
         public event EventHandler<Event<Ready>>? Ready;
         public event EventHandler<Event<Message>>? MessageCreated;
@@ -50,22 +48,18 @@ namespace Turbulence.Discord
             CdnClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
             // WS
             WebSocket = new();
-            // Token
-            _token = new ConfigurationManager().AddUserSecrets<Client>().Build()["token"]!; // TODO: BAD, move out of client
-            if (_token == null)
-                throw new Exception("No token set");
         }
 
-        public async Task Start()
+        public async Task Start(string token)
         {
             // TODO: according to the docs this should be cached and only re-requested if the cached version doesnt exist/is not reachable
             var gateway = await Api.GetGateway(HttpClient);
 
-            HttpClient.DefaultRequestHeaders.Add("Authorization", _token);
+            HttpClient.DefaultRequestHeaders.Add("Authorization", token);
 
             SetWebsocketHeaders();
             await WebSocket.ConnectAsync(new Uri($"{gateway.AbsoluteUri}/?encoding=json&v={Api.Version}"), default);
-            await SendIdentify();
+            await SendIdentify(token);
             // Start the tasks // TODO: save the tasks?
             _ = Task.Run(ReceiveTask);
             _ = Task.Run(HeartbeatTask);
@@ -87,14 +81,14 @@ namespace Turbulence.Discord
             WebSocket.Options.SetRequestHeader("Cache-Control", "no-cache");
         }
 
-        public Task SendIdentify()
+        public Task SendIdentify(string token)
         {
             GatewayPayload payload = new()
             {
                 Opcode = GatewayOpcode.IDENTIFY,
                 Data = JsonSerializer.SerializeToNode(new Identify
                 {
-                    Token = _token,
+                    Token = token,
                     // TODO: turn into an bitfield enum
                     Capabilities = 0b11101111111101, // TODO: use official caps, which probably require other models
                     Properties = new IdentifyConnectionProperties

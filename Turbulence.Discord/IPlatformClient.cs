@@ -11,7 +11,7 @@ namespace Turbulence.Discord;
 public interface IPlatformClient
 {
     public Task<Channel> GetChannel(Snowflake id);
-    public Task Start();
+    public Task Start(string token);
     public Task<List<Message>> GetMessages(Snowflake id);
     public Task<Message[]> GetPinnedMessages(Snowflake id);
     public Task<Guild> GetGuild(Snowflake id);

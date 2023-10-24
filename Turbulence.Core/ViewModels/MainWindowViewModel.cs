@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Configuration;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordGateway;
@@ -27,7 +28,9 @@ public class MainWindowViewModel : ViewModelBase,
 #endif
         // TODO: Move all this somewhere else
         Messenger.Send(new SetStatusMsg("Not connected"));
-        Task.Run(_client.Start);
+        // Token
+        var token = new ConfigurationManager().AddUserSecrets<Client>().Build()["token"]! ?? throw new Exception("No token set"); // TODO: use other storage
+        Task.Run(() => _client.Start(token));
         Messenger.Send(new SetStatusMsg("Connecting..."));
 
         _client.Ready += OnReady;
