@@ -35,12 +35,23 @@
             <Setter Property="Background" Value="#2B2D31" />
         </Style>
         <Style Selector="ToggleButton.ReplyPing">
-            <Setter Property="Content" Value="OFF" />
+            <Setter Property="Content" Value="@ OFF" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Background" Value="Transparent" />
+            <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
         <Style Selector="ToggleButton.ReplyPing:checked">
-            <Setter Property="Content" Value="ON" />
+            <Setter Property="Content" Value="@ ON" />
+        </Style>
+        <Style Selector="ToggleButton.ReplyPing:pointerover">
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="ToggleButton.ReplyPing:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ToggleButton.ReplyPing:checked /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#00A8FC" />
         </Style>
     </UserControl.Styles>
     <DockPanel>
