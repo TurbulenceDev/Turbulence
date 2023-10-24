@@ -24,13 +24,14 @@ public class DesignMessagesViewModel : MessagesViewModel
             Avatar = ""
         };
         var now = DateTimeOffset.Now;
+        var message1 = CreateMessage("hello", MessageType.DEFAULT, user1, now - new TimeSpan(24, 0, 0));
         CurrentMessages.AddRange(new List<Message> {
-            CreateMessage("hello", MessageType.DEFAULT, user1, now - new TimeSpan(24, 0, 0)),
-            CreateMessage("no", MessageType.DEFAULT, user2, now - new TimeSpan(0, 1, 0)),
+            message1,
+            CreateMessage("no", MessageType.DEFAULT, user2, now - new TimeSpan(0, 1, 0), message1),
         });
     }
 
-    private static Message CreateMessage(string content, MessageType type, User author, DateTimeOffset timestamp) => new Message()
+    private static Message CreateMessage(string content, MessageType type, User author, DateTimeOffset timestamp, Message? reference = null) => new Message()
     {
         Content = content,
         Type = type,
@@ -46,5 +47,6 @@ public class DesignMessagesViewModel : MessagesViewModel
         Attachments = Array.Empty<Attachment>(),
         Embeds = Array.Empty<Embed>(),
         Pinned = false,
+        ReferencedMessage = reference,
     };
 }

@@ -21,12 +21,21 @@
             <v:MessageContextMenu />
     </UserControl.ContextFlyout>
     <Grid ColumnDefinitions="Auto,*" Classes="Message">
-        <Border CornerRadius="50" ClipToBounds="True" Width="40" Height="40" Margin="5 0 10 0">
-            <Image Name="Image" UseLayoutRounding="False" Source="{Binding Author, Converter={StaticResource AvatarConverter}}" />
-        </Border>
+        <DockPanel>
+            <Panel IsVisible="{Binding !!ReferencedMessage}" Height="20" DockPanel.Dock="Top">
+                <!--TODO: add weird spine border thingy here-->
+            </Panel>
+            <Border CornerRadius="50" ClipToBounds="True" Width="40" Height="40" Margin="5 0 10 0">
+                <Image Name="Image" UseLayoutRounding="False" Source="{Binding Author, Converter={StaticResource AvatarConverter}}" />
+            </Border>
+        </DockPanel>
         <StackPanel Grid.Column="1"
                     Orientation="Vertical"
                     Classes="MessageContent">
+            <StackPanel Name="MessageReference" Height="20" Orientation="Horizontal" IsVisible="{Binding !!ReferencedMessage}">
+                <TextBlock FontWeight="SemiBold" Text="{Binding ReferencedMessage, Converter={StaticResource AuthorConverter}, StringFormat='@{0} '}" />
+                <TextBlock Foreground="#B5BAC1" Text="{Binding ReferencedMessage.Content}" />
+            </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Name="Author" Classes="Author" Text="{Binding, Converter={StaticResource AuthorConverter}}" />
                 <TextBlock Name="Timestamp" Classes="Timestamp" Text="{Binding Timestamp, StringFormat='G'}">

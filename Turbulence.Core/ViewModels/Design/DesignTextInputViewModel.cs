@@ -26,7 +26,7 @@ public class DesignTextInputViewModel : TextInputViewModel
         Author = user,
         Id = new(0),
         ChannelId = new(0),
-        Timestamp = DateTimeOffset.UtcNow,
+        Timestamp = DateTimeOffset.Now,
         EditedTimestamp = null,
         Tts = false,
         MentionEveryone = false,

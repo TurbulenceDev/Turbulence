@@ -26,6 +26,7 @@ namespace Turbulence.Discord
 
     public class Client : IPlatformClient
     {
+        //TODO: save token here for possible reconnecting?
         // Events
         public event EventHandler<Event<Ready>>? Ready;
         public event EventHandler<Event<Message>>? MessageCreated;
