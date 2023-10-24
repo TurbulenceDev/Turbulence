@@ -32,6 +32,9 @@ namespace Turbulence.Discord
         public event EventHandler<Event<Ready>>? Ready;
         public event EventHandler<Event<Message>>? MessageCreated;
         public event EventHandler<Event<TypingStartEvent>>? TypingStart;
+        public event EventHandler<Event<Message>>? MessageUpdated;
+        public event EventHandler<Event<MessageDeleteEvent>>? MessageDeleted;
+        public event EventHandler<Event<ThreadListSyncEvent>>? ThreadListSync;
 
         public HttpClient HttpClient { get; } = new();
         private static readonly HttpClient CdnClient = new();
@@ -335,7 +338,8 @@ namespace Turbulence.Discord
                                     Console.WriteLine("Invalid message received on THREAD_LIST_SYNC");
                                     return;
                                 }
-                                //TODO: thread list sync event + add data to guilds
+                                ThreadListSync?.Invoke(this, new Event<ThreadListSyncEvent>(threadSync));
+                                //TODO: listen to event + add data to guilds
                                 break;
                             case "TYPING_START":
                                 if (msg.Data.Deserialize<TypingStartEvent>() is not { } typingStart)
@@ -344,6 +348,26 @@ namespace Turbulence.Discord
                                     return;
                                 }
                                 TypingStart?.Invoke(this, new Event<TypingStartEvent>(typingStart));
+                                break;
+                            case "MESSAGE_UPDATE":
+                                //TODO: should we use the message class here? according to the docs:
+                                //> Unlike creates, message updates may contain only a subset of the full message object payload (but will always contain an ID and channel_id).
+                                if (msg.Data.Deserialize<Message>() is not { } messageUpdate)
+                                {
+                                    Console.WriteLine("Invalid message received on MESSAGE_UPDATE");
+                                    return;
+                                }
+                                MessageUpdated?.Invoke(this, new Event<Message>(messageUpdate));
+                                //TODO: listen to this
+                                break;
+                            case "MESSAGE_DELETE":
+                                if (msg.Data.Deserialize<MessageDeleteEvent>() is not { } messageDelete)
+                                {
+                                    Console.WriteLine("Invalid message received on MESSAGE_DELETE");
+                                    return;
+                                }
+                                MessageDeleted?.Invoke(this, new Event<MessageDeleteEvent>(messageDelete));
+                                //TODO: listen to this
                                 break;
                             default:
                                 Console.WriteLine($"[Event: {msg.EventName}] Data: {msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true })}");
