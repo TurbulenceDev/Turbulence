@@ -34,7 +34,7 @@
                     Classes="MessageContent">
             <StackPanel Name="MessageReference" Height="20" Orientation="Horizontal" IsVisible="{Binding !!ReferencedMessage}">
                 <TextBlock FontWeight="SemiBold" Text="{Binding ReferencedMessage, Converter={StaticResource AuthorConverter}, StringFormat='@{0} '}" />
-                <TextBlock Foreground="#B5BAC1" Text="{Binding ReferencedMessage.Content}" />
+                <TextBlock Foreground="#B5BAC1" Text="{Binding ReferencedMessage, Converter={StaticResource MessageConverter}}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Name="Author" Classes="Author" Text="{Binding, Converter={StaticResource AuthorConverter}}" />
