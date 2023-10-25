@@ -37,7 +37,8 @@ public partial class ServerListViewModel : ViewModelBase, IRecipient<SetServersM
         
         TreeUpdated?.Invoke(null, EventArgs.Empty);
 
-        Messenger.Send(new SetChannelsMsg(Servers.First().Channels.ToList()));
+        // Select the first server at the start
+        SelectedServer = Servers.First();
     }
 }
 
