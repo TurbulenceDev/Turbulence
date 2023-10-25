@@ -449,5 +449,10 @@ namespace Turbulence.Discord
         {
             return await Api.GetPinnedMessages(HttpClient, channelId);
         }
+
+        public async Task<SearchResult> SearchMessages(SearchRequest request)
+        {
+            return await Api.SearchMessages(HttpClient, request);
+        }
     }
 }

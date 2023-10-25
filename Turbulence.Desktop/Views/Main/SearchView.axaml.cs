@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Turbulence.Core.ViewModels.Design;
 
 namespace Turbulence.Desktop.Views.Main
 {
@@ -7,6 +8,10 @@ namespace Turbulence.Desktop.Views.Main
         public SearchView()
         {
             InitializeComponent();
+            if (Design.IsDesignMode)
+            {
+                DataContext = new DesignSearchViewModel();
+            }
         }
     }
 }

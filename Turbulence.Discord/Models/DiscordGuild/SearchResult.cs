@@ -19,8 +19,8 @@ public record SearchResult
     public Channel[]? Threads { get; init; }
 
     [JsonPropertyName("members")]
-    public User[]? Members { get; init; }
+    public ThreadMember[]? Members { get; init; }
 
     [JsonPropertyName("messages")]
-    public required Message[] Messages { get; init; }
+    public required Message[][] Messages { get; init; } // INFO: for some reason discord sends each message inside an array. havent seen an array with mroe
 }

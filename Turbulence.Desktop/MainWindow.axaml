@@ -29,7 +29,7 @@
             <DockPanel Grid.Column="2">
                 <v:ChannelBarView DockPanel.Dock="Top" />
                 <v:TextInputView DockPanel.Dock="Bottom" />
-                <SplitView PaneClosing="OnPaneClosing" IsPaneOpen="{Binding SearchOpen}" DisplayMode="Overlay" PanePlacement="Right">
+                <SplitView PaneClosing="OnPaneClosing" IsPaneOpen="{Binding SearchOpen}" DisplayMode="CompactInline" CompactPaneLength="0" PanePlacement="Right">
                     <SplitView.Pane>
                         <v:SearchView />
                     </SplitView.Pane>

@@ -44,7 +44,7 @@
                     </ToolTip.Tip>
                 </TextBlock>
             </StackPanel>
-            <TextBlock Name="Content" TextWrapping="WrapWithOverflow" Classes="MessageContent" Text="{Binding, Converter={StaticResource MessageConverter}}" />
+            <TextBlock Name="Content" TextWrapping="Wrap" Classes="MessageContent" Text="{Binding, Converter={StaticResource MessageConverter}}" />
         </StackPanel>
     </Grid>
 </UserControl>

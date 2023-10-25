@@ -18,7 +18,7 @@ public record ThreadMember {
 	/// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public required Snowflake Id { get; init; }
+	public Snowflake? Id { get; init; }
 
 	/// <summary>
 	/// Snowflake ID of the user.
@@ -26,7 +26,7 @@ public record ThreadMember {
 	/// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
 	/// </summary>
 	[JsonPropertyName("user_id")]
-	public required Snowflake UserId { get; init; }
+	public Snowflake? UserId { get; init; }
 
 	/// <summary>
 	/// Time the user last joined the thread.
@@ -49,5 +49,5 @@ public record ThreadMember {
 	/// </c> or <c>Get Thread Member</c>.
 	/// </summary>
 	[JsonPropertyName("member")]
-	public required GuildMember Member { get; init; }
+	public GuildMember? Member { get; init; }
 }

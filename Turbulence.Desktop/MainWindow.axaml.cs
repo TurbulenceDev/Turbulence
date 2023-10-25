@@ -17,7 +17,8 @@ public partial class MainWindow : Window
         _vm = (MainWindowViewModel)DataContext!;
     }
 
-    public async void OnConnect(object? _1, RoutedEventArgs? _2)
+    // Menu Item Handlers //TODO: move them into the menu bar view + use it??
+    public void OnConnect(object? _1, RoutedEventArgs? _2)
     {
         _vm.Connect();
     }
@@ -38,7 +39,7 @@ public partial class MainWindow : Window
             Key = Key.F12,
             Source = this
         };
-        this.RaiseEvent(ev);
+        RaiseEvent(ev);
     }
 
     public void OnExit(object? _1, RoutedEventArgs _2)
@@ -47,6 +48,7 @@ public partial class MainWindow : Window
             desktop.Shutdown();
     }
 
+    // Prevent the search pane from closing automatically
     public void OnPaneClosing(object? sender, CancelRoutedEventArgs? args)
     {
         if (_vm == null) // why is this null on start??

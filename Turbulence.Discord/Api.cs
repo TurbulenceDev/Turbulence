@@ -50,6 +50,7 @@ public static class Api
     private static async Task<T> SendRequest<T>(HttpClient client, HttpRequestMessage req)
     {
         var response = await SendRequest(client, req);
+        //var res = await response.Content.ReadAsStringAsync();
         return await response.Content.ReadFromJsonAsync<T>() ?? throw new ApiException($"ApiCall to {req.RequestUri!.AbsolutePath} failed");
     }
 
@@ -205,27 +206,27 @@ public static class Api
         return await Get<Message[]>(client, $"/channels/{channelId}/pins");
     }
 
-    public static async Task<SearchResult> SearchMessage(HttpClient client, Snowflake guild, string? message = null, User? author = null, User? mentions = null, string? contains = null, Snowflake? maxId = null, Snowflake? minId = null, Snowflake? channel = null, bool? pinned = null, string? sort_by = null, string? sort_order = null, int offset = 0)
+    public static async Task<SearchResult> SearchMessages(HttpClient client, SearchRequest request)
     {
         var query = HttpUtility.ParseQueryString(string.Empty);
         // null elements arent added to the final query string
-        query.Add("content", message);
-        query.Add("author_id", author?.Id.ToString());
-        query.Add("mentions", mentions?.Id.ToString());
-        query.Add("has", contains); //TODO: enum-ify this? "link", "embed", "file", "video", "image", "sound", "sticker"
-        query.Add("max_id", maxId?.ToString()); // INFO: these are timestamps converted to snowflakes. "during" is handled by both parameters
-        query.Add("min_id", minId?.ToString());
-        query.Add("channel_id", channel?.ToString());
-        query.Add("pinned", pinned?.ToString().ToLowerInvariant());
+        query.Add("content", request.Search);
+        query.Add("author_id", request.Author?.ToString());
+        query.Add("mentions", request.Mentions?.ToString());
+        query.Add("has", request.Contains); //TODO: enum-ify this? "link", "embed", "file", "video", "image", "sound", "sticker"
+        query.Add("max_id", request.MaxId?.ToString()); // INFO: these are timestamps converted to snowflakes. "during" is handled by both parameters
+        query.Add("min_id", request.MinId?.ToString());
+        query.Add("channel_id", request.Channel?.ToString());
+        query.Add("pinned", request.Pinned?.ToString().ToLowerInvariant());
         if (!query.HasKeys())
             throw new Exception("Search has no parameters!");
         query.Add("include_nsfw", "true"); //TODO: what sets the nsfw flag?
-        query.Add("sort_by", sort_by); // "timestamp", "relevance"
-        query.Add("sort_order", sort_order); // "desc"/"asc"
-        if (offset > 0)
-            query.Add("offset", offset.ToString());
+        query.Add("sort_by", request.SortBy); // "timestamp", "relevance"
+        query.Add("sort_order", request.SortOrder); // "desc"/"asc"
+        if (request.Offset > 0)
+            query.Add("offset", request.Offset.ToString());
         var q = query.ToString();
-        var url = $"/guilds/{guild}/messages/search?{q}"; 
+        var url = $"/guilds/{request.Server.Id}/messages/search?{q}"; 
         return await Get<SearchResult>(client, url); 
     }
 }
