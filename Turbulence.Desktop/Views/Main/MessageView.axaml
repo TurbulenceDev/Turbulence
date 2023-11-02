@@ -37,14 +37,14 @@
                 <TextBlock Foreground="#B5BAC1" Text="{Binding ReferencedMessage, Converter={StaticResource MessageConverter}}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Name="Author" Classes="Author" Text="{Binding, Converter={StaticResource AuthorConverter}}" />
+                <TextBlock Name="Author" Classes="Author" Text="{Binding ., Converter={StaticResource AuthorConverter}}" />
                 <TextBlock Name="Timestamp" Classes="Timestamp" Text="{Binding Timestamp, StringFormat='G'}">
                     <ToolTip.Tip>
                         <Label Content="{Binding Timestamp, StringFormat='F'}" />
                     </ToolTip.Tip>
                 </TextBlock>
             </StackPanel>
-            <TextBlock Name="Content" TextWrapping="Wrap" Classes="MessageContent" Text="{Binding, Converter={StaticResource MessageConverter}}" />
+            <TextBlock Name="Content" TextWrapping="Wrap" Classes="MessageContent" Text="{Binding ., Converter={StaticResource MessageConverter}}" />
         </StackPanel>
     </Grid>
 </UserControl>
