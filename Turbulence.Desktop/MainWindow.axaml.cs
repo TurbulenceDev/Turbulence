@@ -54,7 +54,7 @@ public partial class MainWindow : Window
         if (_vm == null) // why is this null on start??
             return;
 
-        if (sender is not SplitView split)
+        if (sender is not SplitView)
             return;
 
         if (_vm.SearchOpen)

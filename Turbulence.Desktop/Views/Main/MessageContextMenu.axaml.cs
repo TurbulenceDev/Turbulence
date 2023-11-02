@@ -9,7 +9,7 @@ namespace Turbulence.Desktop.Views.Main
 {
     public partial class MessageContextMenu : MenuFlyout
     {
-        private MessageContextMenuViewModel viewModel = new();
+        private readonly MessageContextMenuViewModel _viewModel = new();
         public MessageContextMenu()
         {
             InitializeComponent();
@@ -32,7 +32,7 @@ namespace Turbulence.Desktop.Views.Main
                 return;
 
             var toplevel = TopLevel.GetTopLevel(control);
-            if (toplevel == null || toplevel.Clipboard is not IClipboard clipboard)
+            if (toplevel is not { Clipboard: { } clipboard })
                 return;
 
             clipboard.SetTextAsync(message.Content);
@@ -46,7 +46,7 @@ namespace Turbulence.Desktop.Views.Main
             if (control.DataContext is not Message message)
                 return;
 
-            viewModel.ReplyCommand.Execute(message);
+            _viewModel.ReplyCommand.Execute(message);
         }
 
         public void Edit(object? sender, RoutedEventArgs? args)
@@ -58,7 +58,7 @@ namespace Turbulence.Desktop.Views.Main
             if (control.DataContext is not Message message)
                 return;
 
-            viewModel.EditCommand.Execute(message);
+            _viewModel.EditCommand.Execute(message);
         }
         
         public void Delete(object? sender, RoutedEventArgs? args)
@@ -70,7 +70,7 @@ namespace Turbulence.Desktop.Views.Main
             if (control.DataContext is not Message message)
                 return;
 
-            viewModel.DeleteCommand.Execute(message);
+            _viewModel.DeleteCommand.Execute(message);
         }
     }
 }

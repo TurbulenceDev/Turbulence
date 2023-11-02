@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Turbulence.Discord.Models.DiscordGatewayEvents;
+namespace Turbulence.Discord.Models.DiscordGateway;
 
 /// <summary>
 /// <b>Source:</b> <a href="https://github.com/discord/discord-api-docs/blob/main/docs/topics/Gateway_Events.md">GitHub</a>, <a href="https://discord.com/developers/docs/topics/gateway-events">Discord API</a>

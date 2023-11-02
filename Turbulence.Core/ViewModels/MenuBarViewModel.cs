@@ -22,4 +22,4 @@ public partial class MenuBarViewModel : ViewModelBase, IRecipient<SetStatusMsg>
 }
 
 public record SetStatusMsg(string Status);
-public record ConnectMsg();
+public record ConnectMsg;

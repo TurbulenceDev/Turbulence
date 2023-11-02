@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Turbulence.Discord.Models.DiscordChannel;
-using Turbulence.Discord.Models;
 
 namespace Turbulence.Discord.Models.DiscordGatewayEvents;
 

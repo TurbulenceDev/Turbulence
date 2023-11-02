@@ -26,7 +26,7 @@ public partial class MainWindowViewModel : ViewModelBase,
     private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
 
     [ObservableProperty]
-    public bool _searchOpen = false;
+    private bool _searchOpen = false;
 
     public MainWindowViewModel()
     {

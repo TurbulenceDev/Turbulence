@@ -34,10 +34,10 @@ public record CreateMessageParams {
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public Embed[]? Embeds { get; init; }
 
-	/// <summary>
+	/*/// <summary>
 	/// Allowed mentions for the message.
 	/// </summary>
-	/*[JsonPropertyName("allowed_mentions")]
+	[JsonPropertyName("allowed_mentions")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public AllowedMentions? AllowedMentions { get; init; }*/ // TODO: allowed mentions
 
@@ -48,10 +48,10 @@ public record CreateMessageParams {
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public MessageReference? MessageReference { get; set; }
 
-	/// <summary>
+	/*/// <summary>
 	/// Components to include with the message.
 	/// </summary>
-	/*[JsonPropertyName("components")]
+	[JsonPropertyName("components")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public MessageComponent[]? Components { get; init; }*/ // TODO: message components
 

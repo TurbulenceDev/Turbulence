@@ -116,7 +116,7 @@ public static class Converter
             if (field.Contains("files[n]"))
             {
                 record.AppendLine(
-                    "\t// TODO: Implement files[n] bullshit (https://discord.com/developers/docs/reference#uploading-files)");
+                    "    // TODO: Implement files[n] bullshit (https://discord.com/developers/docs/reference#uploading-files)");
                 continue;
             }
 
@@ -126,7 +126,7 @@ public static class Converter
             // Transform ` ` into XML code blocks
             description = Regex.Replace(description, "`(.*?)`", "<c>$1</c>");
 
-            record.AppendLine($"\t/// <summary>\n\t/// {PrettifyDescription(description)}\n\t/// </summary>");
+            record.AppendLine($"    /// <summary>\n    /// {PrettifyDescription(description)}\n    /// </summary>");
             
             var prettyField = ConvertField(field);
             var cleanField = CleanField(field);
@@ -146,7 +146,7 @@ public static class Converter
             else
             {
                 requiredStr = "";
-                ignore = "\n\t[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]";
+                ignore = "\n    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]";
                 
                 // Property that isn't required has to be nullable
                 if (!convertedType.EndsWith('?'))
@@ -158,7 +158,7 @@ public static class Converter
             var newline = i != propertyValues.Count - 1 ? "\n" : "";
 
             record.AppendLine(
-                $"\t[JsonPropertyName(\"{cleanField}\")]{ignore}\n\tpublic {requiredStr}{convertedType} {prettyField} {{ get; init; }}{newline}");
+                $"    [JsonPropertyName(\"{cleanField}\")]{ignore}\n    public {requiredStr}{convertedType} {prettyField} {{ get; init; }}{newline}");
         }
 
         record.AppendLine("}");
