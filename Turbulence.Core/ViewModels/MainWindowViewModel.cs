@@ -51,7 +51,7 @@ public partial class MainWindowViewModel : ViewModelBase,
             return;
 
         // Get token
-        var token = new ConfigurationManager().AddUserSecrets<Client>().Build()["token"]! ?? throw new Exception("No token set"); // TODO: use other storage
+        var token = new ConfigurationManager().AddUserSecrets<MainWindowViewModel>().Build()["token"]! ?? throw new Exception("No token set"); // TODO: use other storage
         Task.Run(() => _client.Start(token));
         Messenger.Send(new SetStatusMsg("Connecting..."));
     }

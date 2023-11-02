@@ -1,14 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
-    </PropertyGroup>
+      <UserSecretsId>f314b34b-c309-412c-a993-8a9b7b15dc0d</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     </ItemGroup>
 
