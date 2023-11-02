@@ -42,10 +42,10 @@ public partial class TextInputViewModel : ViewModelBase, IRecipient<ReplyToMessa
             return;
 
         // fetch the users
-        var users = _typing.GetTypingUsers(channel);
+        var users = _typing.GetTypingUsers(channel)?.ToList();
         if (users == null)
             return;
-        var count = users.Count();
+        var count = users.Count;
 
         //TODO: get user name from snowflake
         switch (count)

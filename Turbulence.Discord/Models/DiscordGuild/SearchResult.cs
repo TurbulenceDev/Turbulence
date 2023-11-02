@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using Turbulence.Discord.Models.DiscordChannel;
-using Turbulence.Discord.Models.DiscordUser;
 
 namespace Turbulence.Discord.Models.DiscordGuild;
 

@@ -149,25 +149,26 @@ public static class Api
             Tts = false,
             Flags = 0, // TODO: silent
         };
-        if (reply != null)
+
+        if (reply == null)
+            return await Post<Message>(client, $"/channels/{channel.Id}/messages", JsonSerializer.Serialize(obj));
+        
+        obj.MessageReference = new MessageReference
         {
-            obj.MessageReference = new()
+            GuildId = reply.GuildId, //TODO: null on the message and channel object, get otherwise?
+            ChannelId = reply.ChannelId,
+            MessageId = reply.Id,
+        };
+        if (!shouldPing)
+        {
+            obj.AllowedMentions = new AllowedMentions
             {
-                GuildId = reply.GuildId, //TODO: null on the message and channel object, get otherwise?
-                ChannelId = reply.ChannelId,
-                MessageId = reply.Id
-            };
-            if (!shouldPing)
-            {
-                obj.AllowedMentions = new()
+                Parse = new[]
                 {
-                    Parse = new string[]
-                    {
-                        "roles", "users", "everyone"
-                    },
-                    RepliedUser = false,
-                };
-            }
+                    "roles", "users", "everyone",
+                },
+                RepliedUser = false,
+            };
         }
         return await Post<Message>(client, $"/channels/{channel.Id}/messages", JsonSerializer.Serialize(obj));
     }

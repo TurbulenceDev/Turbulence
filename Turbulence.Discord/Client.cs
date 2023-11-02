@@ -3,7 +3,6 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Turbulence.Discord.Models.DiscordGatewayEvents;
 using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;

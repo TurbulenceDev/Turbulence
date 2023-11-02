@@ -12,14 +12,14 @@ public partial class SearchViewModel : ViewModelBase, IRecipient<SearchMsg>
 {
     [ObservableProperty]
     private int _totalSearchResult = 0;
-    private SearchRequest? Request = null;
+    private SearchRequest? _request;
     public ObservableList<Message> SearchResults { get; } = new();
     private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
 
     public async void Receive(SearchMsg message)
     {
-        Request = message.Request;
-        var result = await _client.SearchMessages(Request);
+        _request = message.Request;
+        var result = await _client.SearchMessages(_request);
         TotalSearchResult = result.TotalResults;
         //FIXME: fix this somehow not using linq?
         SearchResults.ReplaceAll(result.Messages.Select(m => m[0]));
@@ -32,4 +32,4 @@ public partial class SearchViewModel : ViewModelBase, IRecipient<SearchMsg>
     }
 }
 
-public record SearchClosedMsg();
+public record SearchClosedMsg;

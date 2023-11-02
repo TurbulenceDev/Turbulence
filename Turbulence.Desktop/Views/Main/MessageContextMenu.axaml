@@ -1,7 +1,5 @@
 <MenuFlyout xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:v="clr-namespace:Turbulence.Desktop.Views.Main"
-             xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
              xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
              x:DataType="channel:Message"
              x:Class="Turbulence.Desktop.Views.Main.MessageContextMenu">

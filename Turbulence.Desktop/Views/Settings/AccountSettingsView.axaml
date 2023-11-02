@@ -4,12 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
              x:Class="Turbulence.Desktop.Views.Settings.AccountSettingsView"
-			 Background="#313338">
-	<StackPanel Orientation="Vertical">
-		<Grid ColumnDefinitions="*,auto,auto">
-			<TextBox Name="Token" Watermark="Token" PasswordChar="*" Grid.Column="0" />
-			<Button Click="OnSetToken" Grid.Column="1">Set Token</Button>
-			<CheckBox Checked="OnTokenShow" Grid.Column="2">Show</CheckBox>
-		</Grid>
-	</StackPanel>
+             Background="#313338">
+    <StackPanel Orientation="Vertical">
+        <Grid ColumnDefinitions="*,auto,auto">
+            <TextBox Name="Token" Watermark="Token" PasswordChar="*" Grid.Column="0" />
+            <Button Click="OnSetToken" Grid.Column="1">Set Token</Button>
+            <CheckBox IsCheckedChanged="OnTokenShow" Grid.Column="2">Show</CheckBox>
+        </Grid>
+    </StackPanel>
 </UserControl>
