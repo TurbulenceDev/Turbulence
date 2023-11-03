@@ -39,7 +39,7 @@ public partial class SearchViewModel : ViewModelBase, IRecipient<SearchMsg>
     private void UpdateFields()
     {
         //TODO: can we do this better than manually calling this?
-        MaximumPage = TotalSearchResult / ResultsPerPage;
+        MaximumPage = (int)Math.Ceiling((decimal)TotalSearchResult / ResultsPerPage);
         IsPaginationVisible = TotalSearchResult > ResultsPerPage;
     }
 
