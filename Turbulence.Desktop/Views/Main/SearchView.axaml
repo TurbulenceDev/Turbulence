@@ -35,7 +35,7 @@
             <Setter Property="CornerRadius" Value="3" />
         </Style>
     </UserControl.Styles>
-    <Grid Classes="Search" RowDefinitions="50,*">
+    <Grid Classes="Search" RowDefinitions="50,*,auto">
         <DockPanel>
             <Button Margin="10,10" Command="{Binding CloseSearchCommand}" DockPanel.Dock="Right">X</Button>
             <TextBlock Classes="SearchHeader" Text="{Binding TotalSearchResult, StringFormat='{}{0} Results'}" />
@@ -53,5 +53,9 @@
             </ItemsControl>
         </ScrollViewer>
         <!-- TODO: add pagination -->
+        <StackPanel Orientation="Horizontal" Grid.Row="2" IsVisible="{Binding IsPaginationVisible}">
+            <Label>Page:</Label>
+            <NumericUpDown Value="{Binding CurrentPage}" Focusable="False" Increment="1" Minimum="1" Maximum="{Binding MaximumPage}" ValueChanged="OnPageChanged" />
+        </StackPanel>
     </Grid>
 </UserControl>
