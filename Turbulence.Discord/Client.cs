@@ -423,20 +423,22 @@ namespace Turbulence.Discord
             return Guilds.TryGetValue(id, out var ret) ? ret : await Api.GetGuild(HttpClient, id);
         }
 
-        public async Task<Image> GetAvatar(User user, int size = 128)
+        public async Task<byte[]> GetAvatarAsync(User user, int size = 128)
         {
-            if (_cache.GetAvatar(user.Id) is { } avatar)
+            if (_cache.GetAvatar(user.Id, size) is { } avatar)
                 return avatar;
 
-            // https://discord.com/developers/docs/reference#image-formatting
             if (user.Avatar == null)
             {
-                // index depends on whether the user switched to new username system
-                // users with a username have a Discriminator of "0"
-                var index = user.Discriminator == "0" ? (int)(user.Id >> 22) % 6 : int.Parse(user.Discriminator) % 5;
-                return await Api.GetDefaultAvatar(CdnClient, index);
+                avatar = await Api.GetDefaultAvatarAsync(CdnClient, user);
             }
-            return await Api.GetAvatar(CdnClient, user.Id, user.Avatar!, size);
+            else
+            {
+                avatar = await Api.GetAvatarAsync(CdnClient, user, size);
+            }
+            
+            _cache.SetAvatar(user.Id, size, avatar);
+            return avatar;
         }
 
         public async Task<Channel> GetChannel(Snowflake id)

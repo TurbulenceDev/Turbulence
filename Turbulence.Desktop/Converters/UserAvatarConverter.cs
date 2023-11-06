@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Platform;
 using System.Globalization;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordUser;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
 
@@ -10,6 +12,8 @@ namespace Turbulence.Desktop.Converters;
 
 public class UserAvatarConverter : IValueConverter
 {
+    private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
+
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not User user)
@@ -21,39 +25,18 @@ public class UserAvatarConverter : IValueConverter
             return new Bitmap(AssetLoader.Open(new Uri("resm:Avalonia.Skia.Assets.NoiseAsset_256X256_PNG.png?assembly=Avalonia.Skia")));
         }
 
-        // TODO: use client avatar get
-        if (user.Avatar is { } avatar)
+        var data = Task.Run(async () => await _client.GetAvatarAsync(user, 80)).Result;
+        var bmp = new Bitmap(new MemoryStream(data));
+        if (bmp.PixelSize.Height > 80)
         {
-            return Task.Run(async () =>
-                await LoadFromWeb(new Uri($"https://cdn.discordapp.com/avatars/{user.Id}/{avatar}.png?size=80"))).Result;
+            bmp = bmp.CreateScaledBitmap(new PixelSize(80, 80));
         }
-        else
-        {
-            return Task.Run(async () =>
-                await LoadFromWeb(new Uri($"https://cdn.discordapp.com/embed/avatars/{(user.Id >> 22) % 6}.png"))).Result!.CreateScaledBitmap(new PixelSize(80, 80));
-        }
-        // Image.Source = new Bitmap(new MemoryStream(await _client.GetAvatar(message.Author)));
+
+        return bmp;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
-    }
-
-    private static async Task<Bitmap?> LoadFromWeb(Uri url)
-    {
-        using var httpClient = new HttpClient();
-        try
-        {
-            var response = await httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var data = await response.Content.ReadAsByteArrayAsync();
-            return new Bitmap(new MemoryStream(data));
-        }
-        catch (HttpRequestException ex)
-        {
-            Console.WriteLine($"An error occurred while downloading image '{url}': {ex.Message}");
-            return null;
-        }
     }
 }

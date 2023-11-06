@@ -91,7 +91,7 @@ public static class Api
 
     private static async Task<byte[]> CdnGet(HttpClient client, string endpoint)
     {
-        var req = new HttpRequestMessage(HttpMethod.Get, $"{ApiRoot}{endpoint}");
+        var req = new HttpRequestMessage(HttpMethod.Get, $"{CdnRoot}{endpoint}");
         var response = await client.SendAsync(req);
         if (!response.IsSuccessStatusCode)
         {
@@ -189,16 +189,20 @@ public static class Api
         await Delete(client, $"/channels/{message.ChannelId}/messages/{message.Id}");
     }
 
-    public static async Task<Image> GetAvatar(HttpClient client, Snowflake user, string avatar, int size = 32)
+    //https://discord.com/developers/docs/reference#image-formatting
+    public static Task<byte[]> GetAvatarAsync(HttpClient client, User user, int size = 32)
     {
-        var data = await CdnGet(client, $"avatars/{user}/{avatar}.png?size={size}");
-        return new Image(data, size); // TODO: Size could easily be a lie, as the API will just send the largest available instead of given size
+        return CdnGet(client, $"avatars/{user.Id}/{user.Avatar}.png?size={size}");
+        // TODO: Size could easily be a lie, as the API will just send the largest available instead of given size
     }
 
-    public static async Task<Image> GetDefaultAvatar(HttpClient client, int index)
+    //https://discord.com/developers/docs/reference#image-formatting
+    public static Task<byte[]> GetDefaultAvatarAsync(HttpClient client, User user)
     {
-        var data = await CdnGet(client, $"embed/avatars/{index}.png"); // TODO: Doesn't work
-        return new Image(data, 256);
+        // index depends on whether the user switched to new username system
+        // users with a username have a Discriminator of "0"
+        var index = user.Discriminator == "0" ? (int)(user.Id >> 22) % 6 : int.Parse(user.Discriminator) % 5;
+        return CdnGet(client, $"embed/avatars/{index}.png");
     }
 
     // https://discord.com/developers/docs/resources/channel#get-pinned-messages

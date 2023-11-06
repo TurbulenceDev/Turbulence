@@ -22,7 +22,7 @@ public interface IPlatformClient
     public event EventHandler<Event<TypingStartEvent>>? TypingStart;
 
     public User? CurrentUser { get; set; }
-    public Task<Image> GetAvatar(User user, int size = 128);
+    public Task<byte[]> GetAvatarAsync(User user, int size = 128);
     
     #region Discord specific shit that should not be here
 
