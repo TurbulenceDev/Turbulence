@@ -9,8 +9,7 @@
              mc:Ignorable="d" d:DesignWidth="500"
              x:DataType="channel:Message"
              x:Class="Turbulence.Desktop.Views.Main.MessageView"
-             Name="Message"
-             ShowJumpToMessage="True">
+             Name="Message">
     <Design.DataContext>
         <dvm:DesignMessage />
     </Design.DataContext>
@@ -47,8 +46,9 @@
                 <TextBlock Foreground="#B5BAC1" Text="{Binding ReferencedMessage, Converter={StaticResource MessageConverter}}" />
             </StackPanel>
             <DockPanel>
-                <TextBlock Name="Author" Classes="Author" Text="{Binding ., Converter={StaticResource AuthorConverter}}" DockPanel.Dock="Left" />
+                <!-- Keep jump button first so it takes priority over others and is always fully visible -->
                 <Button IsVisible="{Binding #Message.ShowJumpToMessage}" DockPanel.Dock="Right">Jump To Message</Button>
+                <TextBlock Name="Author" Classes="Author" Text="{Binding ., Converter={StaticResource AuthorConverter}}" DockPanel.Dock="Left" />
                 <TextBlock Name="Timestamp" Classes="Timestamp" Text="{Binding Timestamp, StringFormat='G'}" DockPanel.Dock="Left">
                     <ToolTip.Tip>
                         <Label Content="{Binding Timestamp, StringFormat='F'}" />
