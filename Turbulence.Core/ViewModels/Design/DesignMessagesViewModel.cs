@@ -1,5 +1,6 @@
 ﻿using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
+using Turbulence.Discord.Models.DiscordEmoji;
 using Turbulence.Discord.Models.DiscordUser;
 
 namespace Turbulence.Core.ViewModels.Design;
@@ -23,15 +24,38 @@ public class DesignMessagesViewModel : MessagesViewModel
             Discriminator = "0",
             Avatar = ""
         };
+        var reactions = new Reaction[]
+        {
+            new Reaction()
+            {
+                Count = 1,
+                Me = true,
+                Emoji = new Emoji()
+                {
+                    Id = null,
+                    Name = "\U0001F629", // :weary:
+                }
+            },
+            new Reaction()
+            {
+                Count = 1,
+                Me = false,
+                Emoji = new Emoji()
+                {
+                    Id = null,
+                    Name = "\U0001F914", // :think:
+                }
+            }
+        };
         var now = DateTimeOffset.Now;
-        var message1 = CreateMessage("hello", MessageType.DEFAULT, user1, now - new TimeSpan(24, 0, 0));
+        var message1 = CreateMessage("hello", MessageType.DEFAULT, user1, now - new TimeSpan(24, 0, 0), reactions: reactions);
         CurrentMessages.AddRange(new List<Message> {
             message1,
             CreateMessage("no", MessageType.DEFAULT, user2, now - new TimeSpan(0, 1, 0), message1),
         });
     }
 
-    private static Message CreateMessage(string content, MessageType type, User author, DateTimeOffset timestamp, Message? reference = null) => new Message()
+    private static Message CreateMessage(string content, MessageType type, User author, DateTimeOffset timestamp, Message? reference = null, Reaction[]? reactions = null) => new Message()
     {
         Content = content,
         Type = type,
@@ -48,5 +72,6 @@ public class DesignMessagesViewModel : MessagesViewModel
         Embeds = Array.Empty<Embed>(),
         Pinned = false,
         ReferencedMessage = reference,
+        Reactions = reactions,
     };
 }

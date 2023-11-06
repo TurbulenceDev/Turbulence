@@ -1,5 +1,6 @@
 ﻿using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
+using Turbulence.Discord.Models.DiscordEmoji;
 using Turbulence.Discord.Models.DiscordUser;
 
 namespace Turbulence.Core.ViewModels.Design;
@@ -18,6 +19,29 @@ public record DesignMessage : Message
         Type = MessageType.DEFAULT;
         Content = "This is a test message.";
         Timestamp = DateTime.Now;
+        Reactions = new Reaction[]
+        {
+            new Reaction()
+            {
+                Count = 1,
+                Me = true,
+                Emoji = new Emoji()
+                {
+                    Id = null,
+                    Name = "\U0001F629", // :weary:
+                }
+            },
+            new Reaction()
+            {
+                Count = 1,
+                Me = false,
+                Emoji = new Emoji()
+                {
+                    Id = null,
+                    Name = "\U0001F914", // :think:
+                }
+            }
+        };
         ReferencedMessage = CreateMessage("Reply to this.", MessageType.DEFAULT, Author, DateTimeOffset.Now - new TimeSpan(0, 1, 0));
     }
 
@@ -36,6 +60,6 @@ public record DesignMessage : Message
         MentionRoles = Array.Empty<Snowflake>(),
         Attachments = Array.Empty<Attachment>(),
         Embeds = Array.Empty<Embed>(),
-        Pinned = false,
+        Pinned = false
     };
 }

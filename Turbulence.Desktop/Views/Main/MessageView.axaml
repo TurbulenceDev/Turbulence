@@ -28,6 +28,15 @@
             <Setter Property="Background" Value="#1E1F22" />
             <Setter Property="Foreground" Value="#AFB8C1" />
         </Style>
+        <Style Selector="Border.Reaction">
+            <Setter Property="Background" Value="#2B2D31" />
+        </Style>
+        <Style Selector="Border.Reaction:pointerover">
+            <Setter Property="BorderBrush" Value="Gray" />
+        </Style>
+        <Style Selector="Border.Reaction.Selected">
+            <Setter Property="BorderBrush" Value="#5865F2" />
+        </Style>
     </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*" Classes="Message">
         <DockPanel>
@@ -56,6 +65,25 @@
                 </TextBlock>
             </DockPanel>
             <TextBlock Name="Content" TextWrapping="Wrap" Classes="MessageContent" Text="{Binding ., Converter={StaticResource MessageConverter}}" />
+            <ItemsControl ItemsSource="{Binding Reactions}" IsVisible="{Binding !!Reactions}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="channel:Reaction">
+                        <Border Classes="Reaction" Classes.Selected="{Binding Me}" BorderThickness="1" CornerRadius="5" Margin="0,4,6,0" Padding="2,0,0,0">
+                            <!--TODO: use emoji converter, null if native emoji=>name, else get image from id-->
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Emoji.Name}" />
+                                <TextBlock Text="{Binding Count}" Margin="0,0,6,0"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
         </StackPanel>
     </Grid>
 </UserControl>
