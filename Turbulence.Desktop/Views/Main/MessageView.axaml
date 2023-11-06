@@ -8,7 +8,9 @@
              xmlns:converters="clr-namespace:Turbulence.Desktop.Converters"
              mc:Ignorable="d" d:DesignWidth="500"
              x:DataType="channel:Message"
-             x:Class="Turbulence.Desktop.Views.Main.MessageView">
+             x:Class="Turbulence.Desktop.Views.Main.MessageView"
+             Name="Message"
+             ShowJumpToMessage="True">
     <Design.DataContext>
         <dvm:DesignMessage />
     </Design.DataContext>
@@ -18,8 +20,16 @@
         <converters:UserAvatarConverter x:Key="AvatarConverter" />
     </UserControl.Resources>
     <UserControl.ContextFlyout>
-            <v:MessageContextMenu />
+        <v:MessageContextMenu />
     </UserControl.ContextFlyout>
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="Background" Value="#1E1F22" />
+            <Setter Property="Foreground" Value="#AFB8C1" />
+        </Style>
+    </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*" Classes="Message">
         <DockPanel>
             <Panel IsVisible="{Binding !!ReferencedMessage}" Height="20" DockPanel.Dock="Top">
@@ -36,14 +46,15 @@
                 <TextBlock FontWeight="SemiBold" Text="{Binding ReferencedMessage, Converter={StaticResource AuthorConverter}, StringFormat='@{0} '}" />
                 <TextBlock Foreground="#B5BAC1" Text="{Binding ReferencedMessage, Converter={StaticResource MessageConverter}}" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Name="Author" Classes="Author" Text="{Binding ., Converter={StaticResource AuthorConverter}}" />
-                <TextBlock Name="Timestamp" Classes="Timestamp" Text="{Binding Timestamp, StringFormat='G'}">
+            <DockPanel>
+                <TextBlock Name="Author" Classes="Author" Text="{Binding ., Converter={StaticResource AuthorConverter}}" DockPanel.Dock="Left" />
+                <Button IsVisible="{Binding #Message.ShowJumpToMessage}" DockPanel.Dock="Right">Jump To Message</Button>
+                <TextBlock Name="Timestamp" Classes="Timestamp" Text="{Binding Timestamp, StringFormat='G'}" DockPanel.Dock="Left">
                     <ToolTip.Tip>
                         <Label Content="{Binding Timestamp, StringFormat='F'}" />
                     </ToolTip.Tip>
                 </TextBlock>
-            </StackPanel>
+            </DockPanel>
             <TextBlock Name="Content" TextWrapping="Wrap" Classes="MessageContent" Text="{Binding ., Converter={StaticResource MessageConverter}}" />
         </StackPanel>
     </Grid>

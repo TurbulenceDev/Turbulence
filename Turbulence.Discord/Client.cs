@@ -408,19 +408,23 @@ namespace Turbulence.Discord
         }
 
         // TODO: cache this or smth
-        public async Task<List<Message>> GetMessages(Snowflake id)
+        public async Task<List<Message>> GetMessages(Snowflake channelId)
         {
-            return await Api.GetChannelMessages(HttpClient, id);
+            return await Api.GetChannelMessages(HttpClient, channelId);
+        }
+        public async Task<List<Message>> GetMessagesAround(Snowflake channelId, Snowflake messageId)
+        {
+            return await Api.GetChannelMessages(HttpClient, channelId, messageId);
         }
 
-        public async Task<Message> SendMessage(string content, Channel channel)
+        public async Task<Message> SendMessage(string content, Channel channelId)
         {
-            return await Api.CreateAndSendMessage(HttpClient, channel, content);
+            return await Api.CreateAndSendMessage(HttpClient, channelId, content);
         }
 
-        public async Task<Guild> GetGuild(Snowflake id)
+        public async Task<Guild> GetGuild(Snowflake guildId)
         {
-            return Guilds.TryGetValue(id, out var ret) ? ret : await Api.GetGuild(HttpClient, id);
+            return Guilds.TryGetValue(guildId, out var ret) ? ret : await Api.GetGuild(HttpClient, guildId);
         }
 
         public async Task<Image> GetAvatar(User user, int size = 128)
@@ -439,9 +443,9 @@ namespace Turbulence.Discord
             return await Api.GetAvatar(CdnClient, user.Id, user.Avatar!, size);
         }
 
-        public async Task<Channel> GetChannel(Snowflake id)
+        public async Task<Channel> GetChannel(Snowflake channelId)
         {
-            return await Api.GetChannel(HttpClient, id);
+            return await Api.GetChannel(HttpClient, channelId);
         }
 
         public async Task<Message[]> GetPinnedMessages(Snowflake channelId)

@@ -46,7 +46,7 @@
                     <DataTemplate>
                         <!-- TODO: add the channel name here? -->
                         <Border Classes="Search">
-                            <v:MessageView />
+                            <v:MessageView ShowJumpToMessage="True"/>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

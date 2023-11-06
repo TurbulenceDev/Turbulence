@@ -7,7 +7,7 @@ using static Turbulence.Discord.Models.DiscordChannel.ChannelType;
 
 namespace Turbulence.Core.ViewModels;
 
-public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreatedMsg>, IRecipient<ChannelSelectedMsg>
+public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreatedMsg>, IRecipient<ChannelSelectedMsg>, IRecipient<JumpToMessageMsg>
 {
     public ObservableList<Message> CurrentMessages { get; } = new();
     
@@ -31,16 +31,31 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
         var channelMessages = await _client.GetMessages(message.Channel.Id);
         channelMessages.Reverse();
         CurrentMessages.Clear();
-         foreach (var channelMessage in channelMessages)
-         {
-             // TODO: Generates a collection changed notification on each Add(), fix?
-             CurrentMessages.Add(channelMessage);
-         }
+        foreach (var channelMessage in channelMessages)
+        {
+            // TODO: Generates a collection changed notification on each Add(), fix?
+            CurrentMessages.Add(channelMessage);
+        }
         
         ShowNewChannel?.Invoke(this, EventArgs.Empty);
     }
 
     public void Receive(MessageCreatedMsg message) => CurrentMessages.Add(message.Message);
+
+    public async void Receive(JumpToMessageMsg message)
+    {
+        //TODO: also check the channel
+        //TODO: check if the message is in the current loaded list and scroll to it
+        var channelMessages = await _client.GetMessagesAround(message.Message.ChannelId, message.Message.Id);
+        channelMessages.Reverse();
+        CurrentMessages.Clear();
+        foreach (var channelMessage in channelMessages)
+        {
+            // TODO: Generates a collection changed notification on each Add(), fix?
+            CurrentMessages.Add(channelMessage);
+        }
+    }
 }
 
 public record MessageCreatedMsg(Message Message);
+public record JumpToMessageMsg(Message Message);
