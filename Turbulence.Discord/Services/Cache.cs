@@ -4,15 +4,22 @@ namespace Turbulence.Discord.Services;
 
 public interface ICache
 {
-    public Image? GetAvatar(Snowflake userId);
+    public byte[]? GetAvatar(Snowflake userId, int size);
+
+    public void SetAvatar(Snowflake userId, int size, byte[] avatar);
 }
 
 public class Cache : ICache
 {
-    public Image? GetAvatar(Snowflake userId)
+    private readonly Dictionary<(Snowflake, int), byte[]> _avatars = new();
+
+    public byte[]? GetAvatar(Snowflake userId, int size)
     {
-        return null;
+        return _avatars.TryGetValue((userId, size), out var avatar) ? avatar : null;
+    }
+
+    public void SetAvatar(Snowflake userId, int size, byte[] avatar)
+    {
+        _avatars[(userId, size)] = avatar;
     }
 }
-
-public record Image(byte[] Data, int Size);
