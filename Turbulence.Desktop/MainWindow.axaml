@@ -14,10 +14,11 @@
         <vm:MainWindowViewModel />
     </Window.DataContext>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Background="#23272a">
+        <Menu DockPanel.Dock="Top" Background="#23272A">
             <MenuItem Header="_File">
                 <MenuItem Header="_Connect" Click="OnConnect" />
                 <MenuItem Header="_Settings" Click="OnSettings" />
+                <MenuItem Header="_Open Logs" Click="OnLogs" />
                 <MenuItem Header="_Open Dev Tools" Click="OnDevTools" IsVisible="{Binding IsDebug}" />
                 <Separator />
                 <MenuItem Header="_Exit" Click="OnExit" />

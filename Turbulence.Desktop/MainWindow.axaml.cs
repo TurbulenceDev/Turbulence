@@ -10,6 +10,7 @@ namespace Turbulence.Desktop;
 public partial class MainWindow : Window
 {
     private SettingsWindow? _settingsWindow;
+    private LogWindow? _logWindow;
     private MainWindowViewModel _vm;
     public MainWindow()
     {
@@ -28,6 +29,13 @@ public partial class MainWindow : Window
         // TODO: instead show as a independent window?
         _settingsWindow = new SettingsWindow();
         await _settingsWindow.ShowDialog(this);
+    }
+    
+    public async void OnLogs(object? _1, RoutedEventArgs _2)
+    {
+        // TODO: instead show as a independent window?
+        _logWindow = new LogWindow();
+        await _logWindow.ShowDialog(this);
     }
 
     public void OnDevTools(object? _1, RoutedEventArgs _2)

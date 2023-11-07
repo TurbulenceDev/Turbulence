@@ -31,6 +31,7 @@ internal class Program : Application
                 .AddSingleton<IPlatformClient, Client>()
                 .AddSingleton<ICache, Cache>()
                 .AddSingleton<ITypingStorage, TypingStorage>()
+                .AddSingleton<ILogger, Logger>()
                 .BuildServiceProvider();
         Ioc.Default.ConfigureServices(provider);
 

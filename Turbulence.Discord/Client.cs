@@ -40,6 +40,8 @@ namespace Turbulence.Discord
         private static readonly HttpClient CdnClient = new();
 
         private readonly ICache _cache = Ioc.Default.GetService<ICache>()!;
+        private readonly ILogger? _logger = Ioc.Default.GetService<ILogger>();
+
         private ClientWebSocket WebSocket { get; set; }
         private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"; // idk where to move this
         
@@ -441,7 +443,8 @@ namespace Turbulence.Discord
             {
                 avatar = await Api.GetAvatarAsync(CdnClient, user, size);
             }
-            
+            _logger?.Log($"[CDN] Requested avatar for user {user.Id}");
+
             _cache.SetAvatar(user.Id, size, avatar);
             return avatar;
         }
@@ -455,7 +458,8 @@ namespace Turbulence.Discord
                 return img;
 
             img = await Api.GetEmojiAsync(CdnClient, emoji, size);
-            
+            _logger?.Log($"[CDN] Requested emoji with ID {emoji.Id}");
+
             _cache.SetEmoji(emoji.Id, size, img);
             return img;
         }

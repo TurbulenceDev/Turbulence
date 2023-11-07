@@ -1,12 +1,11 @@
 using Avalonia.Controls;
 
-namespace Turbulence.Desktop
+namespace Turbulence.Desktop;
+
+public partial class SettingsWindow : Window
 {
-    public partial class SettingsWindow : Window
+    public SettingsWindow()
     {
-        public SettingsWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

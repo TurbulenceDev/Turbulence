@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
+        Width="600" Height="500"
+        MinWidth="600" MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        x:Class="Turbulence.Desktop.LogWindow"
+        x:DataType="vm:LogViewModel"
+        Title="Logs"
+        Background="#313338">
+    <Window.DataContext>
+        <vm:LogViewModel />
+    </Window.DataContext>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="#23272A">
+            <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />
+            <!--TODO: add filter-->
+        </Menu>
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Logs}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding .}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
