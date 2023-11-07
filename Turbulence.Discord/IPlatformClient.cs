@@ -1,5 +1,6 @@
 using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
+using Turbulence.Discord.Models.DiscordEmoji;
 using Turbulence.Discord.Models.DiscordGateway;
 using Turbulence.Discord.Models.DiscordGatewayEvents;
 using Turbulence.Discord.Models.DiscordGuild;
@@ -24,6 +25,7 @@ public interface IPlatformClient
 
     public User? CurrentUser { get; set; }
     public Task<byte[]> GetAvatarAsync(User user, int size = 128);
+    public Task<byte[]> GetEmojiAsync(Emoji emoji, int size = 32);
     
     #region Discord specific shit that should not be here
 

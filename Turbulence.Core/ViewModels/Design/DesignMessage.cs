@@ -40,7 +40,17 @@ public record DesignMessage : Message
                     Id = null,
                     Name = "\U0001F914", // :think:
                 }
-            }
+            },
+            new Reaction()
+            {
+                Count = 1,
+                Me = false,
+                Emoji = new Emoji()
+                {
+                    Id = new(0),
+                    Name = "custom",
+                }
+            },
         };
         ReferencedMessage = CreateMessage("Reply to this.", MessageType.DEFAULT, Author, DateTimeOffset.Now - new TimeSpan(0, 1, 0));
     }

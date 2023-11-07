@@ -17,6 +17,7 @@
         <converters:MessageAuthorNameConverter x:Key="AuthorConverter" />
         <converters:MessageContentConverter x:Key="MessageConverter" />
         <converters:UserAvatarConverter x:Key="AvatarConverter" />
+        <converters:EmojiImageConverter x:Key="EmojiConverter" />
     </UserControl.Resources>
     <UserControl.ContextFlyout>
         <v:MessageContextMenu />
@@ -73,10 +74,12 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="channel:Reaction">
+                        <!--TODO: tooltip-->
                         <Border Classes="Reaction" Classes.Selected="{Binding Me}" BorderThickness="1" CornerRadius="5" Margin="0,4,6,0" Padding="2,0,0,0">
-                            <!--TODO: use emoji converter, null if native emoji=>name, else get image from id-->
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Emoji.Name}" />
+                                <!-- TODO: instead also render native emojis as images? -->
+                                <TextBlock Text="{Binding Emoji.Name}" IsVisible="{Binding Emoji.Id, Converter={x:Static ObjectConverters.IsNull}}" />
+                                <Image Source="{Binding Emoji, Converter={StaticResource EmojiConverter}}" IsVisible="{Binding !!Emoji.Id}" Width="16" Height="16" />
                                 <TextBlock Text="{Binding Count}" Margin="0,0,6,0"/>
                             </StackPanel>
                         </Border>

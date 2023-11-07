@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Web;
 using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
+using Turbulence.Discord.Models.DiscordEmoji;
 using Turbulence.Discord.Models.DiscordGateway;
 using Turbulence.Discord.Models.DiscordGuild;
 using Turbulence.Discord.Models.DiscordUser;
@@ -206,6 +207,13 @@ public static class Api
         // users with a username have a Discriminator of "0"
         var index = user.Discriminator == "0" ? (int)(user.Id >> 22) % 6 : int.Parse(user.Discriminator) % 5;
         return CdnGet(client, $"embed/avatars/{index}.png");
+    }
+
+    //https://discord.com/developers/docs/reference#image-formatting
+    public static Task<byte[]> GetEmojiAsync(HttpClient client, Emoji emoji, int size = 32)
+    {
+        return CdnGet(client, $"emojis/{emoji.Id}.webp?size={size}&quality=lossless");
+        // TODO: what quality
     }
 
     // https://discord.com/developers/docs/resources/channel#get-pinned-messages

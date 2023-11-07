@@ -10,6 +10,7 @@ using Turbulence.Discord.Models.DiscordGateway;
 using Turbulence.Discord.Models.DiscordGuild;
 using Turbulence.Discord.Models.DiscordUser;
 using Turbulence.Discord.Services;
+using Turbulence.Discord.Models.DiscordEmoji;
 
 namespace Turbulence.Discord
 {
@@ -443,6 +444,20 @@ namespace Turbulence.Discord
             
             _cache.SetAvatar(user.Id, size, avatar);
             return avatar;
+        }
+        
+        public async Task<byte[]> GetEmojiAsync(Emoji emoji, int size = 32)
+        {
+            if (emoji.Id == null)
+                return Array.Empty<byte>(); //TODO: instead get image from a local emoji cache?
+
+            if (_cache.GetEmoji(emoji.Id, size) is { } img)
+                return img;
+
+            img = await Api.GetEmojiAsync(CdnClient, emoji, size);
+            
+            _cache.SetEmoji(emoji.Id, size, img);
+            return img;
         }
 
         public async Task<Channel> GetChannel(Snowflake channelId)
