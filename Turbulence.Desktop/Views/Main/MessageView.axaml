@@ -29,13 +29,19 @@
             <Setter Property="Background" Value="#1E1F22" />
             <Setter Property="Foreground" Value="#AFB8C1" />
         </Style>
-        <Style Selector="Border.Reaction">
+        <Style Selector="Button.Reaction">
             <Setter Property="Background" Value="#2B2D31" />
         </Style>
-        <Style Selector="Border.Reaction:pointerover">
+        <Style Selector="Button.Reaction TextBlock">
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style Selector="Button.Reaction:pointerover">
             <Setter Property="BorderBrush" Value="Gray" />
         </Style>
-        <Style Selector="Border.Reaction.Selected">
+        <Style Selector="Button.Reaction.Selected">
+            <Setter Property="BorderBrush" Value="#5865F2" />
+        </Style>
+        <Style Selector="Button.Reaction.Selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="BorderBrush" Value="#5865F2" />
         </Style>
     </UserControl.Styles>
@@ -69,20 +75,20 @@
             <ItemsControl ItemsSource="{Binding Reactions}" IsVisible="{Binding !!Reactions}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" />
+                        <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="channel:Reaction">
                         <!--TODO: tooltip-->
-                        <Border Classes="Reaction" Classes.Selected="{Binding Me}" BorderThickness="1" CornerRadius="5" Margin="0,4,6,0" Padding="2,0,0,0">
-                            <StackPanel Orientation="Horizontal">
+                        <Button Classes="Reaction" Classes.Selected="{Binding Me}" BorderThickness="1" CornerRadius="5" Padding="2,0,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
                                 <!-- TODO: instead also render native emojis as images? -->
                                 <TextBlock Text="{Binding Emoji.Name}" IsVisible="{Binding Emoji.Id, Converter={x:Static ObjectConverters.IsNull}}" />
-                                <Image Source="{Binding Emoji, Converter={StaticResource EmojiConverter}}" IsVisible="{Binding !!Emoji.Id}" Width="16" Height="16" />
+                                <Image Source="{Binding Emoji, Converter={StaticResource EmojiConverter}}" IsVisible="{Binding !!Emoji.Id}" Width="16" Height="16" Margin="2,0,6,0" />
                                 <TextBlock Text="{Binding Count}" Margin="0,0,6,0"/>
                             </StackPanel>
-                        </Border>
+                        </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
