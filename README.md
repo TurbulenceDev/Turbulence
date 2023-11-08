@@ -26,9 +26,7 @@ Strap in, more is coming.
 ![How to get the token](docs/img/token.png)
 
 #### Use the token
-1. In a terminal, go to the `Turbulence.Core` directory.
-2. Run `dotnet user-secrets init` (if it's your first time setting user secrets).
-3. Run `dotnet user-secrets set token [your token here]`.
+Run `dotnet user-secrets --project Turbulence.Core set token [your token here]`.
 
 Now you can run your favourite Turbulence frontend like `Turbulence.Desktop` or `Turbulence.TGUI`.
 
