@@ -3,8 +3,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
-        Width="600" Height="500"
+        xmlns:model="using:Turbulence.Discord.Services"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+        Width="800" Height="500"
         MinWidth="600" MinHeight="500"
         WindowStartupLocation="CenterOwner"
         x:Class="Turbulence.Desktop.LogWindow"
@@ -17,16 +18,26 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#23272A">
             <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />
-            <!--TODO: add filter-->
         </Menu>
-        <ScrollViewer>
-            <ItemsControl ItemsSource="{Binding Logs}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding .}" />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="5">
+            <!--TODO: Make these do something-->
+            <ComboBox Name="LevelBox">
+                <ComboBoxItem>Debug</ComboBoxItem>
+                <ComboBoxItem IsSelected="True">Info</ComboBoxItem>
+                <ComboBoxItem>Warning</ComboBoxItem>
+            </ComboBox>
+            <RadioButton GroupName="Types" IsChecked="True">All</RadioButton>
+            <RadioButton GroupName="Types">Application</RadioButton>
+            <RadioButton GroupName="Types">Networking</RadioButton>
+            <RadioButton GroupName="Types">Images</RadioButton>
+        </StackPanel>
+        <DataGrid Name="EventList" ItemsSource="{Binding Logs}" IsReadOnly="True" Focusable="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Timestamp" Width="Auto" Binding="{Binding Timestamp}" />
+                <DataGridTextColumn Header="Level" Width="Auto" Binding="{Binding Level}" />
+                <DataGridTextColumn Header="Type" Width="Auto" Binding="{Binding Type}" />
+                <DataGridTextColumn Header="Message" Width="*" Binding="{Binding Message}" />
+            </DataGrid.Columns>
+        </DataGrid>
     </DockPanel>
 </Window>

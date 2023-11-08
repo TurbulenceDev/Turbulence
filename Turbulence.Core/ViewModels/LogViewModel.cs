@@ -7,7 +7,7 @@ namespace Turbulence.Core.ViewModels;
 public partial class LogViewModel : ViewModelBase
 {
     private readonly ILogger _logger = Ioc.Default.GetService<ILogger>()!;
-    public ObservableList<string> Logs { get; } = new();
+    public ObservableList<LogEntry> Logs { get; } = new();
 
     public LogViewModel()
     {

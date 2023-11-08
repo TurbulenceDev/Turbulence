@@ -2,25 +2,42 @@
 
 public interface ILogger
 {
-    public void Log(string message);
-    public IEnumerable<string> GetLogs();
+    public void Log(string message, LogType type, LogLevel level = LogLevel.Info);
+    public IEnumerable<LogEntry> GetLogs();
 }
 
+public enum LogType
+{
+    Application,
+    Networking,
+    Images
+}
+
+public enum LogLevel
+{
+    Debug,
+    Info,
+    Warning,
+}
+
+public record LogEntry(string Message, LogType Type, LogLevel Level, DateTime Timestamp);
 
 public class Logger : ILogger
 {
-    //TODO: add logging severity/level
-    //TODO: add logging type
-    //TODO: add timestamp
-    private readonly List<string> _log = new();
+    private readonly List<LogEntry> _log = new();
 
-    public IEnumerable<string> GetLogs()
+    public Logger()
+    {
+        Log("Logger started", LogType.Application, LogLevel.Info);
+    }
+
+    public IEnumerable<LogEntry> GetLogs()
     {
         return _log;
     }
 
-    public void Log(string message)
+    public void Log(string message, LogType type, LogLevel level = LogLevel.Info)
     {
-        _log.Add(message);
+        _log.Add(new(message, type, level, DateTime.Now));
     }
 }

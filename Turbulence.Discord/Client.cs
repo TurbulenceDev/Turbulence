@@ -443,7 +443,7 @@ namespace Turbulence.Discord
             {
                 avatar = await Api.GetAvatarAsync(CdnClient, user, size);
             }
-            _logger?.Log($"[CDN] Requested avatar for user {user.Id}");
+            _logger?.Log($"Requested avatar for user {user.Id}", LogType.Images, LogLevel.Debug);
 
             _cache.SetAvatar(user.Id, size, avatar);
             return avatar;
@@ -458,7 +458,7 @@ namespace Turbulence.Discord
                 return img;
 
             img = await Api.GetEmojiAsync(CdnClient, emoji, size);
-            _logger?.Log($"[CDN] Requested emoji with ID {emoji.Id}");
+            _logger?.Log($"Requested emoji with ID {emoji.Id}", LogType.Images, LogLevel.Debug);
 
             _cache.SetEmoji(emoji.Id, size, img);
             return img;
