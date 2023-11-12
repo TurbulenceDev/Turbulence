@@ -10,7 +10,7 @@ public class DesignLogViewModel : LogViewModel
 
     public DesignLogViewModel()
     {
-        Logs.AddRange(new LogEntry[]
+        _logs.AddRange(new LogEntry[]
         {
             new("Request 1", LogType.Images, LogLevel.Debug, DateTime.Now),
             new("Request 2", LogType.Networking, LogLevel.Info, DateTime.Now),
@@ -21,6 +21,6 @@ public class DesignLogViewModel : LogViewModel
     {
         var type = (LogType)types.GetValue(random.Next(types.Length))!;
         var lvl = (LogLevel)levels.GetValue(random.Next(levels.Length))!;
-        Logs.Add(new($"New Request {Logs.Count}", type, lvl, DateTime.Now));
+        _logs.Add(new($"New Request {_logs.Count}", type, lvl, DateTime.Now));
     }
 }

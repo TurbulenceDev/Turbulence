@@ -8,6 +8,7 @@ public interface ILogger
 
 public enum LogType
 {
+    Any = -1,
     Application,
     Networking,
     Images

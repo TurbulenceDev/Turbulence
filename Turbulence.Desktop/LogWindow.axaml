@@ -19,17 +19,18 @@
         <Menu DockPanel.Dock="Top" Background="#23272A">
             <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />
         </Menu>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="5">
-            <!--TODO: Make these do something-->
-            <ComboBox Name="LevelBox">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10">
+            <ComboBox Name="LevelBox" SelectedIndex="{Binding SelectedLevel}">
                 <ComboBoxItem>Debug</ComboBoxItem>
-                <ComboBoxItem IsSelected="True">Info</ComboBoxItem>
+                <ComboBoxItem>Info</ComboBoxItem>
                 <ComboBoxItem>Warning</ComboBoxItem>
             </ComboBox>
-            <RadioButton GroupName="Types" IsChecked="True">All</RadioButton>
-            <RadioButton GroupName="Types">Application</RadioButton>
-            <RadioButton GroupName="Types">Networking</RadioButton>
-            <RadioButton GroupName="Types">Images</RadioButton>
+            <StackPanel Orientation="Horizontal" Spacing="5">
+                <RadioButton GroupName="Types" Checked="RadioChecked" Content="Any" IsChecked="True" />
+                <RadioButton GroupName="Types" Checked="RadioChecked" Content="Application" />
+                <RadioButton GroupName="Types" Checked="RadioChecked" Content="Networking" />
+                <RadioButton GroupName="Types" Checked="RadioChecked" Content="Images" />
+            </StackPanel>
         </StackPanel>
         <DataGrid Name="EventList" ItemsSource="{Binding Logs}" IsReadOnly="True" Focusable="False">
             <DataGrid.Columns>
