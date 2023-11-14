@@ -6,6 +6,8 @@
              xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
              xmlns:converters="clr-namespace:Turbulence.Desktop.Converters"
+             xmlns:vlcsharp="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+             xmlns:controls="clr-namespace:Turbulence.Desktop.Controls"
              mc:Ignorable="d" d:DesignWidth="500"
              x:DataType="channel:Message"
              x:Class="Turbulence.Desktop.Views.Main.MessageView"
@@ -18,6 +20,7 @@
         <converters:MessageContentConverter x:Key="MessageConverter" />
         <converters:UserAvatarConverter x:Key="AvatarConverter" />
         <converters:EmojiImageConverter x:Key="EmojiConverter" />
+        <converters:EmbedConverter x:Key="EmbedConverter"/>
     </UserControl.Resources>
     <UserControl.ContextFlyout>
         <v:MessageContextMenu />
@@ -72,6 +75,19 @@
                 </TextBlock>
             </DockPanel>
             <TextBlock Name="Content" TextWrapping="Wrap" Classes="MessageContent" Text="{Binding ., Converter={StaticResource MessageConverter}}" />
+            <ItemsControl ItemsSource="{Binding Embeds}" IsVisible="{Binding !!Embeds}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="channel:Embed">
+                        <controls:VideoPlayerControl MediaPlayer="{Binding ., Converter={StaticResource EmbedConverter}}"/>
+                        <!--<lottie:Lottie Path="{Binding ., Converter={StaticResource EmbedConverter}}"/>-->
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
             <ItemsControl ItemsSource="{Binding Reactions}" IsVisible="{Binding !!Reactions}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>

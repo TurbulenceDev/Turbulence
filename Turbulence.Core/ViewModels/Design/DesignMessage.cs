@@ -53,6 +53,16 @@ public record DesignMessage : Message
             },
         };
         ReferencedMessage = CreateMessage("Reply to this.", MessageType.DEFAULT, Author, DateTimeOffset.Now - new TimeSpan(0, 1, 0));
+        Embeds = new[]
+        {
+            new Embed
+            {
+                Image = new EmbedImage()
+                {
+                    Url = new Uri("https://media.tenor.com/rIZ4kijzR18AAAAd/turbulence.gif")
+                }
+            }
+        };
     }
 
     private static Message CreateMessage(string content, MessageType type, User author, DateTimeOffset timestamp) => new Message()
