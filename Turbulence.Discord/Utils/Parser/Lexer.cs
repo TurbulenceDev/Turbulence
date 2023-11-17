@@ -28,15 +28,15 @@ public static class Lexer
 {
     public static IEnumerable<Token>? Lex(string input)
     {
-        var seen_simple_text = "";
+        var seenSimpleText = "";
 
         while (true)
         {
             if (input.Length == 0)
             {
-                if (seen_simple_text.Length > 0)
+                if (seenSimpleText.Length > 0)
                 {
-                    yield return new(TokenType.TEXT_INLINE, seen_simple_text);
+                    yield return new(TokenType.TEXT_INLINE, seenSimpleText);
                 }
                 // finished
                 yield break;
@@ -56,19 +56,19 @@ public static class Lexer
 
             if (matchingRule == null)
             {
-                seen_simple_text += input[0];
+                seenSimpleText += input[0];
                 input = input[1..];
                 continue;  // don't yield a token in this run
             }
 
             // cut off matched part
-            input = input[(match!.Groups[0].Length)..];
+            input = input[(match!.Captures[0].Length)..];
 
             // yield inline text if we have some left
-            if (seen_simple_text.Length > 0)
+            if (seenSimpleText.Length > 0)
             {
-                yield return new(TokenType.TEXT_INLINE, seen_simple_text);
-                seen_simple_text = "";
+                yield return new(TokenType.TEXT_INLINE, seenSimpleText);
+                seenSimpleText = "";
             }
 
             CaptureCollection? groups = null;
@@ -101,5 +101,6 @@ public static class Lexer
         new LexingRule(TokenType.CODE_INLINE_DELIMITER, new("^`")),
         new LexingRule(TokenType.NEWLINE, new("^\n")),
     };
+    //TODO: compile deez
 }
 

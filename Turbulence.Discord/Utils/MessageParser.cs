@@ -6,9 +6,11 @@ namespace Turbulence.Discord.Utils;
 
 public static class MessageParser
 {
-    public static List<Node> parse(string text)
+    public static List<Node> Parse(string text)
     {
         var tokens = Lexer.Lex(text);
-        return Parser.Parser.parse_tokens(tokens.ToArray());
+        if (tokens == null)
+            return new List<Node>();
+        return Parser.Parser.ParseTokens(tokens.ToArray());
     }
 }

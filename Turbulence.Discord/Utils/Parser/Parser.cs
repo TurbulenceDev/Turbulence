@@ -33,6 +33,8 @@ public enum NodeType
     CODE_BLOCK,
     CODE_INLINE
 }
+
+//FIXME: this also creates properties for text+children
 public record Node(NodeType Type, string? text = null, Snowflake? Id = null, string? Emoji = null, string? CodeLanguage = null, string? Url = null, List<Node>? children = null)
 {
     public string? Text { get; set; } = text;
@@ -43,123 +45,133 @@ public record Node(NodeType Type, string? text = null, Snowflake? Id = null, str
 
 public static class Parser
 {
-    public static List<Node> parse_tokens(Token[] tokens)
+    public static List<Node> ParseTokens(Token[] tokens)
     {
-        return merge_text_nodes(parse_tokens_generator(tokens.ToArray()));
+        return MergeTextNodes(ParseTokensGenerator(tokens.ToArray()));
     }
 
 
-    public static List<Node> merge_text_nodes(IEnumerable<Node> subtree)
+    public static List<Node> MergeTextNodes(IEnumerable<Node> subtree)
     {
-        var compressed_tree = new List<Node>();
-        Node? prev_text_node = null;
+        var compressedTree = new List<Node>();
+        Node? prevTextNode = null;
         foreach (var node in subtree)
         {
             if (node.Type == NodeType.TEXT)
             {
-                if (prev_text_node is null)
+                if (prevTextNode is null)
                 {
-                    prev_text_node = node;
+                    prevTextNode = node;
                 }
                 else
                 {
-                    prev_text_node.Text += node.Text;
+                    prevTextNode.Text += node.Text;
                     continue; // don't store this node
                 }
             }
             else
             {
 
-                prev_text_node = null;
+                prevTextNode = null;
             }
 
             if (node.Children is not null)
             {
-                node.Children = merge_text_nodes(node.Children);
+                node.Children = MergeTextNodes(node.Children);
             }
 
-            compressed_tree.Add(node);
+            compressedTree.Add(node);
         }
-        return compressed_tree;
+        return compressedTree;
     }
 
-    public static IEnumerable<Node> parse_tokens_generator(Token[] tokens, bool in_quote = false)
+    private static readonly Dictionary<TokenType[], NodeType> _textModifiers = new()
+            {
+                { new TokenType[]{ TokenType.STAR, TokenType.STAR }, NodeType.BOLD },
+                { new TokenType[]{ TokenType.UNDERSCORE, TokenType.UNDERSCORE }, NodeType.UNDERLINE },
+                { new TokenType[]{ TokenType.TILDE, TokenType.TILDE }, NodeType.STRIKETHROUGH },
+                { new TokenType[]{ TokenType.STAR }, NodeType.ITALIC },
+                { new TokenType[]{ TokenType.UNDERSCORE }, NodeType.ITALIC },
+                { new TokenType[]{ TokenType.SPOILER_DELIMITER }, NodeType.SPOILER },
+                { new TokenType[]{ TokenType.CODE_INLINE_DELIMITER }, NodeType.CODE_INLINE },
+            };
+    public static IEnumerable<Node> ParseTokensGenerator(Token[] tokens, bool inQuote = false)
     {
         var i = 0;
         while (i < tokens.Length)
         {
-            Token current_token = tokens[i];
+            Token current = tokens[i];
 
             // === simple node types without children
             // just continue; once any of them match
 
             // text
-            if (current_token.Type == TokenType.TEXT_INLINE)
+            if (current.Type == TokenType.TEXT_INLINE)
             {
-                yield return new Node(NodeType.TEXT, text: current_token.Value);
+                yield return new Node(NodeType.TEXT, text: current.Value);
                 i += 1;
                 continue;
             }
 
             // user mentions
-            if (current_token.Type == TokenType.USER_MENTION)
+            if (current.Type == TokenType.USER_MENTION)
             {
-                yield return new Node(NodeType.USER, Id: new(ulong.Parse(current_token.Groups![0].Value)));
+                yield return new Node(NodeType.USER, Id: new(ulong.Parse(current.Groups![0].Value)));
                 i += 1;
                 continue;
             }
 
             // role mentions
-            if (current_token.Type == TokenType.ROLE_MENTION)
+            if (current.Type == TokenType.ROLE_MENTION)
             {
-                yield return new Node(NodeType.ROLE, Id: new(ulong.Parse(current_token.Groups![0].Value)));
+                yield return new Node(NodeType.ROLE, Id: new(ulong.Parse(current.Groups![0].Value)));
                 i += 1;
                 continue;
             }
 
             // channel mentions
-            if (current_token.Type == TokenType.CHANNEL_MENTION)
+            if (current.Type == TokenType.CHANNEL_MENTION)
             {
-                yield return new Node(NodeType.CHANNEL, Id: new(ulong.Parse(current_token.Groups![0].Value)));
+                yield return new Node(NodeType.CHANNEL, Id: new(ulong.Parse(current.Groups![0].Value)));
                 i += 1;
                 continue;
             }
 
             // custom emoji
-            if (current_token.Type == TokenType.EMOJI_CUSTOM)
+            if (current.Type == TokenType.EMOJI_CUSTOM)
             {
                 yield return new Node(
                     NodeType.EMOJI_CUSTOM,
-                    Id: new(ulong.Parse(current_token.Groups![1].Value)),
-                    Emoji: current_token.Groups[0].Value
+                    Id: new(ulong.Parse(current.Groups![1].Value)),
+                    Emoji: current.Groups[0].Value
                 );
                 i += 1;
                 continue;
             }
 
             // unicode emoji (when it's encoded as :name: and not just written as unicode)
-            if (current_token.Type == TokenType.EMOJI_UNICODE_ENCODED)
+            if (current.Type == TokenType.EMOJI_UNICODE_ENCODED)
             {
                 yield return new Node(
                     NodeType.EMOJI_UNICODE_ENCODED,
-                    Emoji: current_token.Groups![0].Value
+                    Emoji: current.Groups![0].Value
                 );
                 i += 1;
                 continue;
             };
 
             // URL with preview
-            if (current_token.Type == TokenType.URL_WITH_PREVIEW)
+            if (current.Type == TokenType.URL_WITH_PREVIEW)
             {
-                yield return new Node(NodeType.URL_WITH_PREVIEW, Url: current_token.Value);
+                yield return new Node(NodeType.URL_WITH_PREVIEW, Url: current.Value);
                 i += 1;
                 continue;
             }
 
             // URL without preview
-            if (current_token.Type == TokenType.URL_WITHOUT_PREVIEW)
+            if (current.Type == TokenType.URL_WITHOUT_PREVIEW)
             {
-                yield return new Node(NodeType.URL_WITHOUT_PREVIEW, Url: current_token.Value[1..^1]);
+                yield return new Node(NodeType.URL_WITHOUT_PREVIEW, Url: current.Value[1..^1]);
                 i += 1;
                 continue;
             }
@@ -178,39 +190,25 @@ public static class Parser
             //
             // known issue:
             // we don't account for the fact that spoilers can't wrap code blocks
-
-            // format: delimiter, type
-            var text_modifiers = new Dictionary<TokenType[], NodeType>()
-            {
-                { new TokenType[]{ TokenType.STAR, TokenType.STAR }, NodeType.BOLD },
-                { new TokenType[]{ TokenType.UNDERSCORE, TokenType.UNDERSCORE }, NodeType.UNDERLINE },
-                { new TokenType[]{ TokenType.TILDE, TokenType.TILDE }, NodeType.STRIKETHROUGH },
-                { new TokenType[]{ TokenType.STAR }, NodeType.ITALIC },
-                { new TokenType[]{ TokenType.UNDERSCORE }, NodeType.ITALIC },
-                { new TokenType[]{ TokenType.SPOILER_DELIMITER }, NodeType.SPOILER },
-                { new TokenType[]{ TokenType.CODE_INLINE_DELIMITER }, NodeType.CODE_INLINE },
-            };
-
-
             {
                 Node? node = null;
-                int? amount_consumed_tokens = null;
-                foreach ((var delimiter, var node_type) in text_modifiers)
+                int? consumedTokenCount = null;
+                foreach ((var delimiter, var nodeType) in _textModifiers)
                 {
-                    var res = try_parse_node_with_children(
-                        tokens[i..], delimiter, delimiter, node_type, in_quote
+                    var res = TryParseNodeWithChildren(
+                        tokens[i..], delimiter, delimiter, nodeType, inQuote
                     );
                     node = res.Item1;
-                    amount_consumed_tokens = res.Item2;
+                    consumedTokenCount = res.Item2;
 
-                    if (node is not null)
+                    if (node != null)
                         break;
                 }
 
 
-                if (node is not null)
+                if (node != null)
                 {
-                    i += amount_consumed_tokens!.Value;
+                    i += consumedTokenCount!.Value;
                     yield return node;
                     continue;
                 }
@@ -233,36 +231,36 @@ public static class Parser
             //       is, in HTML, <code-block>test<br /></code-block>
             //       and not <code-block><br />test<br /></code-block>
 
-            if (current_token.Type == TokenType.CODE_BLOCK_DELIMITER)
+            if (current.Type == TokenType.CODE_BLOCK_DELIMITER)
             {
-                var (children_token, amount_consumed_tokens) = search_for_closer(
+                var (childrenToken, consumedTokenCount) = SearchForCloser(
                     tokens[(i + 1)..], new TokenType[] { TokenType.CODE_BLOCK_DELIMITER }
                 );
-                if (children_token is not null)
+                if (childrenToken != null)
                 {
-                    var children_content = "";
+                    var childrenContent = "";
                     // treat all children token as inline text
-                    foreach (var child_token in children_token)
+                    foreach (var child_token in childrenToken)
                     {
-                        children_content += child_token.Value;
+                        childrenContent += child_token.Value;
                     }
 
                     // check for a language specifier
-                    var lines = children_content.Split("\n");
+                    var lines = childrenContent.Split("\n");
                     // there must be at least one other non-empty line
                     // (the content doesn't matter, there just has to be one)
-                    var non_empty_line_found = false;
+                    var nonEmptyLineFound = false;
 
                     string? lang = null;
-                    for (var line_index = 1; line_index < lines.Length; line_index++)
+                    for (var lineIndex = 1; lineIndex < lines.Length; lineIndex++)
                     {
-                        if (lines[line_index].Length > 0)
+                        if (lines[lineIndex].Length > 0)
                         {
-                            non_empty_line_found = true;
+                            nonEmptyLineFound = true;
                             break;
                         }
                     }
-                    if (non_empty_line_found)
+                    if (nonEmptyLineFound)
                     {
                         var re = new Regex("^([a-zA-Z0-9-]*)(.*)$");
                         var match = re.Match(lines[0]);
@@ -280,10 +278,10 @@ public static class Parser
                     }
 
 
-                    children_content = string.Join("\n", lines);
-                    var child_node = new Node(NodeType.TEXT, text: children_content);
+                    childrenContent = string.Join("\n", lines);
+                    var child_node = new Node(NodeType.TEXT, text: childrenContent);
                     yield return new Node(NodeType.CODE_BLOCK, CodeLanguage: lang, children: new List<Node>() { child_node });
-                    i += 1 + amount_consumed_tokens!.Value;
+                    i += 1 + consumedTokenCount!.Value;
                     continue;
                 }
             }
@@ -297,12 +295,12 @@ public static class Parser
             // - quote blocks can't be nested. any quote delimiters inside a quote block
             // are just inline text. all other elements can appear inside a quote block
             // - text modifiers
-            Token[]? children_token_in_quote_block = null;
+            Token[]? childrenTokenInQuoteBlock = null;
             // note that in_quote won't change during the while-loop, we're just reducing
             // the level of indentation here by including it in the condition instead of
             // making an additional if statement around the while loop
             while (
-                !in_quote &&
+                !inQuote &&
                 (i < tokens.Length) &&
                     (tokens[i].Type == TokenType.QUOTE_LINE_PREFIX))
             {
@@ -314,7 +312,7 @@ public static class Parser
                     {
                         // add everything from the quote line prefix (non-inclusive)
                         // to the newline (inclusive) as children token
-                        children_token_in_quote_block = tokens[(i + 1)..(j + 1)];
+                        childrenTokenInQuoteBlock = tokens[(i + 1)..(j + 1)];
                         i = j + 1;  // move to the token after the newline
                         found = true;
                         break;
@@ -324,18 +322,18 @@ public static class Parser
                 {
                     // this is the last line,
                     // all remaining tokens are part of the quote block
-                    children_token_in_quote_block = tokens[(i + 1)..];
+                    childrenTokenInQuoteBlock = tokens[(i + 1)..];
                     i = tokens.Length;  // move to the end
                     break;
                 }
             }
 
 
-            if (children_token_in_quote_block != null)
+            if (childrenTokenInQuoteBlock != null)
             {
                 // tell the inner parse function that it's now inside a quote block
-                var children_nodes = parse_tokens_generator(children_token_in_quote_block, in_quote = true);
-                yield return new Node(NodeType.QUOTE_BLOCK, children: children_nodes.ToList());
+                var childrenNodes = ParseTokensGenerator(childrenTokenInQuoteBlock, inQuote = true);
+                yield return new Node(NodeType.QUOTE_BLOCK, children: childrenNodes.ToList());
                 continue;
             }
 
@@ -357,17 +355,17 @@ public static class Parser
             //if you know how to do this *without adding ugly code*: help is appreciated.
             // until then, this is a case of "we'll cross that bridge when we get there",
             // i.e., we'll fix it if anyone comes along that actually needs it
-            yield return new Node(NodeType.TEXT, current_token.Value);
+            yield return new Node(NodeType.TEXT, current.Value);
             i += 1;
         }
     }
 
 
-    public static (Node?, int?) try_parse_node_with_children(
+    private static (Node?, int?) TryParseNodeWithChildren(
         Token[] tokens,
         TokenType[] opener,
         TokenType[] closer,
-        NodeType node_type,
+        NodeType nodeType,
         bool in_quote
     )
     {
@@ -377,9 +375,9 @@ public static class Parser
             return (null, null);
 
         // check if the opener matches
-        for (var opener_index = 0; opener_index < opener.Length; opener_index++)
+        for (var openerIndex = 0; openerIndex < opener.Length; openerIndex++)
         {
-            if (tokens[opener_index].Type != opener[opener_index])
+            if (tokens[openerIndex].Type != opener[openerIndex])
             {
                 return (null, null);
             }
@@ -388,40 +386,40 @@ public static class Parser
         // try finding the matching closer and consume as few tokens as possible
         // (skip the first token as that has to be a child token)
         // TODO: edge case ***bold and italic*** doesn't work
-        var (children_token, amount_consumed_tokens) = search_for_closer(
+        var (childrenToken, consumedTokenCount) = SearchForCloser(
             tokens[(opener.Length + 1)..], closer
         );
 
-        if (children_token is null)
+        if (childrenToken == null)
         {
             // closer not found, abort trying to parse as the selected node type
             return (null, null);
         }
 
         // put first child token back in
-        children_token = new Token[] { tokens[opener.Length] }.Concat(children_token!).ToArray();
+        childrenToken = new Token[] { tokens[opener.Length] }.Concat(childrenToken!).ToArray();
         //children_token = (tokens[opener.Length], *children_token);
-        amount_consumed_tokens += opener.Length + 1;
+        consumedTokenCount += opener.Length + 1;
 
         return (
             new Node(
-                node_type,
-                children: parse_tokens_generator(children_token, in_quote).ToList()
+                nodeType,
+                children: ParseTokensGenerator(childrenToken, in_quote).ToList()
             ),
-            amount_consumed_tokens);
+            consumedTokenCount);
     }
 
 
-    public static (Token[]?, int?) search_for_closer(Token[] tokens, TokenType[] closer)
+    private static (Token[]?, int?) SearchForCloser(Token[] tokens, TokenType[] closer)
     {
         // iterate over tokens
-        for (var token_index = 0; token_index < (tokens.Length - closer.Length + 1); token_index++)
+        for (var tokenIndex = 0; tokenIndex < (tokens.Length - closer.Length + 1); tokenIndex++)
         {
             var matches = true;
             // try matching the closer to the current position by iterating over the closer
-            for (var closer_index = 0; closer_index < closer.Length; closer_index++)
+            for (var closerIndex = 0; closerIndex < closer.Length; closerIndex++)
             {
-                if (tokens[token_index + closer_index].Type != closer[closer_index])
+                if (tokens[tokenIndex + closerIndex].Type != closer[closerIndex])
                 {
                     matches = false;
                     break;
@@ -431,7 +429,7 @@ public static class Parser
             // closer matched
             if (matches)
             {
-                return (tokens[..(token_index)], token_index + closer.Length);
+                return (tokens[..tokenIndex], tokenIndex + closer.Length);
             }
         }
         // closer didn't match, try next token_index
