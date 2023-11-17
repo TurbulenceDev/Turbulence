@@ -85,21 +85,21 @@ public static class Lexer
     private const string URL_REGEX = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+";
     private static readonly LexingRule[] Rules =
     {
-        new LexingRule(TokenType.USER_MENTION, new("^<@!?([0-9]+)>")),
-        new LexingRule(TokenType.ROLE_MENTION, new("^<@&([0-9]+)>")),
-        new LexingRule(TokenType.CHANNEL_MENTION, new("^<#([0-9]+)>")),
-        new LexingRule(TokenType.EMOJI_CUSTOM, new("^<:([a-zA-Z0-9_]{2,}):([0-9]+)>")),
-        new LexingRule(TokenType.EMOJI_UNICODE_ENCODED, new("^:([a-zA-Z0-9_]+):")),
-        new LexingRule(TokenType.URL_WITHOUT_PREVIEW, new($"^<{URL_REGEX}>")),
-        new LexingRule(TokenType.URL_WITH_PREVIEW, new($"^{URL_REGEX}")),
-        new LexingRule(TokenType.QUOTE_LINE_PREFIX, new("^(>>)?> ")),
-        new LexingRule(TokenType.TILDE, new("^~")),
-        new LexingRule(TokenType.STAR, new(@"^\*")),
-        new LexingRule(TokenType.UNDERSCORE, new("^_")),
-        new LexingRule(TokenType.SPOILER_DELIMITER, new(@"^\|\|")),
-        new LexingRule(TokenType.CODE_BLOCK_DELIMITER, new("^```")),
-        new LexingRule(TokenType.CODE_INLINE_DELIMITER, new("^`")),
-        new LexingRule(TokenType.NEWLINE, new("^\n")),
+        new LexingRule(TokenType.USER_MENTION, new("^<@!?([0-9]+)>", RegexOptions.Compiled)),
+        new LexingRule(TokenType.ROLE_MENTION, new("^<@&([0-9]+)>", RegexOptions.Compiled)),
+        new LexingRule(TokenType.CHANNEL_MENTION, new("^<#([0-9]+)>", RegexOptions.Compiled)),
+        new LexingRule(TokenType.EMOJI_CUSTOM, new("^<:([a-zA-Z0-9_]{2,}):([0-9]+)>", RegexOptions.Compiled)),
+        new LexingRule(TokenType.EMOJI_UNICODE_ENCODED, new("^:([a-zA-Z0-9_]+):", RegexOptions.Compiled)),
+        new LexingRule(TokenType.URL_WITHOUT_PREVIEW, new($"^<{URL_REGEX}>", RegexOptions.Compiled)),
+        new LexingRule(TokenType.URL_WITH_PREVIEW, new($"^{URL_REGEX}", RegexOptions.Compiled)),
+        new LexingRule(TokenType.QUOTE_LINE_PREFIX, new("^(>>)?> ", RegexOptions.Compiled)),
+        new LexingRule(TokenType.TILDE, new("^~", RegexOptions.Compiled)),
+        new LexingRule(TokenType.STAR, new(@"^\*", RegexOptions.Compiled)),
+        new LexingRule(TokenType.UNDERSCORE, new("^_", RegexOptions.Compiled)),
+        new LexingRule(TokenType.SPOILER_DELIMITER, new(@"^\|\|", RegexOptions.Compiled)),
+        new LexingRule(TokenType.CODE_BLOCK_DELIMITER, new("^```", RegexOptions.Compiled)),
+        new LexingRule(TokenType.CODE_INLINE_DELIMITER, new("^`", RegexOptions.Compiled)),
+        new LexingRule(TokenType.NEWLINE, new("^\n", RegexOptions.Compiled)),
     };
     //TODO: compile deez
 }
