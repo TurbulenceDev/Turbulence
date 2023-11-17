@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
-using System.Collections.Generic;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
 using static Turbulence.Discord.Models.DiscordChannel.ChannelType;
