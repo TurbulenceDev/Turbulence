@@ -23,9 +23,20 @@ public class ParserTests
         };
         var parts = Parser.ParseTokens(tokens);
         Assert.IsNotEmpty(parts);
+        void print(Node node, int depth = 0)
+        {
+            Console.WriteLine($"{new string('-', depth)}{node}");
+            if (node.Children != null)
+            {
+                foreach (var c in node.Children)
+                {
+                    print(c, depth + 1);
+                }
+            }
+        }
         foreach (var part in parts)
         {
-            Console.WriteLine(part);
+            print(part);
         }
     }
 }
