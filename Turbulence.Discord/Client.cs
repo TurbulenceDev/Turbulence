@@ -417,7 +417,15 @@ namespace Turbulence.Discord
         }
         public async Task<List<Message>> GetMessagesAround(Snowflake channelId, Snowflake messageId)
         {
-            return await Api.GetChannelMessages(HttpClient, channelId, messageId);
+            return await Api.GetChannelMessages(HttpClient, channelId, around: messageId);
+        }
+        public async Task<List<Message>> GetMessagesBefore(Snowflake channelId, Snowflake messageId)
+        {
+            return await Api.GetChannelMessages(HttpClient, channelId, before: messageId);
+        }
+        public async Task<List<Message>> GetMessagesAfter(Snowflake channelId, Snowflake messageId)
+        {
+            return await Api.GetChannelMessages(HttpClient, channelId, after: messageId);
         }
 
         public async Task<Message> SendMessage(string content, Channel channelId)

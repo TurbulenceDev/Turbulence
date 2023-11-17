@@ -16,6 +16,8 @@ public interface IPlatformClient
     public Task Start(string token);
     public Task<List<Message>> GetMessages(Snowflake channelId);
     public Task<List<Message>> GetMessagesAround(Snowflake channelId, Snowflake messageId);
+    public Task<List<Message>> GetMessagesBefore(Snowflake channelId, Snowflake messageId);
+    public Task<List<Message>> GetMessagesAfter(Snowflake channelId, Snowflake messageId);
     public Task<Message[]> GetPinnedMessages(Snowflake channelId);
     public Task<SearchResult> SearchMessages(SearchRequest request);
     public Task<Guild> GetGuild(Snowflake guildId);
