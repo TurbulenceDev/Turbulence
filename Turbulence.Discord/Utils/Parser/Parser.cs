@@ -29,11 +29,11 @@ public record Node(NodeType Type, string? Text = null, Snowflake? Id = null, str
     public IEnumerable<Node>? Children { get; set; } = Children;
 }
 
-public static class Parser
+public static partial class Parser
 {
     public static List<Node> ParseTokens(Token[] tokens)
     {
-        return MergeTextNodes(ParseTokensGenerator(tokens.ToArray()));
+        return MergeTextNodes(ParseTokensGenerator(tokens));
     }
 
 
@@ -81,6 +81,8 @@ public static class Parser
                 { new TokenType[]{ TokenType.SPOILER_DELIMITER }, NodeType.SPOILER },
                 { new TokenType[]{ TokenType.CODE_INLINE_DELIMITER }, NodeType.CODE_INLINE },
             };
+    [GeneratedRegex("^([a-zA-Z0-9-]*)(.*)$", RegexOptions.Compiled)]
+    private static partial Regex CodeLanguageRegex();
     public static IEnumerable<Node> ParseTokensGenerator(Token[] tokens, bool inQuote = false)
     {
         var i = 0;
@@ -102,7 +104,7 @@ public static class Parser
             // user mentions
             if (current.Type == TokenType.USER_MENTION)
             {
-                yield return new Node(NodeType.USER, Id: new(ulong.Parse(current.Groups![0].Value)));
+                yield return new Node(NodeType.USER, Id: new(ulong.Parse(current.Groups![1].Value)));
                 i += 1;
                 continue;
             }
@@ -110,7 +112,7 @@ public static class Parser
             // role mentions
             if (current.Type == TokenType.ROLE_MENTION)
             {
-                yield return new Node(NodeType.ROLE, Id: new(ulong.Parse(current.Groups![0].Value)));
+                yield return new Node(NodeType.ROLE, Id: new(ulong.Parse(current.Groups![1].Value)));
                 i += 1;
                 continue;
             }
@@ -118,7 +120,7 @@ public static class Parser
             // channel mentions
             if (current.Type == TokenType.CHANNEL_MENTION)
             {
-                yield return new Node(NodeType.CHANNEL, Id: new(ulong.Parse(current.Groups![0].Value)));
+                yield return new Node(NodeType.CHANNEL, Id: new(ulong.Parse(current.Groups![1].Value)));
                 i += 1;
                 continue;
             }
@@ -128,8 +130,8 @@ public static class Parser
             {
                 yield return new Node(
                     NodeType.EMOJI_CUSTOM,
-                    Id: new(ulong.Parse(current.Groups![1].Value)),
-                    Emoji: current.Groups[0].Value
+                    Id: new(ulong.Parse(current.Groups![2].Value)),
+                    Emoji: current.Groups[1].Value
                 );
                 i += 1;
                 continue;
@@ -140,7 +142,7 @@ public static class Parser
             {
                 yield return new Node(
                     NodeType.EMOJI_UNICODE_ENCODED,
-                    Emoji: current.Groups![0].Value
+                    Emoji: current.Groups![1].Value
                 );
                 i += 1;
                 continue;
@@ -248,17 +250,16 @@ public static class Parser
                     }
                     if (nonEmptyLineFound)
                     {
-                        var re = new Regex("^([a-zA-Z0-9-]*)(.*)$");
-                        var match = re.Match(lines[0]);
+                        var match = CodeLanguageRegex().Match(lines[0]);
                         //if there is any behind the lang spec, then it is normal text
                         // otherwise, it is either a lang spec (gets removed from the
                         // displayed text) or it is empty (newline gets removed)
-                        if (match.Captures[2].Length == 0)
+                        if (match.Groups[2].Length == 0)
                         {
                             lines = lines[1..];  // remove first line from code block
-                            if (match.Captures[1].Length > 0)
+                            if (match.Groups[1].Length > 0)
                             {
-                                lang = match.Captures[1].Value;
+                                lang = match.Groups[1].Value;
                             }
                         }
                     }
@@ -287,8 +288,8 @@ public static class Parser
             // making an additional if statement around the while loop
             while (
                 !inQuote &&
-                (i < tokens.Length) &&
-                    (tokens[i].Type == TokenType.QUOTE_LINE_PREFIX))
+                i < tokens.Length &&
+                    tokens[i].Type == TokenType.QUOTE_LINE_PREFIX)
             {
                 // scan until next newline
                 var found = false;
@@ -399,7 +400,7 @@ public static class Parser
     private static (Token[]?, int?) SearchForCloser(Token[] tokens, TokenType[] closer)
     {
         // iterate over tokens
-        for (var tokenIndex = 0; tokenIndex < (tokens.Length - closer.Length + 1); tokenIndex++)
+        for (var tokenIndex = 0; tokenIndex < tokens.Length - closer.Length + 1; tokenIndex++)
         {
             var matches = true;
             // try matching the closer to the current position by iterating over the closer

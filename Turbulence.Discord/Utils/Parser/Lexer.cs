@@ -22,7 +22,7 @@ public enum TokenType
     CODE_BLOCK_DELIMITER
 }
 
-public record Token(TokenType Type, string Value, CaptureCollection? Groups = null);
+public record Token(TokenType Type, string Value, GroupCollection? Groups = null);
 
 public static partial class Lexer
 {
@@ -71,10 +71,10 @@ public static partial class Lexer
                 seenSimpleText = "";
             }
 
-            CaptureCollection? groups = null;
-            if (match.Captures.Count > 0)
+            GroupCollection? groups = null;
+            if (match.Groups.Count > 0)
             {
-                groups = match.Captures;
+                groups = match.Groups;
             }
 
             yield return new(matchingRule.Type, match.Groups[0].Value, groups);
