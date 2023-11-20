@@ -282,14 +282,14 @@ public static partial class Parser
             // - quote blocks can't be nested. any quote delimiters inside a quote block
             // are just inline text. all other elements can appear inside a quote block
             // - text modifiers
-            Token[]? childrenTokenInQuoteBlock = null;
+            List<Token>? childrenTokenInQuoteBlock = new();
             // note that in_quote won't change during the while-loop, we're just reducing
             // the level of indentation here by including it in the condition instead of
             // making an additional if statement around the while loop
             while (
                 !inQuote &&
                 i < tokens.Length &&
-                    tokens[i].Type == TokenType.QUOTE_LINE_PREFIX)
+                tokens[i].Type == TokenType.QUOTE_LINE_PREFIX)
             {
                 // scan until next newline
                 var found = false;
@@ -299,7 +299,7 @@ public static partial class Parser
                     {
                         // add everything from the quote line prefix (non-inclusive)
                         // to the newline (inclusive) as children token
-                        childrenTokenInQuoteBlock = tokens[(i + 1)..(j + 1)];
+                        childrenTokenInQuoteBlock.AddRange(tokens[(i + 1)..(j + 1)]);
                         i = j + 1;  // move to the token after the newline
                         found = true;
                         break;
@@ -309,17 +309,17 @@ public static partial class Parser
                 {
                     // this is the last line,
                     // all remaining tokens are part of the quote block
-                    childrenTokenInQuoteBlock = tokens[(i + 1)..];
+                    childrenTokenInQuoteBlock.AddRange(tokens[(i + 1)..]);
                     i = tokens.Length;  // move to the end
                     break;
                 }
             }
 
 
-            if (childrenTokenInQuoteBlock != null)
+            if (childrenTokenInQuoteBlock.Count > 0)
             {
                 // tell the inner parse function that it's now inside a quote block
-                var childrenNodes = ParseTokensGenerator(childrenTokenInQuoteBlock, inQuote = true);
+                var childrenNodes = ParseTokensGenerator(childrenTokenInQuoteBlock.ToArray(), inQuote = true);
                 yield return new Node(NodeType.QUOTE_BLOCK, Children: childrenNodes.ToList());
                 continue;
             }

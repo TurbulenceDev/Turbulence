@@ -68,14 +68,30 @@ public class ParserTests
         }
     }
     [Test]
-    public void TextBold()
+    public void Text()
     {
-        var text = "hello, **world**";
+        var text = "text, **bold**, *italics*, _italics_, ~~strikethrough~~, ||spoiler||";
         var should = new Node[]
         {
-            new(NodeType.TEXT, Text: "hello, "),
+            new(NodeType.TEXT, Text: "text, "),
             new(NodeType.BOLD, Children: new List<Node>(){
-                new(NodeType.TEXT, Text: "world")
+                new(NodeType.TEXT, Text: "bold")
+            }),
+            new(NodeType.TEXT, Text: ", "),
+            new(NodeType.ITALIC, Children: new List<Node>(){
+                new(NodeType.TEXT, Text: "italics")
+            }),
+            new(NodeType.TEXT, Text: ", "),
+            new(NodeType.ITALIC, Children: new List<Node>(){
+                new(NodeType.TEXT, Text: "italics")
+            }),
+            new(NodeType.TEXT, Text: ", "),
+            new(NodeType.STRIKETHROUGH, Children: new List<Node>(){
+                new(NodeType.TEXT, Text: "strikethrough")
+            }),
+            new(NodeType.TEXT, Text: ", "),
+            new(NodeType.SPOILER, Children: new List<Node>(){
+                new(NodeType.TEXT, Text: "spoiler")
             }),
         };
         Test(text, should);
@@ -84,7 +100,8 @@ public class ParserTests
     [Test]
     public void Code()
     {
-        var text = @"```cs
+        var text = @"`code`
+```cs
 // *fake*
 public void Real() {
   Stuff();
@@ -92,6 +109,11 @@ public void Real() {
 ```".Replace("\r\n", "\n");
         var should = new Node[]
         {
+            new(NodeType.CODE_INLINE, Children: new List<Node>()
+            {
+                new(NodeType.TEXT, Text: "code")
+            }),
+            new(NodeType.TEXT, Text: "\n"),
             new(NodeType.CODE_BLOCK, CodeLanguage: "cs", Children: new List<Node>()
             {
                 new(NodeType.TEXT, Text: "// *fake*\npublic void Real() {\n  Stuff();\n}\n")
@@ -137,6 +159,20 @@ public void Real() {
             new(NodeType.URL_WITHOUT_PREVIEW, Url: "https://google.com"),
             new(NodeType.TEXT, Text: "\n"),
             new(NodeType.URL_WITH_PREVIEW, Url: "https://google.com"),
+        };
+        Test(text, should);
+    }
+
+    [Test]
+    public void Quote()
+    {
+        var text = "> line1\n> line2";
+        var should = new Node[]
+        {
+            new(NodeType.QUOTE_BLOCK, Children: new List<Node>()
+            {
+                new(NodeType.TEXT, Text: "line1\nline2")
+            }),
         };
         Test(text, should);
     }

@@ -32,17 +32,35 @@ public class LexerTests
     }
 
     [Test]
-    public void TextBold()
+    public void Text()
     {
-        var text = "hello, **world**";
+        var text = "text, **bold**, *italics*, _italics_, ~~strikethrough~~, ||spoiler||";
         var tokens = new Token[]
         {
-            new(TokenType.TEXT_INLINE, "hello, "),
+            new(TokenType.TEXT_INLINE, "text, "),
             new(TokenType.STAR, "*"),
             new(TokenType.STAR, "*"),
-            new(TokenType.TEXT_INLINE, "world"),
+            new(TokenType.TEXT_INLINE, "bold"),
             new(TokenType.STAR, "*"),
             new(TokenType.STAR, "*"),
+            new(TokenType.TEXT_INLINE, ", "),
+            new(TokenType.STAR, "*"),
+            new(TokenType.TEXT_INLINE, "italics"),
+            new(TokenType.STAR, "*"),
+            new(TokenType.TEXT_INLINE, ", "),
+            new(TokenType.UNDERSCORE, "_"),
+            new(TokenType.TEXT_INLINE, "italics"),
+            new(TokenType.UNDERSCORE, "_"),
+            new(TokenType.TEXT_INLINE, ", "),
+            new(TokenType.TILDE, "~"),
+            new(TokenType.TILDE, "~"),
+            new(TokenType.TEXT_INLINE, "strikethrough"),
+            new(TokenType.TILDE, "~"),
+            new(TokenType.TILDE, "~"),
+            new(TokenType.TEXT_INLINE, ", "),
+            new(TokenType.SPOILER_DELIMITER, "||"),
+            new(TokenType.TEXT_INLINE, "spoiler"),
+            new(TokenType.SPOILER_DELIMITER, "||"),
         };
         Test(text, tokens);
     }
@@ -50,7 +68,8 @@ public class LexerTests
     [Test]
     public void Code()
     {
-        var text = @"```cs
+        var text = @"`code`
+```cs
 // *fake*
 public void Real() {
   Stuff();
@@ -58,6 +77,10 @@ public void Real() {
 ```".Replace("\r\n", "\n");
         var tokens = new Token[]
         {
+            new(TokenType.CODE_INLINE_DELIMITER, "`"),
+            new(TokenType.TEXT_INLINE, "code"),
+            new(TokenType.CODE_INLINE_DELIMITER, "`"),
+            new(TokenType.NEWLINE, "\n"),
             new(TokenType.CODE_BLOCK_DELIMITER, "```"),
             new(TokenType.TEXT_INLINE, "cs"),
             new(TokenType.NEWLINE, "\n"),
@@ -114,6 +137,21 @@ public void Real() {
             new(TokenType.URL_WITHOUT_PREVIEW, "<https://google.com>"),
             new(TokenType.NEWLINE, "\n"),
             new(TokenType.URL_WITH_PREVIEW, "https://google.com"),
+        };
+        Test(text, tokens);
+    }
+
+    [Test]
+    public void Quote()
+    {
+        var text = "> line1\n> line2";
+        var tokens = new Token[]
+        {
+            new(TokenType.QUOTE_LINE_PREFIX, "> "),
+            new(TokenType.TEXT_INLINE, "line1"),
+            new(TokenType.NEWLINE, "\n"),
+            new(TokenType.QUOTE_LINE_PREFIX, "> "),
+            new(TokenType.TEXT_INLINE, "line2"),
         };
         Test(text, tokens);
     }
