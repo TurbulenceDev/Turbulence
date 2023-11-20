@@ -24,7 +24,7 @@ public enum TokenType
 
 public record Token(TokenType Type, string Value, CaptureCollection? Groups = null);
 
-public static class Lexer
+public static partial class Lexer
 {
     public static IEnumerable<Token>? Lex(string input)
     {
@@ -62,7 +62,7 @@ public static class Lexer
             }
 
             // cut off matched part
-            input = input[(match!.Captures[0].Length)..];
+            input = input[match!.Captures[0].Length..];
 
             // yield inline text if we have some left
             if (seenSimpleText.Length > 0)
@@ -82,25 +82,54 @@ public static class Lexer
     }
 
     private record LexingRule(TokenType Type, Regex Pattern);
-    private const string URL_REGEX = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+";
     private static readonly LexingRule[] Rules =
     {
-        new LexingRule(TokenType.USER_MENTION, new("^<@!?([0-9]+)>", RegexOptions.Compiled)),
-        new LexingRule(TokenType.ROLE_MENTION, new("^<@&([0-9]+)>", RegexOptions.Compiled)),
-        new LexingRule(TokenType.CHANNEL_MENTION, new("^<#([0-9]+)>", RegexOptions.Compiled)),
-        new LexingRule(TokenType.EMOJI_CUSTOM, new("^<:([a-zA-Z0-9_]{2,}):([0-9]+)>", RegexOptions.Compiled)),
-        new LexingRule(TokenType.EMOJI_UNICODE_ENCODED, new("^:([a-zA-Z0-9_]+):", RegexOptions.Compiled)),
-        new LexingRule(TokenType.URL_WITHOUT_PREVIEW, new($"^<{URL_REGEX}>", RegexOptions.Compiled)),
-        new LexingRule(TokenType.URL_WITH_PREVIEW, new($"^{URL_REGEX}", RegexOptions.Compiled)),
-        new LexingRule(TokenType.QUOTE_LINE_PREFIX, new("^(>>)?> ", RegexOptions.Compiled)),
-        new LexingRule(TokenType.TILDE, new("^~", RegexOptions.Compiled)),
-        new LexingRule(TokenType.STAR, new(@"^\*", RegexOptions.Compiled)),
-        new LexingRule(TokenType.UNDERSCORE, new("^_", RegexOptions.Compiled)),
-        new LexingRule(TokenType.SPOILER_DELIMITER, new(@"^\|\|", RegexOptions.Compiled)),
-        new LexingRule(TokenType.CODE_BLOCK_DELIMITER, new("^```", RegexOptions.Compiled)),
-        new LexingRule(TokenType.CODE_INLINE_DELIMITER, new("^`", RegexOptions.Compiled)),
-        new LexingRule(TokenType.NEWLINE, new("^\n", RegexOptions.Compiled)),
+        new LexingRule(TokenType.USER_MENTION, UserMentionRegex()),
+        new LexingRule(TokenType.ROLE_MENTION, RoleMentionRegex()),
+        new LexingRule(TokenType.CHANNEL_MENTION, ChannelMentionRegex()),
+        new LexingRule(TokenType.EMOJI_CUSTOM, CustomEmojiRegex()),
+        new LexingRule(TokenType.EMOJI_UNICODE_ENCODED, UnicodeEmojiRegex()),
+        new LexingRule(TokenType.URL_WITHOUT_PREVIEW, URLRegex()),
+        new LexingRule(TokenType.URL_WITH_PREVIEW, URLPreviewRegex()),
+        new LexingRule(TokenType.QUOTE_LINE_PREFIX, QuoteLineRegex()),
+        new LexingRule(TokenType.TILDE, TildeRegex()),
+        new LexingRule(TokenType.STAR, StarRegex()),
+        new LexingRule(TokenType.UNDERSCORE, UnderscoreRegex()),
+        new LexingRule(TokenType.SPOILER_DELIMITER, SpoilerRegex()),
+        new LexingRule(TokenType.CODE_BLOCK_DELIMITER, CodeBlockRegex()),
+        new LexingRule(TokenType.CODE_INLINE_DELIMITER, CodeInlineRegex()),
+        new LexingRule(TokenType.NEWLINE, NewlineRegex()),
     };
-    //TODO: compile deez
-}
 
+    
+    [GeneratedRegex("^<@!?([0-9]+)>", RegexOptions.Compiled)]
+    private static partial Regex UserMentionRegex();
+    [GeneratedRegex("^<@&([0-9]+)>", RegexOptions.Compiled)]
+    private static partial Regex RoleMentionRegex();
+    [GeneratedRegex("^<#([0-9]+)>", RegexOptions.Compiled)]
+    private static partial Regex ChannelMentionRegex();
+    [GeneratedRegex("^<:([a-zA-Z0-9_]{2,}):([0-9]+)>", RegexOptions.Compiled)]
+    private static partial Regex CustomEmojiRegex();
+    [GeneratedRegex("^:([a-zA-Z0-9_]+):", RegexOptions.Compiled)]
+    private static partial Regex UnicodeEmojiRegex();
+    [GeneratedRegex("^<http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+>", RegexOptions.Compiled)]
+    private static partial Regex URLRegex();
+    [GeneratedRegex("^http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", RegexOptions.Compiled)]
+    private static partial Regex URLPreviewRegex();
+    [GeneratedRegex("^(>>)?> ", RegexOptions.Compiled)]
+    private static partial Regex QuoteLineRegex();
+    [GeneratedRegex("^~", RegexOptions.Compiled)]
+    private static partial Regex TildeRegex();
+    [GeneratedRegex("^\\*", RegexOptions.Compiled)]
+    private static partial Regex StarRegex();
+    [GeneratedRegex("^_", RegexOptions.Compiled)]
+    private static partial Regex UnderscoreRegex();
+    [GeneratedRegex("^\\|\\|", RegexOptions.Compiled)]
+    private static partial Regex SpoilerRegex();
+    [GeneratedRegex("^```", RegexOptions.Compiled)]
+    private static partial Regex CodeBlockRegex();
+    [GeneratedRegex("^`", RegexOptions.Compiled)]
+    private static partial Regex CodeInlineRegex();
+    [GeneratedRegex("^\n", RegexOptions.Compiled)]
+    private static partial Regex NewlineRegex();
+}
