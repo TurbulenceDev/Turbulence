@@ -101,7 +101,7 @@ public static partial class Lexer
         new LexingRule(TokenType.NEWLINE, NewlineRegex()),
     };
 
-    
+    private const string URL_REGEX = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+";
     [GeneratedRegex("^<@!?([0-9]+)>", RegexOptions.Compiled)]
     private static partial Regex UserMentionRegex();
     [GeneratedRegex("^<@&([0-9]+)>", RegexOptions.Compiled)]
@@ -112,9 +112,9 @@ public static partial class Lexer
     private static partial Regex CustomEmojiRegex();
     [GeneratedRegex("^:([a-zA-Z0-9_]+):", RegexOptions.Compiled)]
     private static partial Regex UnicodeEmojiRegex();
-    [GeneratedRegex("^<http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+>", RegexOptions.Compiled)]
+    [GeneratedRegex($"^<{URL_REGEX}>", RegexOptions.Compiled)]
     private static partial Regex URLRegex();
-    [GeneratedRegex("^http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", RegexOptions.Compiled)]
+    [GeneratedRegex($"^{URL_REGEX}", RegexOptions.Compiled)]
     private static partial Regex URLPreviewRegex();
     [GeneratedRegex("^(>>)?> ", RegexOptions.Compiled)]
     private static partial Regex QuoteLineRegex();
