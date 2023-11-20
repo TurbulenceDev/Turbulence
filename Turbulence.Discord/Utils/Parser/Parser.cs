@@ -24,10 +24,10 @@ public enum NodeType
 }
 
 //FIXME: this also creates properties for text+children
-public record Node(NodeType Type, string? Text = null, Snowflake? Id = null, string? Emoji = null, string? CodeLanguage = null, string? Url = null, List<Node>? Children = null)
+public record Node(NodeType Type, string? Text = null, Snowflake? Id = null, string? Emoji = null, string? CodeLanguage = null, string? Url = null, IEnumerable<Node>? Children = null)
 {
     public string? Text { get; set; } = Text;
-    public List<Node>? Children { get; set; } = Children;
+    public IEnumerable<Node>? Children { get; set; } = Children;
 
     //TODO: to dict?
 }
