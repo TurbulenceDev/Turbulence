@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Security.Policy;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using System.Text.RegularExpressions;
 using Turbulence.Discord.Models;
-using Turbulence.Discord.Utils.Parser;
 
 namespace Turbulence.Discord.Utils.Parser;
 
@@ -35,10 +24,10 @@ public enum NodeType
 }
 
 //FIXME: this also creates properties for text+children
-public record Node(NodeType Type, string? text = null, Snowflake? Id = null, string? Emoji = null, string? CodeLanguage = null, string? Url = null, List<Node>? children = null)
+public record Node(NodeType Type, string? Text = null, Snowflake? Id = null, string? Emoji = null, string? CodeLanguage = null, string? Url = null, List<Node>? Children = null)
 {
-    public string? Text { get; set; } = text;
-    public List<Node>? Children { get; set; } = children;
+    public string? Text { get; set; } = Text;
+    public List<Node>? Children { get; set; } = Children;
 
     //TODO: to dict?
 }
@@ -108,7 +97,7 @@ public static class Parser
             // text
             if (current.Type == TokenType.TEXT_INLINE)
             {
-                yield return new Node(NodeType.TEXT, text: current.Value);
+                yield return new Node(NodeType.TEXT, Text: current.Value);
                 i += 1;
                 continue;
             }
@@ -279,8 +268,8 @@ public static class Parser
 
 
                     childrenContent = string.Join("\n", lines);
-                    var child_node = new Node(NodeType.TEXT, text: childrenContent);
-                    yield return new Node(NodeType.CODE_BLOCK, CodeLanguage: lang, children: new List<Node>() { child_node });
+                    var child_node = new Node(NodeType.TEXT, Text: childrenContent);
+                    yield return new Node(NodeType.CODE_BLOCK, CodeLanguage: lang, Children: new List<Node>() { child_node });
                     i += 1 + consumedTokenCount!.Value;
                     continue;
                 }
@@ -333,7 +322,7 @@ public static class Parser
             {
                 // tell the inner parse function that it's now inside a quote block
                 var childrenNodes = ParseTokensGenerator(childrenTokenInQuoteBlock, inQuote = true);
-                yield return new Node(NodeType.QUOTE_BLOCK, children: childrenNodes.ToList());
+                yield return new Node(NodeType.QUOTE_BLOCK, Children: childrenNodes.ToList());
                 continue;
             }
 
@@ -404,7 +393,7 @@ public static class Parser
         return (
             new Node(
                 nodeType,
-                children: ParseTokensGenerator(childrenToken, in_quote).ToList()
+                Children: ParseTokensGenerator(childrenToken, in_quote).ToList()
             ),
             consumedTokenCount);
     }

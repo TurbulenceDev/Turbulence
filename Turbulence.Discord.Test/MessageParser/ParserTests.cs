@@ -42,9 +42,9 @@ public class ParserTests
 
         var should = new Node[]
         {
-            new(NodeType.TEXT, text: "hello, "),
-            new(NodeType.BOLD, children: new List<Node>(){
-                new(NodeType.TEXT, text: "world")
+            new(NodeType.TEXT, Text: "hello, "),
+            new(NodeType.BOLD, Children: new List<Node>(){
+                new(NodeType.TEXT, Text: "world")
             }),
         };
         // asserts that two nodes (and its children) are the same

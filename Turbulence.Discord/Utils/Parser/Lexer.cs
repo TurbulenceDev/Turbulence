@@ -84,21 +84,21 @@ public static partial class Lexer
     private record LexingRule(TokenType Type, Regex Pattern);
     private static readonly LexingRule[] Rules =
     {
-        new LexingRule(TokenType.USER_MENTION, UserMentionRegex()),
-        new LexingRule(TokenType.ROLE_MENTION, RoleMentionRegex()),
-        new LexingRule(TokenType.CHANNEL_MENTION, ChannelMentionRegex()),
-        new LexingRule(TokenType.EMOJI_CUSTOM, CustomEmojiRegex()),
-        new LexingRule(TokenType.EMOJI_UNICODE_ENCODED, UnicodeEmojiRegex()),
-        new LexingRule(TokenType.URL_WITHOUT_PREVIEW, URLRegex()),
-        new LexingRule(TokenType.URL_WITH_PREVIEW, URLPreviewRegex()),
-        new LexingRule(TokenType.QUOTE_LINE_PREFIX, QuoteLineRegex()),
-        new LexingRule(TokenType.TILDE, TildeRegex()),
-        new LexingRule(TokenType.STAR, StarRegex()),
-        new LexingRule(TokenType.UNDERSCORE, UnderscoreRegex()),
-        new LexingRule(TokenType.SPOILER_DELIMITER, SpoilerRegex()),
-        new LexingRule(TokenType.CODE_BLOCK_DELIMITER, CodeBlockRegex()),
-        new LexingRule(TokenType.CODE_INLINE_DELIMITER, CodeInlineRegex()),
-        new LexingRule(TokenType.NEWLINE, NewlineRegex()),
+        new(TokenType.USER_MENTION, UserMentionRegex()),
+        new(TokenType.ROLE_MENTION, RoleMentionRegex()),
+        new(TokenType.CHANNEL_MENTION, ChannelMentionRegex()),
+        new(TokenType.EMOJI_CUSTOM, CustomEmojiRegex()),
+        new(TokenType.EMOJI_UNICODE_ENCODED, UnicodeEmojiRegex()),
+        new(TokenType.URL_WITHOUT_PREVIEW, URLRegex()),
+        new(TokenType.URL_WITH_PREVIEW, URLPreviewRegex()),
+        new(TokenType.QUOTE_LINE_PREFIX, QuoteLineRegex()),
+        new(TokenType.TILDE, TildeRegex()),
+        new(TokenType.STAR, StarRegex()),
+        new(TokenType.UNDERSCORE, UnderscoreRegex()),
+        new(TokenType.SPOILER_DELIMITER, SpoilerRegex()),
+        new(TokenType.CODE_BLOCK_DELIMITER, CodeBlockRegex()),
+        new(TokenType.CODE_INLINE_DELIMITER, CodeInlineRegex()),
+        new(TokenType.NEWLINE, NewlineRegex()),
     };
 
     private const string URL_REGEX = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+";
