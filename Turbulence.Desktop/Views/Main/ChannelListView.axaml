@@ -40,6 +40,12 @@
 						<TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
 					</Grid>
                 </DataTemplate>
+                <DataTemplate x:Key="GUILD_STAGE_VOICE" x:DataType="channel:Channel">
+                    <Grid ColumnDefinitions="20,*">
+                        <TextBlock Text="&#x1F399;" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
+                    </Grid>
+                </DataTemplate>
                 <DataTemplate x:Key="unknown" x:DataType="channel:Channel">
                     <TextBlock Background="Red" Text="{Binding Name, StringFormat='Unknown: {0}'}" />
                 </DataTemplate>

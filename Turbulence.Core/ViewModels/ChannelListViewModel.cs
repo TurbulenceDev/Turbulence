@@ -29,6 +29,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
     
     public void Receive(SetChannelsMsg m) => Channels.ReplaceAll(m.Channels);
     
+    //TODO: move to client
     private bool CanSeeChannel(Guild Server, Channel channel, BigInteger perms, List<Role> myRoles)
     {
         if (Server.OwnerId == _client.CurrentUser?.Id)
