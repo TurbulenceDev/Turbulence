@@ -6,20 +6,15 @@ public class DesignChannelListViewModel : ChannelListViewModel
 {
     public DesignChannelListViewModel()
     {
+        var text = new Channel()
+        {
+            Id = new(1),
+            Type = ChannelType.GUILD_TEXT,
+            Name = "Text"
+        };
         Channels.AddRange(new List<Channel>()
         {
-            new()
-            {
-                Id = new(0),
-                Type = ChannelType.GUILD_CATEGORY,
-                Name = "Category"
-            },
-            new()
-            {
-                Id = new(1),
-                Type = ChannelType.GUILD_TEXT,
-                Name = "Text"
-            },
+            text,
             new()
             {
                 Id = new(2),
@@ -34,10 +29,17 @@ public class DesignChannelListViewModel : ChannelListViewModel
             },
             new()
             {
-                Id = new(3),
+                Id = new(0),
+                Type = ChannelType.GUILD_CATEGORY,
+                Name = "Category"
+            },
+            new()
+            {
+                Id = new(4),
                 Type = ChannelType.GUILD_ANNOUNCEMENT,
                 Name = "Announcement"
             },
         });
+        SelectedChannel = text;
     }
 }
