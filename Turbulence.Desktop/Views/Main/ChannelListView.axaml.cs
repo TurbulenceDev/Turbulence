@@ -31,7 +31,7 @@ public partial class ChannelListView : UserControl
             {
                 if (_vm.SelectedChannel != (Channel)dataContext)
                     _vm.SelectedChannel = (Channel)dataContext;
-                else
+                else // if its already selected, then pls check this one again
                     control.IsChecked = true;
             }
         }

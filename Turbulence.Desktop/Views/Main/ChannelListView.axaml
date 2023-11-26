@@ -38,7 +38,7 @@
                         <ToggleButton.IsChecked>
                             <MultiBinding Converter="{StaticResource EqualsConverter}">
                                 <Binding Path="$parent[ItemsControl].((vm:ChannelListViewModel)DataContext).SelectedChannel" />
-                                <Binding Path="."/>
+                                <Binding Path="." />
                             </MultiBinding>
                         </ToggleButton.IsChecked>
                         <Grid ColumnDefinitions="20,*">
