@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using LibVLCSharp.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using Turbulence.Discord;
 using Turbulence.Discord.Services;
@@ -32,6 +33,16 @@ internal class Program : Application
                 .AddSingleton<ICache, Cache>()
                 .AddSingleton<ITypingStorage, TypingStorage>()
                 .AddSingleton<ILogger, Logger>()
+                .AddSingleton<LibVLC>(_ =>
+                {
+                    LibVLCSharp.Shared.Core.Initialize();
+                    var libVLC = new LibVLC(
+                        enableDebugLogs: true,
+                        "--input-repeat=2"
+                    );
+                    //libVLC.Log += (sender, args) => Console.WriteLine(args.Message);
+                    return libVLC;
+                })
                 .BuildServiceProvider();
         Ioc.Default.ConfigureServices(provider);
 

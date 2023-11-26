@@ -83,7 +83,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="channel:Embed">
-                        <controls:VideoPlayerControl MediaPlayer="{Binding ., Converter={StaticResource EmbedConverter}}"/>
+                        <controls:VideoPlayerControl HorizontalAlignment="Left" Width="{Binding Video.Width}" Height="{Binding Video.Height}" Media="{Binding ., Converter={StaticResource EmbedConverter}}" />
                         <!--<lottie:Lottie Path="{Binding ., Converter={StaticResource EmbedConverter}}"/>-->
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

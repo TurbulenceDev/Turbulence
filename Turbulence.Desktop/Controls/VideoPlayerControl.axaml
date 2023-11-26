@@ -2,11 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:libVlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+             xmlns:unofficial="clr-namespace:LibVLCSharp.Avalonia.Unofficial;assembly=LibVLCSharp.Avalonia.Unofficial"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Turbulence.Desktop.Controls.VideoPlayerControl">
-    <libVlc:VideoView
-        HorizontalAlignment="Stretch"
-        VerticalAlignment="Stretch"
-        x:Name="VideoViewer"/>
+    <unofficial:VideoView
+            Margin="10"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            x:Name="VideoViewer"/>
 </UserControl>

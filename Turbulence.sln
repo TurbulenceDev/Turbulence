@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{C0D654EF-8CDC-4090-B40C-485E645355E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibVLCSharp.Avalonia.Unofficial", "LibVLCSharp.Avalonia.Unofficial\LibVLCSharp.Avalonia.Unofficial.csproj", "{DCF4168D-8C0A-426E-85B6-0C3741D505AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{EE593AB4-B2BA-4872-A33B-E695BBF2B232}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE593AB4-B2BA-4872-A33B-E695BBF2B232}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE593AB4-B2BA-4872-A33B-E695BBF2B232}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCF4168D-8C0A-426E-85B6-0C3741D505AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCF4168D-8C0A-426E-85B6-0C3741D505AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCF4168D-8C0A-426E-85B6-0C3741D505AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCF4168D-8C0A-426E-85B6-0C3741D505AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,5 +70,6 @@ Global
 		{EE593AB4-B2BA-4872-A33B-E695BBF2B232} = {C0D654EF-8CDC-4090-B40C-485E645355E1}
 		{03A741E6-770F-4013-A26D-1CC2FB7BF9CC} = {83FBB5FD-A549-4A21-A5D4-E68F027A0DD1}
 		{DA085BF7-18C0-4FEF-AB89-75E7E3F503FD} = {C0D654EF-8CDC-4090-B40C-485E645355E1}
+		{DCF4168D-8C0A-426E-85B6-0C3741D505AE} = {C0D654EF-8CDC-4090-B40C-485E645355E1}
 	EndGlobalSection
 EndGlobal

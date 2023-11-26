@@ -3,53 +3,48 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using LibVLCSharp.Avalonia;
-using LibVLCSharp.Shared;
+using LibVLCSharp.Avalonia.Unofficial;
 
 namespace Turbulence.Desktop.Controls;
 
 public partial class VideoPlayerControl : UserControl
 {
-    public static readonly DirectProperty<VideoPlayerControl, MediaPlayer?> MediaPlayerProperty =
-        AvaloniaProperty.RegisterDirect<VideoPlayerControl, MediaPlayer?>(nameof(MediaPlayer),
-            o => o.MediaPlayer,
-            (o, v) => o.MediaPlayer = v,
+    public static readonly DirectProperty<VideoPlayerControl, Uri?> MediaProperty =
+        AvaloniaProperty.RegisterDirect<VideoPlayerControl, Uri?>(nameof(Media),
+            o => o.Media,
+            (o, v) => o.Media = v,
             null!,
             BindingMode.TwoWay,
             false);
 
-    private readonly VideoView _videoViewer;
-    private MediaPlayer? _mediaPlayer;
-    
-    public MediaPlayer? MediaPlayer
+    private VideoView? _videoViewer;
+    public VideoPlayerControlModel viewModel;
+
+    public Uri? Media
     {
-        get => _mediaPlayer;
-        set
-        {
-            _mediaPlayer = value;
-            if (_videoViewer.IsLoaded || _mediaPlayer == null)
-            {
-                SetMediaPlayer();
-            }
-        }
+        get => viewModel.Media;
+        set => viewModel.Media = value;
     }
 
     public VideoPlayerControl()
     {
         InitializeComponent();
-        
+
+        viewModel = new VideoPlayerControlModel();
+
         _videoViewer = this.Get<VideoView>("VideoViewer");
+        
         _videoViewer.Loaded += VideoViewerLoaded;
     }
 
     private void VideoViewerLoaded(object? sender, RoutedEventArgs e)
     {
-        SetMediaPlayer();
-    }
-
-    private void SetMediaPlayer()
-    {
-        _videoViewer.MediaPlayer = _mediaPlayer;
+        if (_videoViewer != null && viewModel.MediaPlayer != null)
+        {
+            _videoViewer.MediaPlayer = viewModel.MediaPlayer;
+            _videoViewer.MediaPlayer.Hwnd = _videoViewer.hndl.Handle;
+            viewModel.Play();
+        }
     }
 
     private void InitializeComponent()
