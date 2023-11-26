@@ -16,10 +16,10 @@
         <converters:ObjectEqualsMultiConverter x:Key="EqualsConverter" />
     </UserControl.Resources>
     <UserControl.Styles>
-        <Style Selector="ToggleButton">
+        <Style Selector="Button">
             <Setter Property="Background" Value="Transparent" />
         </Style>
-        <Style Selector="ToggleButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Style Selector="Button.Checked /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="#404249" />
         </Style>
         <Style Selector="TextBlock.Category">
@@ -33,14 +33,15 @@
             <dataTemplates:ChannelTemplateSelector>
                 <!--Channels that can be clicked-->
                 <DataTemplate x:Key="channel" x:DataType="channel:Channel">
-                    <ToggleButton Click="ChannelSelected"
+                    <Button Command="{Binding $parent[ItemsControl].((vm:ChannelListViewModel)DataContext).SelectChannelCommand}"
+                            CommandParameter="{Binding .}"
                             HorizontalAlignment="Stretch" Margin="4,1">
-                        <ToggleButton.IsChecked>
+                        <Classes.Checked>
                             <MultiBinding Converter="{StaticResource EqualsConverter}">
                                 <Binding Path="$parent[ItemsControl].((vm:ChannelListViewModel)DataContext).SelectedChannel" />
                                 <Binding Path="." />
                             </MultiBinding>
-                        </ToggleButton.IsChecked>
+                        </Classes.Checked>
                         <Grid ColumnDefinitions="20,*">
                             <!--The icon-->
                             <ContentControl Content="{Binding}">
@@ -67,7 +68,7 @@
                             <!--Channel Name-->
                             <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
                         </Grid>
-                    </ToggleButton>
+                    </Button>
                 </DataTemplate>
                 <!--Category-->
                 <DataTemplate x:Key="category" x:DataType="channel:Channel">

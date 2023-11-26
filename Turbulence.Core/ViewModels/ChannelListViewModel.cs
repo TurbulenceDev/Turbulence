@@ -1,6 +1,7 @@
 using System.Numerics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
 using Turbulence.Discord.Models;
@@ -26,7 +27,13 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
                 Messenger.Send(new ChannelSelectedMsg(channel));
         };
     }
-    
+
+    [RelayCommand]
+    public void SelectChannel(Channel channel)
+    {
+        SelectedChannel = channel;
+    }
+
     public void Receive(SetChannelsMsg m) => Channels.ReplaceAll(m.Channels);
     
     //TODO: move to client
