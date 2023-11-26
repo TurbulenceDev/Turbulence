@@ -5,7 +5,7 @@ using Turbulence.Discord.Models.DiscordChannel;
 
 namespace Turbulence.Desktop.DataTemplates;
 
-public class ChannelTemplateSelector : IDataTemplate
+public class ChannelTypeTemplateSelector : IDataTemplate
 {
     [Content]
     public Dictionary<string, IDataTemplate> Templates { get; } = new Dictionary<string, IDataTemplate>();
@@ -15,10 +15,7 @@ public class ChannelTemplateSelector : IDataTemplate
     Control? ITemplate<object?, Control?>.Build(object? param)
     {
         var channel = (Channel)param!;
-        var type = "channel";
-        if (channel.Type == ChannelType.GUILD_CATEGORY)
-            type = "category";
-        if (!Templates.TryGetValue(type, out var template))
+        if (!Templates.TryGetValue(channel.Type.ToString(), out var template))
             return Templates["unknown"].Build(param);
         return template.Build(param);
     }

@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+             xmlns:converters="using:Turbulence.Desktop.Converters"
              xmlns:dataTemplates="using:Turbulence.Desktop.DataTemplates"
              xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
              x:Class="Turbulence.Desktop.Views.Main.ChannelListView"
@@ -11,39 +12,78 @@
     <UserControl.DataContext>
         <vm:ChannelListViewModel />
     </UserControl.DataContext>
-    <ListBox ItemsSource="{Binding Channels}"
-             Background="#2B2D31"
-             SelectedValue="{Binding SelectedChannel}">
-        <ListBox.DataTemplates>
+    <UserControl.Resources>
+        <converters:ObjectEqualsMultiConverter x:Key="EqualsConverter" />
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="ToggleButton">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ToggleButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#404249" />
+        </Style>
+        <Style Selector="TextBlock.Category">
+            <Setter Property="Margin" Value="0,10,0,0" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+    </UserControl.Styles>
+    <ItemsControl ItemsSource="{Binding Channels}"
+             Background="#2B2D31">
+        <ItemsControl.DataTemplates>
             <dataTemplates:ChannelTemplateSelector>
-                <DataTemplate x:Key="GUILD_TEXT" x:DataType="channel:Channel">
-					<Grid ColumnDefinitions="20,*">
-						<TextBlock Text="#" HorizontalAlignment="Center" />
-						<TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
-					</Grid>
+                <!--Channels that can be clicked-->
+                <DataTemplate x:Key="channel" x:DataType="channel:Channel">
+                    <ToggleButton Click="ChannelSelected"
+                            HorizontalAlignment="Stretch" Margin="4,1">
+                        <ToggleButton.IsChecked>
+                            <MultiBinding Converter="{StaticResource EqualsConverter}">
+                                <Binding Path="$parent[ItemsControl].((vm:ChannelListViewModel)DataContext).SelectedChannel" />
+                                <Binding Path="."/>
+                            </MultiBinding>
+                        </ToggleButton.IsChecked>
+                        <Grid ColumnDefinitions="20,*">
+                            <!--The icon-->
+                            <ContentControl Content="{Binding}">
+                                <ContentControl.DataTemplates>
+                                    <dataTemplates:ChannelTypeTemplateSelector>
+                                        <DataTemplate x:Key="GUILD_TEXT" x:DataType="channel:Channel">
+                                            <TextBlock Text="#" HorizontalAlignment="Center" />
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="GUILD_VOICE" x:DataType="channel:Channel">
+                                            <TextBlock Text="&#x1F50A;" HorizontalAlignment="Center" />
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="GUILD_ANNOUNCEMENT" x:DataType="channel:Channel">
+                                            <TextBlock Text="&#x1F4E3;" HorizontalAlignment="Center" />
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="GUILD_STAGE_VOICE" x:DataType="channel:Channel">
+                                            <TextBlock Text="&#x1F399;" HorizontalAlignment="Center" />
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="unknown" x:DataType="channel:Channel">
+                                            <TextBlock Text="#" Background="Red" HorizontalAlignment="Center" />
+                                        </DataTemplate>
+                                    </dataTemplates:ChannelTypeTemplateSelector>
+                                </ContentControl.DataTemplates>
+                            </ContentControl>
+                            <!--Channel Name-->
+                            <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
+                        </Grid>
+                    </ToggleButton>
                 </DataTemplate>
-                <DataTemplate x:Key="GUILD_VOICE" x:DataType="channel:Channel">
-					<Grid ColumnDefinitions="20,*">
-						<TextBlock Text="&#x1F50A;" HorizontalAlignment="Center" />
-						<TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
-					</Grid>
+                <!--Category-->
+                <DataTemplate x:Key="category" x:DataType="channel:Channel">
+                    <Grid ColumnDefinitions="15,*">
+                        <TextBlock Text="&#x23F7;" FontSize="11" VerticalAlignment="Bottom" />
+                        <TextBlock Classes="Category" Text="{Binding Name}" Grid.Column="1" />
+                    </Grid>
                 </DataTemplate>
-                <DataTemplate x:Key="GUILD_CATEGORY" x:DataType="channel:Channel">
-					<Grid ColumnDefinitions="20,*">
-						<TextBlock Text="&#x23F7;" HorizontalAlignment="Center" />
-						<TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
-					</Grid>
-                </DataTemplate>
-                <DataTemplate x:Key="GUILD_ANNOUNCEMENT" x:DataType="channel:Channel">
-					<Grid ColumnDefinitions="20,*">
-						<TextBlock Text="&#x1F4E3;" HorizontalAlignment="Center" />
-						<TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
-					</Grid>
-                </DataTemplate>
+                <!--Default case-->
                 <DataTemplate x:Key="unknown" x:DataType="channel:Channel">
-                    <TextBlock Background="Red" Text="{Binding Name, StringFormat='Unknown: {0}'}" />
+                    <Grid ColumnDefinitions="20,*" Background="Red">
+                        <TextBlock Text="UNKNOWN" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
+                    </Grid>
                 </DataTemplate>
             </dataTemplates:ChannelTemplateSelector>
-        </ListBox.DataTemplates>
-    </ListBox>
+        </ItemsControl.DataTemplates>
+    </ItemsControl>
 </UserControl>

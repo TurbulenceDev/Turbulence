@@ -10,8 +10,8 @@
     <UserControl.DataContext>
         <vm:MessagesViewModel />
     </UserControl.DataContext>
-    <ScrollViewer Name="Scroll">
-        <ItemsControl ItemsSource="{Binding CurrentMessages}"
+    <ScrollViewer Name="Scroll" ScrollChanged="ScrollChanged">
+        <ItemsControl Name="MessageList" ItemsSource="{Binding CurrentMessages}"
                       Background="#313338"
                       Padding="8">
             <ItemsControl.ItemTemplate>

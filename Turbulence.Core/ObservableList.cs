@@ -12,11 +12,24 @@ public class ObservableList<T> : ObservableCollection<T>
         if (!SuppressNotification)
             base.OnCollectionChanged(e);
     }
- 
-    public void AddRange(IEnumerable<T> list)
+
+    public void AddRange(IEnumerable<T> list) => InsertRange(list, Items.Count);
+
+    public void InsertRange(IEnumerable<T> list, int at)
     {
         SuppressNotification = true;
         foreach (var item in list)
+        {
+            Insert(at, item);
+        }
+        SuppressNotification = false;
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+    }
+
+    public void ReverseAddRange(IEnumerable<T> list)
+    {
+        SuppressNotification = true;
+        foreach (var item in list.Reverse())
         {
             Add(item);
         }

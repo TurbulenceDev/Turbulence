@@ -133,9 +133,11 @@ public static class Api
     }
 
     // https://discord.com/developers/docs/resources/channel#get-channel-messages
-    public static async Task<List<Message>> GetChannelMessages(HttpClient client, ulong channelId, Snowflake? around = null, int limit = 50)
+    public static async Task<List<Message>> GetChannelMessages(HttpClient client, ulong channelId, Snowflake? around = null, Snowflake? before = null, Snowflake? after = null, int limit = 50)
     {
         var query = HttpUtility.ParseQueryString(string.Empty);
+        query.Add("before", before?.Id.ToString());
+        query.Add("after", after?.Id.ToString());
         query.Add("limit", limit.ToString());
         query.Add("around", around?.Id.ToString());
         return await Get<List<Message>>(client, $"/channels/{channelId}/messages?{query}");

@@ -397,8 +397,8 @@ public static class ChannelTypeExtensions
 			not GUILD_CATEGORY when other is GUILD_CATEGORY => -1,
 			
 			// Text channels go before voice channels
-			GUILD_VOICE when other is GUILD_TEXT => 1,
-			GUILD_TEXT when other is GUILD_VOICE => -1,
+			(GUILD_VOICE or GUILD_STAGE_VOICE) when other is not (GUILD_VOICE or GUILD_STAGE_VOICE) => 1,
+			not (GUILD_VOICE or GUILD_STAGE_VOICE) when other is (GUILD_VOICE or GUILD_STAGE_VOICE)=> -1,
 			
 			// TODO: Implement more cases
 			

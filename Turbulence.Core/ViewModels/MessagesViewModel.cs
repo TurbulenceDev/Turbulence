@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
+using System.Collections.Generic;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
 using static Turbulence.Discord.Models.DiscordChannel.ChannelType;
@@ -17,6 +18,30 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
     private string _title = "";
 
     public event EventHandler? ShowNewChannel;
+    private bool _loadingMessages = false;
+
+    public async Task RequestMoreMessages(bool older = true)
+    {
+        if (_loadingMessages)
+            return;
+
+        //TODO: check if we have enough messages to even request?
+        _loadingMessages = true;
+        if (older)
+        {
+            
+            var first = CurrentMessages.First();
+            var messages = await _client.GetMessagesBefore(first.ChannelId, first.Id);
+            CurrentMessages.InsertRange(messages, 0);
+        }
+        else
+        {
+            var last = CurrentMessages.Last();
+            var messages = await _client.GetMessagesAfter(last.ChannelId, last.Id);
+            // TODO: insert at the end
+        }
+        _loadingMessages = false;
+    }
 
     public async void Receive(ChannelSelectedMsg message)
     {
@@ -29,14 +54,9 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
         };
 
         var channelMessages = await _client.GetMessages(message.Channel.Id);
-        channelMessages.Reverse();
         CurrentMessages.Clear();
-        foreach (var channelMessage in channelMessages)
-        {
-            // TODO: Generates a collection changed notification on each Add(), fix?
-            CurrentMessages.Add(channelMessage);
-        }
-        
+        CurrentMessages.ReverseAddRange(channelMessages);
+
         ShowNewChannel?.Invoke(this, EventArgs.Empty);
     }
 
@@ -47,13 +67,8 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
         //TODO: also check the channel
         //TODO: check if the message is in the current loaded list and scroll to it
         var channelMessages = await _client.GetMessagesAround(message.Message.ChannelId, message.Message.Id);
-        channelMessages.Reverse();
         CurrentMessages.Clear();
-        foreach (var channelMessage in channelMessages)
-        {
-            // TODO: Generates a collection changed notification on each Add(), fix?
-            CurrentMessages.Add(channelMessage);
-        }
+        CurrentMessages.ReverseAddRange(channelMessages);
     }
 }
 
