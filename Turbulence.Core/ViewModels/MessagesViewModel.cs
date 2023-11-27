@@ -1,10 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
-using System.Collections.Generic;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
-using static Turbulence.Discord.Models.DiscordChannel.ChannelType;
 
 namespace Turbulence.Core.ViewModels;
 
@@ -45,13 +43,7 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
 
     public async void Receive(ChannelSelectedMsg message)
     {
-        Title = message.Channel.Type switch
-        {
-            DM => $"Messages: {(message.Channel.Recipients is { } recipients
-                ? recipients.First().Username
-                : (await _client.GetChannel(message.Channel.Id)).Recipients?.First().Username) ?? "unknown"}",
-            _ => $"Messages: {message.Channel.Name}",
-        };
+        Title = $"Messages: {await _client.GetChannelName(message.Channel)}";
 
         var channelMessages = await _client.GetMessages(message.Channel.Id);
         CurrentMessages.Clear();

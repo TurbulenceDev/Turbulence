@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Turbulence.Discord.Models.DiscordChannel;
 
 namespace Turbulence.Discord.Models.DiscordUser;
 
@@ -120,4 +121,12 @@ public record User {
 	[JsonPropertyName("avatar_decoration")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public string? AvatarDecoration { get; init; }
+}
+
+public static class UserExtensions
+{
+    public static string GetBestName(this User user)
+    {
+        return user.GlobalName ?? user.Username;
+    }
 }

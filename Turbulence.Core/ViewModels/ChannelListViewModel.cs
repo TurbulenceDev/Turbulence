@@ -129,7 +129,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
 
     public void Receive(DMsSelectedMsg message)
     {
-        //TODO: sort?
+        //TODO: sort
         Channels.ReplaceAll(message.Channels);
     }
 }

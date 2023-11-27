@@ -17,7 +17,7 @@ public class ChannelTemplateSelector : IDataTemplate
         var channel = (Channel)param!;
         var type = channel.Type switch
         {
-            ChannelType.DM => "dm",
+            ChannelType.DM or ChannelType.GROUP_DM => "dm",
             ChannelType.GUILD_CATEGORY => "category",
             _ => "channel",
         };

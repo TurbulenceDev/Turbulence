@@ -54,7 +54,18 @@ public class DesignChannelListViewModel : ChannelListViewModel
                     new(12345678)
                 },
                 Type = ChannelType.DM,
-                Name = "DMs"
+                Name = "DM"
+            },
+            new()
+            {
+                Id = new(0),
+                RecipientIDs = new Snowflake[]
+                {
+                    new(12345678),
+                    new(12345679)
+                },
+                Type = ChannelType.GROUP_DM,
+                Name = "Group DM"
             },
         });
         SelectedChannel = text;

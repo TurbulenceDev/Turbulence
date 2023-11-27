@@ -122,6 +122,11 @@ public static class Api
         return await Get<GuildMember>(client, $"/users/@me/guilds/{guildId}/member");
     }
 
+    public static async Task<User> GetUser(HttpClient client, ulong userId)
+    {
+        return await Get<User>(client, $"/users/{userId}");
+    }
+
     public static async Task<Channel> GetChannel(HttpClient client, ulong channelId)
     {
         return await Get<Channel>(client, $"/channels/{channelId}");

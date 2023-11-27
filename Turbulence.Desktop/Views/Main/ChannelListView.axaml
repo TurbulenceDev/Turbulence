@@ -14,7 +14,7 @@
     </UserControl.DataContext>
     <UserControl.Resources>
         <converters:ObjectEqualsMultiConverter x:Key="EqualsConverter" />
-        <converters:DMNameConverter x:Key="DMNameConverter" />
+        <converters:ChannelNameConverter x:Key="ChannelNameConverter" />
     </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="Button">
@@ -45,10 +45,10 @@
                                 </MultiBinding>
                             </Classes.Checked>
                             <Grid ColumnDefinitions="20,*">
-                                <!--The icon-->
+                                <!--TODO: The icon-->
                                 <TextBlock HorizontalAlignment="Center">#</TextBlock>
                                 <!--User Name-->
-                                <TextBlock Text="{Binding RecipientIDs, Converter={StaticResource DMNameConverter}}" Grid.Column="1" Margin="5,0" />
+                                <TextBlock Text="{Binding ., Converter={StaticResource ChannelNameConverter}}" Grid.Column="1" Margin="5,0" />
                             </Grid>
                         </Button>
                     </DataTemplate>

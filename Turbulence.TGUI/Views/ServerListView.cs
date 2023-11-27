@@ -11,7 +11,7 @@ public sealed class ServerListView : FrameView
 {
     private readonly TreeView<ServerTreeNode> _serverTree;
     private readonly ServerListViewModel _vm = new();
-    
+
     public ServerListView()
     {
         _serverTree = new TreeView<ServerTreeNode>
@@ -20,14 +20,14 @@ public sealed class ServerListView : FrameView
             Height = Dim.Fill(),
             TreeBuilder = new ServerTreeBuilder(_vm),
         };
-        
+
         Title = "Servers";
         X = 0;
         Y = 1;
         Width = 25;
         Height = Dim.Fill();
         Border = new Border { BorderStyle = BorderStyle.Rounded };
-        
+
         Add(_serverTree);
 
         _serverTree.SelectionChanged += (_, e) =>
@@ -37,7 +37,7 @@ public sealed class ServerListView : FrameView
                     Channel.Type: GUILD_TEXT or GUILD_FORUM or GROUP_DM or DM or PUBLIC_THREAD or PRIVATE_THREAD
                     or ANNOUNCEMENT_THREAD or GUILD_ANNOUNCEMENT or GUILD_MEDIA, // TODO: this sucks
                 } channelNode)
-            { 
+            {
                 _vm.SelectionChangedCommand.Execute(channelNode.Channel);
             }
         };
@@ -72,49 +72,49 @@ public class ServerTreeBuilder : ITreeBuilder<ServerTreeNode>
         switch (node)
         {
             case DmsNode:
-            {
-                // build a user id 2 name dict
-                var userNames = _vm.Users.ToDictionary(u => u.Id, u => u.Username);
-                List<ServerTreeNode> list = new();
-            
-                // TODO: Sort by last message timestamp?
-                foreach (var dm in _vm.PrivateChannels)
                 {
-                    // get the channel name by getting the name of the recipients (or the id if the lookup fails)
-                    var name = string.Join(", ", dm.RecipientIDs!.Select(r => userNames.TryGetValue(r, out var userName) ? userName : r.ToString()));
-                    list.Add(new ChannelNode(dm, name));
+                    // build a user id 2 name dict
+                    var userNames = _vm.Users.ToDictionary(u => u.Id, u => u.Username);
+                    List<ServerTreeNode> list = new();
+
+                    // TODO: Sort by last message timestamp?
+                    foreach (var dm in _vm.PrivateChannels)
+                    {
+                        // get the channel name by getting the name of the recipients (or the id if the lookup fails)
+                        var name = Task.Run(() => _client.GetChannelName(dm)).Result;
+                        list.Add(new ChannelNode(dm, name));
+                    }
+
+                    return list;
                 }
-            
-                return list;
-            }
             case ServerNode serverNode:
-            {
-                // Return channels that have no parent ordered by position
-                return serverNode.Server.Channels
-                    .Where(c => c.ParentId == null) // top level
-                    .Order()
-                    .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Server channel has no name")));
-            }
-            case ChannelNode { Channel.Type: GUILD_CATEGORY } categoryNode:
-            {
-                if (_vm.Servers.FirstOrDefault(g => g.Id == categoryNode.Channel.GuildId) is not { } guild)
                 {
-                    // Failed to find guild, probably because the guild was from a gateway event. Get it from the API directly
-                    // TODO: Can we do this another way?
-                    var channel = Task.Run(() => Api.GetChannel(_client.HttpClient, categoryNode.Channel.Id)).GetAwaiter().GetResult();
-
-                    if (_vm.Servers.FirstOrDefault(g => g.Id == channel.GuildId) is not { } retryGuild)
-                        throw new Exception("Can't find guild associated with channel");
-
-                    guild = retryGuild;
+                    // Return channels that have no parent ordered by position
+                    return serverNode.Server.Channels
+                        .Where(c => c.ParentId == null) // top level
+                        .Order()
+                        .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Server channel has no name")));
                 }
+            case ChannelNode { Channel.Type: GUILD_CATEGORY } categoryNode:
+                {
+                    if (_vm.Servers.FirstOrDefault(g => g.Id == categoryNode.Channel.GuildId) is not { } guild)
+                    {
+                        // Failed to find guild, probably because the guild was from a gateway event. Get it from the API directly
+                        // TODO: Can we do this another way?
+                        var channel = Task.Run(() => Api.GetChannel(_client.HttpClient, categoryNode.Channel.Id)).GetAwaiter().GetResult();
 
-                // Return children of this channel category
-                return guild.Channels
-                    .Where(c => c.ParentId == categoryNode.Channel.Id)
-                    .Order()
-                    .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Guild channel has no name")));
-            }
+                        if (_vm.Servers.FirstOrDefault(g => g.Id == channel.GuildId) is not { } retryGuild)
+                            throw new Exception("Can't find guild associated with channel");
+
+                        guild = retryGuild;
+                    }
+
+                    // Return children of this channel category
+                    return guild.Channels
+                        .Where(c => c.ParentId == categoryNode.Channel.Id)
+                        .Order()
+                        .Select(c => new ChannelNode(c, c.Name ?? throw new Exception("Guild channel has no name")));
+                }
             default:
                 return Enumerable.Empty<ServerTreeNode>();
         }

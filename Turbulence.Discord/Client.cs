@@ -146,7 +146,6 @@ namespace Turbulence.Discord
         // TODO: probably shouldnt be static?
         public User? CurrentUser { get; set; }
         //public static List<dynamic> MemberInfos = new(); // TODO: should we like put the roles into a simple array?
-        public static Dictionary<Snowflake, Guild> Guilds = new();
         //public static List<dynamic> ServerSettings = new(); // TODO: listen to the guild settings update event
 
         // TODO: move these into a gateway class thingy?
@@ -323,7 +322,9 @@ namespace Turbulence.Discord
 
                                 // Cache that shit // TODO: cache more/all. probably also need like private channels etc
                                 foreach (var guild in ready.Guilds)
-                                    Guilds.Add(guild.Id, guild);
+                                    _cache.SetGuild(guild);
+                                foreach (var user in ready.Users)
+                                    _cache.SetUser(user);
                                 // foreach (var guildSetting in ready.user_guild_settings.entries)
                                 //     ServerSettings.Add(guildSetting);
                                 CurrentUser = ready.User;
@@ -437,7 +438,30 @@ namespace Turbulence.Discord
 
         public async Task<Guild> GetGuild(Snowflake guildId)
         {
-            return Guilds.TryGetValue(guildId, out var ret) ? ret : await Api.GetGuild(HttpClient, guildId);
+            if (_cache.GetGuild(guildId) is { } guild)
+                return guild;
+            guild = await Api.GetGuild(HttpClient, guildId);
+            _logger?.Log($"Requested guild {guild.Name} ({guild.Id})", LogType.Networking, LogLevel.Debug);
+            _cache.SetGuild(guild);
+            return guild;
+        }
+        public async Task<User> GetUser(Snowflake userId)
+        {
+            if (_cache.GetUser(userId) is { } user)
+                return user;
+            user = await Api.GetUser(HttpClient, userId);
+            _logger?.Log($"Requested user {user.Username} ({user.Id})", LogType.Networking, LogLevel.Debug);
+            _cache.SetUser(user);
+            return user;
+        }
+        public async Task<Channel> GetChannel(Snowflake channelId)
+        {
+            if (_cache.GetChannel(channelId) is { } channel)
+                return channel;
+            channel = await Api.GetChannel(HttpClient, channelId);
+            _logger?.Log($"Requested channel {channel.Name} ({channel.Id})", LogType.Networking, LogLevel.Debug);
+            _cache.SetChannel(channel);
+            return channel;
         }
 
         public async Task<byte[]> GetAvatarAsync(User user, int size = 128)
@@ -474,11 +498,6 @@ namespace Turbulence.Discord
             return img;
         }
 
-        public async Task<Channel> GetChannel(Snowflake channelId)
-        {
-            return await Api.GetChannel(HttpClient, channelId);
-        }
-
         public async Task<Message[]> GetPinnedMessages(Snowflake channelId)
         {
             return await Api.GetPinnedMessages(HttpClient, channelId);
@@ -487,6 +506,31 @@ namespace Turbulence.Discord
         public async Task<SearchResult> SearchMessages(SearchRequest request)
         {
             return await Api.SearchMessages(HttpClient, request);
+        }
+
+        public async Task<string> GetChannelName(Channel channel)
+        {
+            return channel.Type switch
+            {
+                ChannelType.DM or ChannelType.GROUP_DM => string.Join(", ", 
+                    (channel.Recipients is { } recipients
+                        ? recipients : (await GetChannel(channel.Id)).Recipients!).Select(u => u.GetBestName())),
+                _ => $"{channel.Name}",
+            };
+        }
+
+        public string GetMessageContent(Message message)
+        {
+            var author = message.GetBestAuthorName();
+            return message.Type switch
+            {
+                MessageType.THREAD_CREATED => $"{author} created thread \"{message.Content}\"",
+                MessageType.CALL => $"{author} started a voice call",
+                MessageType.CHANNEL_PINNED_MESSAGE => $"{author} pinned a message.",
+                MessageType.USER_JOIN => $"{author} joined the server.",
+                MessageType.RECIPIENT_ADD => $"{author} added {message.Mentions[0].GlobalName}.",
+                _ => message.Content,
+            };
         }
     }
 }
