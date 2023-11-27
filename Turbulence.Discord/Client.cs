@@ -34,6 +34,7 @@ namespace Turbulence.Discord
         public event EventHandler<Event<Message>>? MessageUpdated;
         public event EventHandler<Event<MessageDeleteEvent>>? MessageDeleted;
         public event EventHandler<Event<ThreadListSyncEvent>>? ThreadListSync;
+        public event EventHandler<Event<bool>>? OnConnectionStatusChanged;
 
         public bool Connected => WebSocket.State == WebSocketState.Open;
         public HttpClient HttpClient { get; } = new();
@@ -63,6 +64,7 @@ namespace Turbulence.Discord
 
             SetWebsocketHeaders();
             await WebSocket.ConnectAsync(new Uri($"{gateway.AbsoluteUri}/?encoding=json&v={Api.Version}"), default);
+            OnConnectionStatusChanged?.Invoke(this, new(true));
             await SendIdentify(token);
             // Start the tasks // TODO: save the tasks?
             _ = Task.Run(ReceiveTask);

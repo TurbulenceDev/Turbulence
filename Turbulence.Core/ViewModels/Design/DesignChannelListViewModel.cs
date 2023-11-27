@@ -1,4 +1,5 @@
-﻿using Turbulence.Discord.Models.DiscordChannel;
+﻿using Turbulence.Discord.Models;
+using Turbulence.Discord.Models.DiscordChannel;
 
 namespace Turbulence.Core.ViewModels.Design;
 
@@ -32,6 +33,22 @@ public class DesignChannelListViewModel : ChannelListViewModel
                 Id = new(0),
                 Type = ChannelType.GUILD_CATEGORY,
                 Name = "Category"
+            },
+            new()
+            {
+                Id = new(0),
+                RecipientIDs = new Snowflake[]
+                {
+                    new(12345678)
+                },
+                Type = ChannelType.DM,
+                Name = "DMs"
+            },
+            new()
+            {
+                Id = new(0),
+                Type = ChannelType.GUILD_CATEGORY,
+                Name = "DMs"
             },
             new()
             {

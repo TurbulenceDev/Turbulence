@@ -21,6 +21,7 @@ public interface IPlatformClient
     public Task<Message[]> GetPinnedMessages(Snowflake channelId);
     public Task<SearchResult> SearchMessages(SearchRequest request);
     public Task<Guild> GetGuild(Snowflake guildId);
+    public event EventHandler<Event<bool>>? OnConnectionStatusChanged;
     public event EventHandler<Event<Ready>>? Ready;
     public event EventHandler<Event<Message>>? MessageCreated;
     public event EventHandler<Event<TypingStartEvent>>? TypingStart;

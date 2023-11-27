@@ -15,9 +15,12 @@ public class ChannelTemplateSelector : IDataTemplate
     Control? ITemplate<object?, Control?>.Build(object? param)
     {
         var channel = (Channel)param!;
-        var type = "channel";
-        if (channel.Type == ChannelType.GUILD_CATEGORY)
-            type = "category";
+        var type = channel.Type switch
+        {
+            ChannelType.DM => "dm",
+            ChannelType.GUILD_CATEGORY => "category",
+            _ => "channel",
+        };
         if (!Templates.TryGetValue(type, out var template))
             return Templates["unknown"].Build(param);
         return template.Build(param);

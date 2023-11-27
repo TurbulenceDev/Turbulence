@@ -11,7 +11,7 @@ using Turbulence.Discord.Models.DiscordPermissions;
 
 namespace Turbulence.Core.ViewModels;
 
-public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannelsMsg>, IRecipient<ServerSelectedMsg>
+public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannelsMsg>, IRecipient<ServerSelectedMsg>, IRecipient<DMsSelectedMsg>
 {
     public ObservableList<Channel> Channels { get; } = new();
     private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
@@ -125,6 +125,12 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
                     Channels.Add(c);
             }
         }
+    }
+
+    public void Receive(DMsSelectedMsg message)
+    {
+        //TODO: sort?
+        Channels.ReplaceAll(message.Channels);
     }
 }
 
