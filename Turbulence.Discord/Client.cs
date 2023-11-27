@@ -320,11 +320,13 @@ namespace Turbulence.Discord
                                     return;
                                 }
 
-                                // Cache that shit // TODO: cache more/all. probably also need like private channels etc
+                                // Cache that shit // TODO: cache more/all.
                                 foreach (var guild in ready.Guilds)
                                     _cache.SetGuild(guild);
                                 foreach (var user in ready.Users)
                                     _cache.SetUser(user);
+                                foreach (var channel in ready.PrivateChannels)
+                                    _cache.SetChannel(channel);
                                 // foreach (var guildSetting in ready.user_guild_settings.entries)
                                 //     ServerSettings.Add(guildSetting);
                                 CurrentUser = ready.User;
@@ -510,13 +512,23 @@ namespace Turbulence.Discord
 
         public async Task<string> GetChannelName(Channel channel)
         {
+            async Task<IEnumerable<string>> GetChannelUsers(Channel channel)
+            {
+                if (channel.Recipients == null && channel.RecipientIDs == null)
+                    channel = await GetChannel(channel.Id);
+                if (channel.Recipients != null)
+                    return channel.Recipients.Select(u => u.GetBestName());
+                else if (channel.RecipientIDs != null)
+                    return channel.RecipientIDs.Select(id => (GetUser(id).Result).GetBestName());
+                return Array.Empty<string>();
+            }
+
             return channel.Type switch
             {
-                ChannelType.DM or ChannelType.GROUP_DM => string.Join(", ", 
-                    (channel.Recipients is { } recipients
-                        ? recipients : (await GetChannel(channel.Id)).Recipients!).Select(u => u.GetBestName())),
+                //TODO: alternatively use RecipientIDs
+                ChannelType.DM or ChannelType.GROUP_DM => string.Join(", ", await GetChannelUsers(channel)),
                 _ => $"{channel.Name}",
-            };
+            } ;
         }
 
         public string GetMessageContent(Message message)
@@ -528,7 +540,7 @@ namespace Turbulence.Discord
                 MessageType.CALL => $"{author} started a voice call",
                 MessageType.CHANNEL_PINNED_MESSAGE => $"{author} pinned a message.",
                 MessageType.USER_JOIN => $"{author} joined the server.",
-                MessageType.RECIPIENT_ADD => $"{author} added {message.Mentions[0].GlobalName}.",
+                MessageType.RECIPIENT_ADD => $"{author} added {message.Mentions[0].GetBestName()}.",
                 _ => message.Content,
             };
         }
