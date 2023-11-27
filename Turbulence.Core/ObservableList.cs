@@ -13,14 +13,14 @@ public class ObservableList<T> : ObservableCollection<T>
             base.OnCollectionChanged(e);
     }
 
-    public void AddRange(IEnumerable<T> list) => InsertRange(list, Items.Count);
+    public void AddRange(IEnumerable<T> list) => InsertRange(list, -1);
 
     public void InsertRange(IEnumerable<T> list, int at)
     {
         SuppressNotification = true;
         foreach (var item in list)
         {
-            Insert(at, item);
+            Insert(at == -1 ? Items.Count : at, item);
         }
         SuppressNotification = false;
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

@@ -15,6 +15,12 @@ public class DesignChannelListViewModel : ChannelListViewModel
         };
         Channels.AddRange(new List<Channel>()
         {
+            new()
+            {
+                Id = new(0),
+                Type = ChannelType.GUILD_CATEGORY,
+                Name = "Category"
+            },
             text,
             new()
             {
@@ -30,9 +36,15 @@ public class DesignChannelListViewModel : ChannelListViewModel
             },
             new()
             {
+                Id = new(4),
+                Type = ChannelType.GUILD_ANNOUNCEMENT,
+                Name = "Announcement"
+            },
+            new()
+            {
                 Id = new(0),
                 Type = ChannelType.GUILD_CATEGORY,
-                Name = "Category"
+                Name = "DMs"
             },
             new()
             {
@@ -43,18 +55,6 @@ public class DesignChannelListViewModel : ChannelListViewModel
                 },
                 Type = ChannelType.DM,
                 Name = "DMs"
-            },
-            new()
-            {
-                Id = new(0),
-                Type = ChannelType.GUILD_CATEGORY,
-                Name = "DMs"
-            },
-            new()
-            {
-                Id = new(4),
-                Type = ChannelType.GUILD_ANNOUNCEMENT,
-                Name = "Announcement"
             },
         });
         SelectedChannel = text;
