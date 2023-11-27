@@ -27,64 +27,66 @@
             <Setter Property="FontSize" Value="12" />
         </Style>
     </UserControl.Styles>
-    <ItemsControl ItemsSource="{Binding Channels}"
-             Background="#2B2D31">
-        <ItemsControl.DataTemplates>
-            <dataTemplates:ChannelTemplateSelector>
-                <!--Channels that can be clicked-->
-                <DataTemplate x:Key="channel" x:DataType="channel:Channel">
-                    <Button Command="{Binding $parent[ItemsControl].((vm:ChannelListViewModel)DataContext).SelectChannelCommand}"
-                            CommandParameter="{Binding .}"
-                            HorizontalAlignment="Stretch" Margin="4,1">
-                        <Classes.Checked>
-                            <MultiBinding Converter="{StaticResource EqualsConverter}">
-                                <Binding Path="$parent[ItemsControl].((vm:ChannelListViewModel)DataContext).SelectedChannel" />
-                                <Binding Path="." />
-                            </MultiBinding>
-                        </Classes.Checked>
-                        <Grid ColumnDefinitions="20,*">
-                            <!--The icon-->
-                            <ContentControl Content="{Binding}">
-                                <ContentControl.DataTemplates>
-                                    <dataTemplates:ChannelTypeTemplateSelector>
-                                        <DataTemplate x:Key="GUILD_TEXT" x:DataType="channel:Channel">
-                                            <TextBlock Text="#" HorizontalAlignment="Center" />
-                                        </DataTemplate>
-                                        <DataTemplate x:Key="GUILD_VOICE" x:DataType="channel:Channel">
-                                            <TextBlock Text="&#x1F50A;" HorizontalAlignment="Center" />
-                                        </DataTemplate>
-                                        <DataTemplate x:Key="GUILD_ANNOUNCEMENT" x:DataType="channel:Channel">
-                                            <TextBlock Text="&#x1F4E3;" HorizontalAlignment="Center" />
-                                        </DataTemplate>
-                                        <DataTemplate x:Key="GUILD_STAGE_VOICE" x:DataType="channel:Channel">
-                                            <TextBlock Text="&#x1F399;" HorizontalAlignment="Center" />
-                                        </DataTemplate>
-                                        <DataTemplate x:Key="unknown" x:DataType="channel:Channel">
-                                            <TextBlock Text="#" Background="Red" HorizontalAlignment="Center" />
-                                        </DataTemplate>
-                                    </dataTemplates:ChannelTypeTemplateSelector>
-                                </ContentControl.DataTemplates>
-                            </ContentControl>
-                            <!--Channel Name-->
+    <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding Channels}"
+                 Background="#2B2D31">
+            <ItemsControl.DataTemplates>
+                <dataTemplates:ChannelTemplateSelector>
+                    <!--Channels that can be clicked-->
+                    <DataTemplate x:Key="channel" x:DataType="channel:Channel">
+                        <Button Command="{Binding $parent[ItemsControl].((vm:ChannelListViewModel)DataContext).SelectChannelCommand}"
+                                CommandParameter="{Binding .}"
+                                HorizontalAlignment="Stretch" Margin="4,1">
+                            <Classes.Checked>
+                                <MultiBinding Converter="{StaticResource EqualsConverter}">
+                                    <Binding Path="$parent[ItemsControl].((vm:ChannelListViewModel)DataContext).SelectedChannel" />
+                                    <Binding Path="." />
+                                </MultiBinding>
+                            </Classes.Checked>
+                            <Grid ColumnDefinitions="20,*">
+                                <!--The icon-->
+                                <ContentControl Content="{Binding}">
+                                    <ContentControl.DataTemplates>
+                                        <dataTemplates:ChannelTypeTemplateSelector>
+                                            <DataTemplate x:Key="GUILD_TEXT" x:DataType="channel:Channel">
+                                                <TextBlock Text="#" HorizontalAlignment="Center" />
+                                            </DataTemplate>
+                                            <DataTemplate x:Key="GUILD_VOICE" x:DataType="channel:Channel">
+                                                <TextBlock Text="&#x1F50A;" HorizontalAlignment="Center" />
+                                            </DataTemplate>
+                                            <DataTemplate x:Key="GUILD_ANNOUNCEMENT" x:DataType="channel:Channel">
+                                                <TextBlock Text="&#x1F4E3;" HorizontalAlignment="Center" />
+                                            </DataTemplate>
+                                            <DataTemplate x:Key="GUILD_STAGE_VOICE" x:DataType="channel:Channel">
+                                                <TextBlock Text="&#x1F399;" HorizontalAlignment="Center" />
+                                            </DataTemplate>
+                                            <DataTemplate x:Key="unknown" x:DataType="channel:Channel">
+                                                <TextBlock Text="#" Background="Red" HorizontalAlignment="Center" />
+                                            </DataTemplate>
+                                        </dataTemplates:ChannelTypeTemplateSelector>
+                                    </ContentControl.DataTemplates>
+                                </ContentControl>
+                                <!--Channel Name-->
+                                <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                    <!--Category-->
+                    <DataTemplate x:Key="category" x:DataType="channel:Channel">
+                        <Grid ColumnDefinitions="15,*">
+                            <TextBlock Text="&#x23F7;" FontSize="11" VerticalAlignment="Bottom" />
+                            <TextBlock Classes="Category" Text="{Binding Name}" Grid.Column="1" />
+                        </Grid>
+                    </DataTemplate>
+                    <!--Default case-->
+                    <DataTemplate x:Key="unknown" x:DataType="channel:Channel">
+                        <Grid ColumnDefinitions="20,*" Background="Red">
+                            <TextBlock Text="UNKNOWN" HorizontalAlignment="Center" />
                             <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
                         </Grid>
-                    </Button>
-                </DataTemplate>
-                <!--Category-->
-                <DataTemplate x:Key="category" x:DataType="channel:Channel">
-                    <Grid ColumnDefinitions="15,*">
-                        <TextBlock Text="&#x23F7;" FontSize="11" VerticalAlignment="Bottom" />
-                        <TextBlock Classes="Category" Text="{Binding Name}" Grid.Column="1" />
-                    </Grid>
-                </DataTemplate>
-                <!--Default case-->
-                <DataTemplate x:Key="unknown" x:DataType="channel:Channel">
-                    <Grid ColumnDefinitions="20,*" Background="Red">
-                        <TextBlock Text="UNKNOWN" HorizontalAlignment="Center" />
-                        <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0" />
-                    </Grid>
-                </DataTemplate>
-            </dataTemplates:ChannelTemplateSelector>
-        </ItemsControl.DataTemplates>
-    </ItemsControl>
+                    </DataTemplate>
+                </dataTemplates:ChannelTemplateSelector>
+            </ItemsControl.DataTemplates>
+        </ItemsControl>
+    </ScrollViewer>
 </UserControl>
