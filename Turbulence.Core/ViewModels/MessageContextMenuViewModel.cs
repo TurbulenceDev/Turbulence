@@ -25,5 +25,13 @@ public partial class MessageContextMenuViewModel : ViewModelBase
     }
 }
 
+/// <summary>
+/// Notifies that the user wants to reply to the message <paramref name="Message"/>
+/// </summary>
+/// <param name="Message"></param>
 public record ReplyToMessage(Message Message);
+/// <summary>
+/// Notifies that the user wants to edit the message <paramref name="Message"/>
+/// </summary>
+/// <param name="Message">The message to be edited</param>
 public record EditMessage(Message Message);

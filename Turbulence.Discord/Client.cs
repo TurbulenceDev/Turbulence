@@ -528,7 +528,7 @@ namespace Turbulence.Discord
                 //TODO: alternatively use RecipientIDs
                 ChannelType.DM or ChannelType.GROUP_DM => string.Join(", ", await GetChannelUsers(channel)),
                 _ => $"{channel.Name}",
-            } ;
+            };
         }
 
         public string GetMessageContent(Message message)

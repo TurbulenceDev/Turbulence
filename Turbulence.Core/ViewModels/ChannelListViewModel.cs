@@ -129,7 +129,8 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
 
     public void Receive(DMsSelectedMsg message)
     {
-        //TODO: sort
+        //reverse sort by last message id
+        message.Channels.Sort((a, b) => b.LastMessageId == null ? -1 : b.LastMessageId.CompareTo(a.LastMessageId));
         Channels.ReplaceAll(message.Channels);
     }
 }
