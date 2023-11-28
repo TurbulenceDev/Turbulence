@@ -1,4 +1,5 @@
-﻿using Avalonia.Data.Converters;
+﻿using Avalonia.Controls.Documents;
+using Avalonia.Data.Converters;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using System.Globalization;
 using Turbulence.Discord;
@@ -15,7 +16,18 @@ public class MessageContentConverter : IValueConverter
         if (value is not Message message)
             return null;
 
-        return _client.GetMessageContent(message);
+        var res = new InlineCollection
+        {
+            _client.GetMessageContent(message),
+        };
+        if (message.EditedTimestamp != null)
+        {
+            var editRun = new Run(" [Edited]");
+            //TODO: tooltip?
+            editRun.Classes.Add("Edit");
+            res.Add(editRun);
+        }
+        return res;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

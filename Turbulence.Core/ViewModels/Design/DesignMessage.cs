@@ -73,6 +73,7 @@ public record DesignMessage : Message
                 ProxyUrl = "https://localhost",
             },
         };
+        EditedTimestamp = Timestamp + new TimeSpan(1, 0, 0);
         ReferencedMessage = CreateMessage("Reply to this.", MessageType.DEFAULT, Author, DateTimeOffset.Now - new TimeSpan(0, 1, 0));
     }
 

@@ -51,6 +51,10 @@
             <Setter Property="CornerRadius" Value="0" />
             <Setter Property="Padding" Value="4" />
         </Style>
+        <Style Selector="Run.Edit">
+            <Setter Property="Foreground" Value="#949BA4" />
+            <Setter Property="FontSize" Value="10" />
+        </Style>
     </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*" Classes="Message">
         <!-- Avatar -->
@@ -84,7 +88,7 @@
             </DockPanel>
             <!-- Message Content -->
             <TextBlock Name="Content" TextWrapping="Wrap" Classes="MessageContent"
-                       Text="{Binding ., Converter={StaticResource MessageConverter}}"
+                       Inlines="{Binding ., Converter={StaticResource MessageConverter}}"
                        IsVisible="{Binding ., Converter={StaticResource MessageVisibleConverter}}" />
             <!-- Attachments (images, files) -->
             <ItemsControl ItemsSource="{Binding Attachments}" IsVisible="{Binding !!Attachments.Length}">

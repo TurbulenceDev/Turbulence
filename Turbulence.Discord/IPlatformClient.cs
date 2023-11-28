@@ -28,6 +28,8 @@ public interface IPlatformClient
     public event EventHandler<Event<bool>>? OnConnectionStatusChanged;
     public event EventHandler<Event<Ready>>? Ready;
     public event EventHandler<Event<Message>>? MessageCreated;
+    public event EventHandler<Event<Message>>? MessageUpdated;
+    public event EventHandler<Event<MessageDeleteEvent>>? MessageDeleted;
     public event EventHandler<Event<TypingStartEvent>>? TypingStart;
 
     public User? CurrentUser { get; set; }

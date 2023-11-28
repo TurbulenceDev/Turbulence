@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
+using Turbulence.Discord.Models.DiscordGatewayEvents;
 
 namespace Turbulence.Core.ViewModels;
 
@@ -17,6 +18,52 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
 
     public event EventHandler? ShowNewChannel;
     private bool _loadingMessages = false;
+    private Channel? _currentChannel = null;
+
+    public MessagesViewModel()
+    {
+        _client.MessageUpdated += Client_MessageUpdated;
+        _client.MessageDeleted += Client_MessageDeleted;
+    }
+
+    private void Client_MessageUpdated(object? sender, Event<Message> e)
+    {
+        var msg = e.Data;
+        // check if we have the channel loaded
+        if (msg.ChannelId != _currentChannel?.Id)
+            return;
+
+        //TODO: we could alternatively check the ids of the first and the last msg as they should be chronological
+        // find the message and change it
+        for (var i = 0; i < CurrentMessages.Count; i++)
+        {
+            var m = CurrentMessages[i];
+            if (m.Id == msg.Id)
+            {
+                CurrentMessages[i] = msg;
+                return;
+            }
+        }
+    }
+
+    private void Client_MessageDeleted(object? sender, Event<MessageDeleteEvent> e)
+    {
+        var ev = e.Data;
+        // check if we have the channel loaded
+        if (ev.ChannelId != _currentChannel?.Id)
+            return;
+
+        // find the message and delete it
+        for (var i = 0; i < CurrentMessages.Count; i++)
+        {
+            var m = CurrentMessages[i];
+            if (m.Id == ev.Id)
+            {
+                CurrentMessages.RemoveAt(i);
+                return;
+            }
+        }
+    }
 
     public async Task RequestMoreMessages(bool older = true)
     {
@@ -43,6 +90,7 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
 
     public async void Receive(ChannelSelectedMsg message)
     {
+        _currentChannel = message.Channel;
         Title = $"Messages: {await _client.GetChannelName(message.Channel)}";
 
         var channelMessages = await _client.GetMessages(message.Channel.Id);
