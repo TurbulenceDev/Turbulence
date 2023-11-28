@@ -45,7 +45,7 @@ namespace Turbulence.Discord
 
         private ClientWebSocket WebSocket { get; set; }
         private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"; // idk where to move this
-        
+
         public Client()
         {
             // Set up http client
@@ -499,7 +499,7 @@ namespace Turbulence.Discord
             _cache.SetAvatar(user.Id, size, avatar);
             return avatar;
         }
-        
+
         public async Task<byte[]> GetEmojiAsync(Emoji emoji, int size = 32)
         {
             if (emoji.Id == null)
@@ -558,6 +558,25 @@ namespace Turbulence.Discord
                 MessageType.RECIPIENT_ADD => $"{author} added {message.Mentions[0].GetBestName()}.",
                 _ => message.Content,
             };
+        }
+
+        public async Task<byte[]> GetImageAsync(string url)
+        {
+            //TODO: cache
+            /*if (_cache.GetAvatar(user.Id, size) is { } avatar)
+                return avatar;*/
+
+            var req = new HttpRequestMessage(HttpMethod.Get, url);
+            var response = await CdnClient.SendAsync(req);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApiException($"Got error while fetching image: {response.StatusCode}, {response.ReasonPhrase}");
+            }
+            var image = await response.Content.ReadAsByteArrayAsync();
+            _logger?.Log($"Requested media image {url}", LogType.Images, LogLevel.Debug);
+
+            //_cache.SetAvatar(user.Id, size, avatar);
+            return image;
         }
     }
 }

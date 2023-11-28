@@ -31,6 +31,7 @@ public interface IPlatformClient
     public event EventHandler<Event<TypingStartEvent>>? TypingStart;
 
     public User? CurrentUser { get; set; }
+    public Task<byte[]> GetImageAsync(string url);
     public Task<byte[]> GetAvatarAsync(User user, int size = 128);
     public Task<byte[]> GetEmojiAsync(Emoji emoji, int size = 32);
     public Task<string> GetChannelName(Channel channel);

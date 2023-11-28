@@ -6,6 +6,7 @@
              xmlns:dvm="clr-namespace:Turbulence.Core.ViewModels.Design;assembly=Turbulence.Core"
              xmlns:channel="clr-namespace:Turbulence.Discord.Models.DiscordChannel;assembly=Turbulence.Discord"
              xmlns:converters="clr-namespace:Turbulence.Desktop.Converters"
+             xmlns:dataTemplates="clr-namespace:Turbulence.Desktop.DataTemplates"
              mc:Ignorable="d" d:DesignWidth="500"
              x:DataType="channel:Message"
              x:Class="Turbulence.Desktop.Views.Main.MessageView"
@@ -16,14 +17,16 @@
     <UserControl.Resources>
         <converters:MessageAuthorNameConverter x:Key="AuthorConverter" />
         <converters:MessageContentConverter x:Key="MessageConverter" />
+        <converters:MessageVisibleConverter x:Key="MessageVisibleConverter" />
         <converters:UserAvatarConverter x:Key="AvatarConverter" />
         <converters:EmojiImageConverter x:Key="EmojiConverter" />
+        <converters:ImageUrlConverter x:Key="ImageUrlConverter" />
     </UserControl.Resources>
     <UserControl.ContextFlyout>
         <v:MessageContextMenu />
     </UserControl.ContextFlyout>
     <UserControl.Styles>
-        <Style Selector="Button">
+        <Style Selector="Button.JumpTo">
             <Setter Property="FontSize" Value="10" />
             <Setter Property="Padding" Value="2" />
             <Setter Property="Background" Value="#1E1F22" />
@@ -44,8 +47,13 @@
         <Style Selector="Button.Reaction.Selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="BorderBrush" Value="#5865F2" />
         </Style>
+        <Style Selector="Button.Link">
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="Padding" Value="4" />
+        </Style>
     </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*" Classes="Message">
+        <!-- Avatar -->
         <DockPanel>
             <Panel IsVisible="{Binding !!ReferencedMessage}" Height="20" DockPanel.Dock="Top">
                 <!--TODO: add weird spine border thingy here-->
@@ -54,16 +62,19 @@
                 <Image Name="Image" UseLayoutRounding="False" Source="{Binding Author, Converter={StaticResource AvatarConverter}}" />
             </Border>
         </DockPanel>
+        <!-- Actual Message -->
         <StackPanel Grid.Column="1"
                     Orientation="Vertical"
                     Classes="MessageContent">
+            <!-- Reply Message Preview -->
             <StackPanel Name="MessageReference" Height="20" Orientation="Horizontal" IsVisible="{Binding !!ReferencedMessage}">
                 <TextBlock FontWeight="SemiBold" Text="{Binding ReferencedMessage, Converter={StaticResource AuthorConverter}, StringFormat='@{0} '}" />
                 <TextBlock Foreground="#B5BAC1" Text="{Binding ReferencedMessage, Converter={StaticResource MessageConverter}}" />
             </StackPanel>
+            <!-- Author Name, Timestamp etc -->
             <DockPanel>
                 <!-- Keep jump button first so it takes priority over others and is always fully visible -->
-                <Button IsVisible="{Binding #Message.ShowJumpToMessage}" DockPanel.Dock="Right">Jump To Message</Button>
+                <Button Classes="JumpTo" IsVisible="{Binding #Message.ShowJumpToMessage}" DockPanel.Dock="Right">Jump To Message</Button>
                 <TextBlock Name="Author" Classes="Author" Text="{Binding ., Converter={StaticResource AuthorConverter}}" DockPanel.Dock="Left" />
                 <TextBlock Name="Timestamp" Classes="Timestamp" Text="{Binding Timestamp, StringFormat='G'}" DockPanel.Dock="Left">
                     <ToolTip.Tip>
@@ -71,7 +82,24 @@
                     </ToolTip.Tip>
                 </TextBlock>
             </DockPanel>
-            <TextBlock Name="Content" TextWrapping="Wrap" Classes="MessageContent" Text="{Binding ., Converter={StaticResource MessageConverter}}" />
+            <!-- Message Content -->
+            <TextBlock Name="Content" TextWrapping="Wrap" Classes="MessageContent"
+                       Text="{Binding ., Converter={StaticResource MessageConverter}}"
+                       IsVisible="{Binding ., Converter={StaticResource MessageVisibleConverter}}" />
+            <!-- Attachments (images, files) -->
+            <ItemsControl ItemsSource="{Binding Attachments}" IsVisible="{Binding !!Attachments.Length}">
+                <ItemsControl.ItemTemplate>
+                    <dataTemplates:AttachmentTypeSelector>
+                        <DataTemplate x:Key="image" x:DataType="channel:Attachment">
+                            <Image Source="{Binding ProxyUrl, Converter={StaticResource ImageUrlConverter}}" MaxWidth="100" MaxHeight="100" HorizontalAlignment="Left" />
+                        </DataTemplate>
+                        <DataTemplate x:Key="default" x:DataType="channel:Attachment">
+                            <Button Classes="Link" Content="{Binding Filename}" Click="OnAttachmentButton" />
+                        </DataTemplate>
+                    </dataTemplates:AttachmentTypeSelector>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <!-- Reactions -->
             <ItemsControl ItemsSource="{Binding Reactions}" IsVisible="{Binding !!Reactions}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -92,7 +120,6 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-
         </StackPanel>
     </Grid>
 </UserControl>
