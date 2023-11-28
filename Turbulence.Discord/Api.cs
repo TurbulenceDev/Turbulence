@@ -11,7 +11,7 @@ using Turbulence.Discord.Models.DiscordUser;
 
 namespace Turbulence.Discord;
 
-public static class Api
+internal static class Api
 {
     public const string Version = "9";
     private const string RootAdress = "https://discord.com/api";

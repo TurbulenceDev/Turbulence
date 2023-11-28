@@ -76,7 +76,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
         // Calculate permissions //TODO: move into client
         var everyoneRole = m.Server.Roles.First(r => r.Id == m.Server.Id);
         // TODO: Get rid of API call
-        var myGuildMember = await Api.GetCurrentUserGuildMember(_client.HttpClient, m.Server.Id);
+        var myGuildMember = await _client.GetCurrentUserGuildMember(m.Server.Id);
         var myRoles = m.Server.Roles.Where(r => myGuildMember.Roles.Contains(r.Id)).ToList();
         // Parse base permission for everyone
         var perms = BigInteger.Parse(everyoneRole.Permissions);
@@ -129,7 +129,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
 
     public void Receive(DMsSelectedMsg message)
     {
-        //reverse sort by last message id
+        // reverse sort by last message id
         message.Channels.Sort((a, b) => b.LastMessageId == null ? -1 : b.LastMessageId.CompareTo(a.LastMessageId));
         Channels.ReplaceAll(message.Channels);
     }

@@ -37,7 +37,7 @@ namespace Turbulence.Discord
         public event EventHandler<Event<bool>>? OnConnectionStatusChanged;
 
         public bool Connected => WebSocket.State == WebSocketState.Open;
-        public HttpClient HttpClient { get; } = new();
+        private HttpClient HttpClient { get; } = new();
         private static readonly HttpClient CdnClient = new();
 
         private readonly ICache _cache = Ioc.Default.GetService<ICache>()!;
@@ -433,9 +433,24 @@ namespace Turbulence.Discord
             return await Api.GetChannelMessages(HttpClient, channelId, after: messageId);
         }
 
-        public async Task<Message> SendMessage(string content, Channel channelId)
+        public async Task<Message> SendMessage(Channel channel, string content, Message? reply = null, bool shouldPing = false)
         {
-            return await Api.CreateAndSendMessage(HttpClient, channelId, content);
+            return await Api.CreateAndSendMessage(HttpClient, channel, content, reply, shouldPing);
+        }
+
+        public async Task<Message> EditMessage(string input, Message original)
+        {
+            return await Api.EditMessage(HttpClient, input, original);
+        }
+
+        public async Task DeleteMessage(Message message)
+        {
+            await Api.DeleteMessage(HttpClient, message);
+        }
+
+        public async Task<GuildMember> GetCurrentUserGuildMember(Snowflake guildId)
+        {
+            return await Api.GetCurrentUserGuildMember(HttpClient, guildId);
         }
 
         public async Task<Guild> GetGuild(Snowflake guildId)

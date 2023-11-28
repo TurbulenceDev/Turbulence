@@ -36,7 +36,7 @@ public partial class MessagesViewModel : ViewModelBase, IRecipient<MessageCreate
         {
             var last = CurrentMessages.Last();
             var messages = await _client.GetMessagesAfter(last.ChannelId, last.Id);
-            // TODO: insert at the end
+            CurrentMessages.AddRange(messages);
         }
         _loadingMessages = false;
     }

@@ -20,6 +20,10 @@ public interface IPlatformClient
     public Task<List<Message>> GetMessagesAfter(Snowflake channelId, Snowflake messageId);
     public Task<Message[]> GetPinnedMessages(Snowflake channelId);
     public Task<SearchResult> SearchMessages(SearchRequest request);
+    public Task<Message> SendMessage(Channel channel, string content, Message? reply = null, bool shouldPing = false);
+    public Task<Message> EditMessage(string input, Message original);
+    public Task DeleteMessage(Message message);
+    public Task<GuildMember> GetCurrentUserGuildMember(Snowflake guildId);
     public Task<Guild> GetGuild(Snowflake guildId);
     public event EventHandler<Event<bool>>? OnConnectionStatusChanged;
     public event EventHandler<Event<Ready>>? Ready;
@@ -35,8 +39,6 @@ public interface IPlatformClient
     #region Discord specific shit that should not be here
 
     public bool SendGatewayMessage<T>(GatewayOpcode opcode, T data);
-
-    public HttpClient HttpClient { get; }
 
     #endregion
 }

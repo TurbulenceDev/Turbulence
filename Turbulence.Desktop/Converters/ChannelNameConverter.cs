@@ -15,13 +15,13 @@ public class ChannelNameConverter : IValueConverter
     {
         if (value is not Channel channel)
             return null;
-
+        
+        // design exception so we dont api call
         if (Design.IsDesignMode)
         {
             return channel.Name;
         }
 
-        //TODO: fetch names from client (cache)
         return Task.Run(() => _client.GetChannelName(channel)).Result;
     }
 

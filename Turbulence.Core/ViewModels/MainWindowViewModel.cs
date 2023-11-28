@@ -98,13 +98,13 @@ public partial class MainWindowViewModel : ViewModelBase,
     public void Receive(SearchClosedMsg message) => SearchOpen = false;
 
     public async void Receive(SendMessageMsg message) =>
-        await Api.CreateAndSendMessage(_client.HttpClient, SelectedChannel!, message.Message, message.Reply, message.ShouldPing);
+        await _client.SendMessage(SelectedChannel!, message.Message, message.Reply, message.ShouldPing);
 
     public async void Receive(EditMessageMsg message) =>
-        await Api.EditMessage(_client.HttpClient, message.Message, message.Original);
+        await _client.EditMessage(message.Message, message.Original);
     
     public async void Receive(DeleteMessageMsg message) =>
-        await Api.DeleteMessage(_client.HttpClient, message.Message);
+        await _client.DeleteMessage(message.Message);
 }
 
 /// <summary>
