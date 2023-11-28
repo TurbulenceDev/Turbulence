@@ -101,35 +101,50 @@ public static partial class Lexer
         new(TokenType.NEWLINE, NewlineRegex()),
     };
 
+    // https://discord.com/developers/docs/reference#message-formatting
     private const string URL_REGEX = "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+";
     [GeneratedRegex("^<@!?([0-9]+)>", RegexOptions.Compiled)]
     private static partial Regex UserMentionRegex();
+
     [GeneratedRegex("^<@&([0-9]+)>", RegexOptions.Compiled)]
     private static partial Regex RoleMentionRegex();
+
     [GeneratedRegex("^<#([0-9]+)>", RegexOptions.Compiled)]
     private static partial Regex ChannelMentionRegex();
+
     [GeneratedRegex("^<:([a-zA-Z0-9_]{2,}):([0-9]+)>", RegexOptions.Compiled)]
     private static partial Regex CustomEmojiRegex();
+
     [GeneratedRegex("^:([a-zA-Z0-9_]+):", RegexOptions.Compiled)]
     private static partial Regex UnicodeEmojiRegex();
+
     [GeneratedRegex($"^<{URL_REGEX}>", RegexOptions.Compiled)]
     private static partial Regex URLRegex();
+
     [GeneratedRegex($"^{URL_REGEX}", RegexOptions.Compiled)]
     private static partial Regex URLPreviewRegex();
+
     [GeneratedRegex("^(>>)?> ", RegexOptions.Compiled)]
     private static partial Regex QuoteLineRegex();
+
     [GeneratedRegex("^~", RegexOptions.Compiled)]
     private static partial Regex TildeRegex();
+
     [GeneratedRegex("^\\*", RegexOptions.Compiled)]
     private static partial Regex StarRegex();
+
     [GeneratedRegex("^_", RegexOptions.Compiled)]
     private static partial Regex UnderscoreRegex();
+
     [GeneratedRegex("^\\|\\|", RegexOptions.Compiled)]
     private static partial Regex SpoilerRegex();
+
     [GeneratedRegex("^```", RegexOptions.Compiled)]
     private static partial Regex CodeBlockRegex();
+
     [GeneratedRegex("^`", RegexOptions.Compiled)]
     private static partial Regex CodeInlineRegex();
+
     [GeneratedRegex("^\n", RegexOptions.Compiled)]
     private static partial Regex NewlineRegex();
 }
