@@ -3,19 +3,48 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+             xmlns:converters="using:Turbulence.Desktop.Converters"
              x:Class="Turbulence.Desktop.Views.Main.ServerListView"
              mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="500"
              x:DataType="vm:ServerListViewModel">
     <UserControl.DataContext>
         <vm:ServerListViewModel />
     </UserControl.DataContext>
-    <ListBox ItemsSource="{Binding Servers}"
-             Background="#1E1F22"
-             SelectedValue="{Binding SelectedServer}">
-        <ListBox.ItemTemplate>
-            <DataTemplate>
-                <TextBlock Text="{Binding Name}" />
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+    <UserControl.Resources>
+        <converters:ObjectEqualsMultiConverter x:Key="EqualsConverter" />
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Button.Checked /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#404249" />
+        </Style>
+    </UserControl.Styles>
+    <ScrollViewer Background="#1E1F22">
+        <StackPanel Orientation="Vertical"
+                    IsVisible="{Binding Connected}">
+            <Button Command="{Binding SelectDMsCommand}"
+                HorizontalAlignment="Stretch"
+                Classes.Checked="{Binding DMsSelected}"
+                Content="DMs" />
+            <ItemsControl ItemsSource="{Binding Servers}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Command="{Binding $parent[ItemsControl].((vm:ServerListViewModel)DataContext).SelectServerCommand}"
+                                CommandParameter="{Binding .}"
+                                Content="{Binding Name}"
+                                HorizontalAlignment="Stretch">
+                            <Classes.Checked>
+                                <MultiBinding Converter="{StaticResource EqualsConverter}">
+                                    <Binding Path="$parent[ItemsControl].((vm:ServerListViewModel)DataContext).SelectedServer" />
+                                    <Binding Path="." />
+                                </MultiBinding>
+                            </Classes.Checked>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

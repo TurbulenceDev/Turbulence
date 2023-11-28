@@ -314,6 +314,6 @@ public static class MessageExtensions {
 	public static string GetBestAuthorName(this Message message)
 	{
 		// TODO: message.Member is null for some reason
-		return message.Member?.Nick ?? message.Author.GlobalName ?? message.Author.Username;
+		return message.Member?.Nick ?? message.Author.GetBestName();
 	}
 }

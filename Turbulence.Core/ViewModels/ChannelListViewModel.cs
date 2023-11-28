@@ -1,13 +1,17 @@
 using System.Numerics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Turbulence.Discord;
+using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
+using Turbulence.Discord.Models.DiscordGuild;
+using Turbulence.Discord.Models.DiscordPermissions;
 
 namespace Turbulence.Core.ViewModels;
 
-public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannelsMsg>, IRecipient<ServerSelectedMsg>
+public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannelsMsg>, IRecipient<ServerSelectedMsg>, IRecipient<DMsSelectedMsg>
 {
     public ObservableList<Channel> Channels { get; } = new();
     private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
@@ -23,60 +27,111 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
                 Messenger.Send(new ChannelSelectedMsg(channel));
         };
     }
-    
+
+    [RelayCommand]
+    public void SelectChannel(Channel channel)
+    {
+        SelectedChannel = channel;
+    }
+
     public void Receive(SetChannelsMsg m) => Channels.ReplaceAll(m.Channels);
     
+    //TODO: move to client
+    private bool CanSeeChannel(Guild Server, Channel channel, BigInteger perms, List<Role> myRoles)
+    {
+        if (Server.OwnerId == _client.CurrentUser?.Id)
+        {
+            return true;
+        }
+
+        var channelPerms = perms;
+        if (channel.PermissionOverwrites is { } overwrites)
+        {
+            List<Overwrite> toApply = new();
+            if (overwrites.FirstOrDefault(o => o.Id == Server.Id) is { } everyoneOverwrite)
+                toApply.Add(everyoneOverwrite);
+
+            // Add overwrites for my roles
+            toApply.AddRange(overwrites.Where(o => o.Type == 0 && myRoles.Exists(r => r.Id == o.Id)));
+            // Add overwrites for me specifically
+            toApply.AddRange(overwrites.Where(o => o.Type == 1 && o.Id == _client.CurrentUser?.Id));
+
+            // Then apply
+            foreach (var overwrite in toApply)
+            {
+                channelPerms |= BigInteger.Parse(overwrite.Allow);
+                channelPerms &= ~BigInteger.Parse(overwrite.Deny);
+            }
+        }
+
+        // Add to channel list if we have permission to view it
+        // TODO: Use enum flag here
+        return (channelPerms & (1 << 10)) != 0;
+    }
+
     public async void Receive(ServerSelectedMsg m)
     {
         Channels.Clear();
-        
-        // TODO: Move this to its own method
-        if (m.Server.OwnerId == _client.CurrentUser?.Id)
+
+        // Calculate permissions //TODO: move into client
+        var everyoneRole = m.Server.Roles.First(r => r.Id == m.Server.Id);
+        // TODO: Get rid of API call
+        var myGuildMember = await _client.GetCurrentUserGuildMember(m.Server.Id);
+        var myRoles = m.Server.Roles.Where(r => myGuildMember.Roles.Contains(r.Id)).ToList();
+        // Parse base permission for everyone
+        var perms = BigInteger.Parse(everyoneRole.Permissions);
+        // Add our permission onto it
+        foreach (var role in myRoles)
         {
-            Channels.ReplaceAll(m.Server.Channels);
+            perms |= BigInteger.Parse(role.Permissions);
         }
-        else
+
+        var topLevel = new List<Channel>();
+        var subChannels = new Dictionary<Snowflake, List<Channel>>();
+        // iterate over list
+        foreach (var channel in m.Server.Channels)
         {
-            var everyoneRole = m.Server.Roles.First(r => r.Id == m.Server.Id);
-            // TODO: Get rid of API call
-            var myGuildMember = await Api.GetCurrentUserGuildMember(_client.HttpClient, m.Server.Id);
-            var myRoles = m.Server.Roles.Where(r => myGuildMember.Roles.Contains(r.Id)).ToList();
+            //TODO: permission filtering 
+            if (!CanSeeChannel(m.Server, channel, perms, myRoles))
+                continue;
 
-            var perms = BigInteger.Parse(everyoneRole.Permissions);
-
-            foreach (var role in myRoles)
+            // save top level channels/categories into one list
+            if (channel.ParentId == null)
             {
-                perms |= BigInteger.Parse(role.Permissions);
+                topLevel.Add(channel);
             }
-
-            foreach (var channel in m.Server.Channels.Order())
+            else // save every other channel into a dict<parentid, list>
             {
-                var channelPerms = perms;
-                if (channel.PermissionOverwrites is { } overwrites)
+                if (!subChannels.TryGetValue(channel.ParentId, out var list))
                 {
-                    List<Overwrite> toApply = new();
-                    if (overwrites.FirstOrDefault(o => o.Id == m.Server.Id) is { } everyoneOverwrite)
-                        toApply.Add(everyoneOverwrite);
-
-                    // Add overwrites for my roles
-                    toApply.AddRange(overwrites.Where(o => o.Type == 0 && myRoles.Exists(r => r.Id == o.Id))); 
-                    // Add overwrites for me specifically
-                    toApply.AddRange(overwrites.Where(o => o.Type == 1 && o.Id == _client.CurrentUser?.Id));
-
-                    // Then apply
-                    foreach (var overwrite in toApply)
-                    {
-                        channelPerms |= BigInteger.Parse(overwrite.Allow);
-                        channelPerms &= ~BigInteger.Parse(overwrite.Deny);
-                    }
+                    list = new();
+                    subChannels.Add(channel.ParentId, list);
                 }
-
-                // Add to channel list if we have permission to view it
-                // TODO: Use enum flag here
-                if ((channelPerms & (1 << 10)) != 0)
-                    Channels.Add(channel);
+                list.Add(channel);
             }
         }
+        // Sort 
+        topLevel.Sort();
+        foreach (var l in subChannels.Values)
+            l.Sort();
+        // Then add each top level channel
+        foreach (var cat in topLevel)
+        {
+            Channels.Add(cat);
+            // Add child channels if they exist
+            if (subChannels.TryGetValue(cat.Id, out var list))
+            {
+                foreach (var c in list)
+                    Channels.Add(c);
+            }
+        }
+    }
+
+    public void Receive(DMsSelectedMsg message)
+    {
+        // reverse sort by last message id
+        message.Channels.Sort((a, b) => b.LastMessageId == null ? -1 : b.LastMessageId.CompareTo(a.LastMessageId));
+        Channels.ReplaceAll(message.Channels);
     }
 }
 

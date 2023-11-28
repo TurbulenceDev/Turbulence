@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:v="clr-namespace:Turbulence.Desktop.Views.Main"
              xmlns:vm="clr-namespace:Turbulence.Core.ViewModels;assembly=Turbulence.Core"
+             xmlns:converters="using:Turbulence.Desktop.Converters"
              x:DataType="vm:ChannelBarViewModel"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
              Height="40"
@@ -11,6 +12,9 @@
     <UserControl.DataContext>
         <vm:ChannelBarViewModel />
     </UserControl.DataContext>
+    <UserControl.Resources>
+        <converters:ChannelNameConverter x:Key="ChannelNameConverter" />
+    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="Grid">
             <Setter Property="Background" Value="#313338" />
@@ -38,7 +42,7 @@
     <Grid RowDefinitions="*,auto">
         <DockPanel IsVisible="{Binding !!Channel}" LastChildFill="False">
             <StackPanel Margin="20,0" Orientation="Horizontal" DockPanel.Dock="Left">
-                <TextBlock FontWeight="SemiBold" Text="{Binding Channel.Name}" />
+                <TextBlock FontWeight="SemiBold" Text="{Binding Channel, Converter={StaticResource ChannelNameConverter}}" />
                 <Separator Height="20" Width="1" IsVisible="{Binding !!Channel.Topic}" />
                 <TextBlock Text="{Binding Channel.Topic}" />
             </StackPanel>

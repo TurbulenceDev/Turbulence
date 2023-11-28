@@ -1,25 +1,24 @@
-﻿using Avalonia.Controls.Templates;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Metadata;
 using Turbulence.Discord.Models.DiscordChannel;
 
 namespace Turbulence.Desktop.DataTemplates;
 
-public class ChannelTemplateSelector : IDataTemplate
+public class AttachmentTypeSelector : IDataTemplate
 {
     [Content]
     public Dictionary<string, IDataTemplate> Templates { get; } = new Dictionary<string, IDataTemplate>();
 
-    public bool Match(object? data) => data is Channel;
+    public bool Match(object? data) => data is Attachment;
 
     Control? ITemplate<object?, Control?>.Build(object? param)
     {
-        var channel = (Channel)param!;
-        var type = channel.Type switch
+        var attachment = (Attachment)param!;
+        var type = attachment.ContentType switch
         {
-            ChannelType.DM or ChannelType.GROUP_DM => "dm",
-            ChannelType.GUILD_CATEGORY => "category",
-            _ => "channel",
+            "image/png" or "image/jpeg" => "image",
+            _ => "default",
         };
         if (!Templates.TryGetValue(type, out var template))
             return Templates["unknown"].Build(param);

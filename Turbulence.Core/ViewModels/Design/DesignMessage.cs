@@ -21,7 +21,7 @@ public record DesignMessage : Message
         Timestamp = DateTime.Now;
         Reactions = new Reaction[]
         {
-            new Reaction()
+            new()
             {
                 Count = 1,
                 Me = true,
@@ -31,7 +31,7 @@ public record DesignMessage : Message
                     Name = "\U0001F629", // :weary:
                 }
             },
-            new Reaction()
+            new()
             {
                 Count = 1,
                 Me = false,
@@ -41,7 +41,7 @@ public record DesignMessage : Message
                     Name = "\U0001F914", // :think:
                 }
             },
-            new Reaction()
+            new()
             {
                 Count = 1,
                 Me = false,
@@ -52,6 +52,28 @@ public record DesignMessage : Message
                 }
             },
         };
+        Attachments = new Attachment[]
+        {
+            new()
+            {
+                Id = new(0),
+                Filename = "file.jpg",
+                ContentType = "image/jpeg",
+                Size = 0,
+                Url = "https://localhost",
+                ProxyUrl = "https://localhost",
+            },
+            new()
+            {
+                Id = new(1),
+                Filename = "file.txt",
+                ContentType = "text/plain; charset=utf-8",
+                Size = 0,
+                Url = "https://localhost",
+                ProxyUrl = "https://localhost",
+            },
+        };
+        EditedTimestamp = Timestamp + new TimeSpan(1, 0, 0);
         ReferencedMessage = CreateMessage("Reply to this.", MessageType.DEFAULT, Author, DateTimeOffset.Now - new TimeSpan(0, 1, 0));
     }
 

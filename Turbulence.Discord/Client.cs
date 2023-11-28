@@ -34,9 +34,10 @@ namespace Turbulence.Discord
         public event EventHandler<Event<Message>>? MessageUpdated;
         public event EventHandler<Event<MessageDeleteEvent>>? MessageDeleted;
         public event EventHandler<Event<ThreadListSyncEvent>>? ThreadListSync;
+        public event EventHandler<Event<bool>>? OnConnectionStatusChanged;
 
         public bool Connected => WebSocket.State == WebSocketState.Open;
-        public HttpClient HttpClient { get; } = new();
+        private HttpClient HttpClient { get; } = new();
         private static readonly HttpClient CdnClient = new();
 
         private readonly ICache _cache = Ioc.Default.GetService<ICache>()!;
@@ -44,7 +45,7 @@ namespace Turbulence.Discord
 
         private ClientWebSocket WebSocket { get; set; }
         private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"; // idk where to move this
-        
+
         public Client()
         {
             // Set up http client
@@ -63,6 +64,7 @@ namespace Turbulence.Discord
 
             SetWebsocketHeaders();
             await WebSocket.ConnectAsync(new Uri($"{gateway.AbsoluteUri}/?encoding=json&v={Api.Version}"), default);
+            OnConnectionStatusChanged?.Invoke(this, new(true));
             await SendIdentify(token);
             // Start the tasks // TODO: save the tasks?
             _ = Task.Run(ReceiveTask);
@@ -144,7 +146,6 @@ namespace Turbulence.Discord
         // TODO: probably shouldnt be static?
         public User? CurrentUser { get; set; }
         //public static List<dynamic> MemberInfos = new(); // TODO: should we like put the roles into a simple array?
-        public static Dictionary<Snowflake, Guild> Guilds = new();
         //public static List<dynamic> ServerSettings = new(); // TODO: listen to the guild settings update event
 
         // TODO: move these into a gateway class thingy?
@@ -319,9 +320,13 @@ namespace Turbulence.Discord
                                     return;
                                 }
 
-                                // Cache that shit // TODO: cache more/all. probably also need like private channels etc
+                                // Cache that shit // TODO: cache more/all.
                                 foreach (var guild in ready.Guilds)
-                                    Guilds.Add(guild.Id, guild);
+                                    _cache.SetGuild(guild);
+                                foreach (var user in ready.Users)
+                                    _cache.SetUser(user);
+                                foreach (var channel in ready.PrivateChannels)
+                                    _cache.SetChannel(channel);
                                 // foreach (var guildSetting in ready.user_guild_settings.entries)
                                 //     ServerSettings.Add(guildSetting);
                                 CurrentUser = ready.User;
@@ -428,14 +433,52 @@ namespace Turbulence.Discord
             return await Api.GetChannelMessages(HttpClient, channelId, after: messageId);
         }
 
-        public async Task<Message> SendMessage(string content, Channel channelId)
+        public async Task<Message> SendMessage(Channel channel, string content, Message? reply = null, bool shouldPing = false)
         {
-            return await Api.CreateAndSendMessage(HttpClient, channelId, content);
+            return await Api.CreateAndSendMessage(HttpClient, channel, content, reply, shouldPing);
+        }
+
+        public async Task<Message> EditMessage(string input, Message original)
+        {
+            return await Api.EditMessage(HttpClient, input, original);
+        }
+
+        public async Task DeleteMessage(Message message)
+        {
+            await Api.DeleteMessage(HttpClient, message);
+        }
+
+        public async Task<GuildMember> GetCurrentUserGuildMember(Snowflake guildId)
+        {
+            return await Api.GetCurrentUserGuildMember(HttpClient, guildId);
         }
 
         public async Task<Guild> GetGuild(Snowflake guildId)
         {
-            return Guilds.TryGetValue(guildId, out var ret) ? ret : await Api.GetGuild(HttpClient, guildId);
+            if (_cache.GetGuild(guildId) is { } guild)
+                return guild;
+            guild = await Api.GetGuild(HttpClient, guildId);
+            _logger?.Log($"Requested guild {guild.Name} ({guild.Id})", LogType.Networking, LogLevel.Debug);
+            _cache.SetGuild(guild);
+            return guild;
+        }
+        public async Task<User> GetUser(Snowflake userId)
+        {
+            if (_cache.GetUser(userId) is { } user)
+                return user;
+            user = await Api.GetUser(HttpClient, userId);
+            _logger?.Log($"Requested user {user.Username} ({user.Id})", LogType.Networking, LogLevel.Debug);
+            _cache.SetUser(user);
+            return user;
+        }
+        public async Task<Channel> GetChannel(Snowflake channelId)
+        {
+            if (_cache.GetChannel(channelId) is { } channel)
+                return channel;
+            channel = await Api.GetChannel(HttpClient, channelId);
+            _logger?.Log($"Requested channel {channel.Name} ({channel.Id})", LogType.Networking, LogLevel.Debug);
+            _cache.SetChannel(channel);
+            return channel;
         }
 
         public async Task<byte[]> GetAvatarAsync(User user, int size = 128)
@@ -456,7 +499,7 @@ namespace Turbulence.Discord
             _cache.SetAvatar(user.Id, size, avatar);
             return avatar;
         }
-        
+
         public async Task<byte[]> GetEmojiAsync(Emoji emoji, int size = 32)
         {
             if (emoji.Id == null)
@@ -472,11 +515,6 @@ namespace Turbulence.Discord
             return img;
         }
 
-        public async Task<Channel> GetChannel(Snowflake channelId)
-        {
-            return await Api.GetChannel(HttpClient, channelId);
-        }
-
         public async Task<Message[]> GetPinnedMessages(Snowflake channelId)
         {
             return await Api.GetPinnedMessages(HttpClient, channelId);
@@ -485,6 +523,60 @@ namespace Turbulence.Discord
         public async Task<SearchResult> SearchMessages(SearchRequest request)
         {
             return await Api.SearchMessages(HttpClient, request);
+        }
+
+        public async Task<string> GetChannelName(Channel channel)
+        {
+            async Task<IEnumerable<string>> GetChannelUsers(Channel channel)
+            {
+                if (channel.Recipients == null && channel.RecipientIDs == null)
+                    channel = await GetChannel(channel.Id);
+                if (channel.Recipients != null)
+                    return channel.Recipients.Select(u => u.GetBestName());
+                else if (channel.RecipientIDs != null)
+                    return channel.RecipientIDs.Select(id => (GetUser(id).Result).GetBestName());
+                return Array.Empty<string>();
+            }
+
+            return channel.Type switch
+            {
+                //TODO: alternatively use RecipientIDs
+                ChannelType.DM or ChannelType.GROUP_DM => string.Join(", ", await GetChannelUsers(channel)),
+                _ => $"{channel.Name}",
+            };
+        }
+
+        public string GetMessageContent(Message message)
+        {
+            var author = message.GetBestAuthorName();
+            return message.Type switch
+            {
+                MessageType.THREAD_CREATED => $"{author} created thread \"{message.Content}\"",
+                MessageType.CALL => $"{author} started a voice call",
+                MessageType.CHANNEL_PINNED_MESSAGE => $"{author} pinned a message.",
+                MessageType.USER_JOIN => $"{author} joined the server.",
+                MessageType.RECIPIENT_ADD => $"{author} added {message.Mentions[0].GetBestName()}.",
+                _ => message.Content,
+            };
+        }
+
+        public async Task<byte[]> GetImageAsync(string url)
+        {
+            //TODO: cache
+            /*if (_cache.GetAvatar(user.Id, size) is { } avatar)
+                return avatar;*/
+
+            var req = new HttpRequestMessage(HttpMethod.Get, url);
+            var response = await CdnClient.SendAsync(req);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApiException($"Got error while fetching image: {response.StatusCode}, {response.ReasonPhrase}");
+            }
+            var image = await response.Content.ReadAsByteArrayAsync();
+            _logger?.Log($"Requested media image {url}", LogType.Images, LogLevel.Debug);
+
+            //_cache.SetAvatar(user.Id, size, avatar);
+            return image;
         }
     }
 }

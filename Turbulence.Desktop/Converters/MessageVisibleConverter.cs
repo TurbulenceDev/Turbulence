@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls.Documents;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using System.Globalization;
 using Turbulence.Discord;
@@ -7,7 +6,7 @@ using Turbulence.Discord.Models.DiscordChannel;
 
 namespace Turbulence.Desktop.Converters;
 
-public class MessageContentConverter : IValueConverter
+public class MessageVisibleConverter : IValueConverter
 {
     private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
 
@@ -16,18 +15,8 @@ public class MessageContentConverter : IValueConverter
         if (value is not Message message)
             return null;
 
-        var res = new InlineCollection
-        {
-            _client.GetMessageContent(message),
-        };
-        if (message.EditedTimestamp != null)
-        {
-            var editRun = new Run(" [Edited]");
-            //TODO: tooltip?
-            editRun.Classes.Add("Edit");
-            res.Add(editRun);
-        }
-        return res;
+        //TODO: can we optimize this by not needing call this again or not needing a new converter
+        return !string.IsNullOrEmpty(_client.GetMessageContent(message));
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

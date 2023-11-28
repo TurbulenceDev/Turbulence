@@ -9,6 +9,7 @@ public class DesignServerListViewModel : ServerListViewModel
 {
     public DesignServerListViewModel()
     {
+        Connected = true;
         Servers.AddRange(new List<Guild>()
         {
             CreateServer(0, "Server"),

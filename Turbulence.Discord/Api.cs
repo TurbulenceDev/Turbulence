@@ -11,7 +11,7 @@ using Turbulence.Discord.Models.DiscordUser;
 
 namespace Turbulence.Discord;
 
-public static class Api
+internal static class Api
 {
     public const string Version = "9";
     private const string RootAdress = "https://discord.com/api";
@@ -120,6 +120,11 @@ public static class Api
     public static async Task<GuildMember> GetCurrentUserGuildMember(HttpClient client, ulong guildId)
     {
         return await Get<GuildMember>(client, $"/users/@me/guilds/{guildId}/member");
+    }
+
+    public static async Task<User> GetUser(HttpClient client, ulong userId)
+    {
+        return await Get<User>(client, $"/users/{userId}");
     }
 
     public static async Task<Channel> GetChannel(HttpClient client, ulong channelId)

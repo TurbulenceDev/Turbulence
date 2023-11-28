@@ -1,12 +1,15 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Terminal.Gui;
 using Turbulence.Core.ViewModels;
+using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
-using static Turbulence.Discord.Models.DiscordChannel.MessageType;
 
 namespace Turbulence.TGUI.Views;
 
 public sealed class MessagesView : FrameView
 {
+    private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
+
     private readonly ListView _messagesListView = new()
     {
         Width = Dim.Fill(1),
@@ -76,15 +79,9 @@ public sealed class MessagesView : FrameView
         {
             _currentMessagesProcessed.Clear();
             _currentMessagesProcessed.AddRange(_vm.CurrentMessages.Select(m =>
-            {
-                var author = m.GetBestAuthorName();
-                return m.Type switch
-                {
-                    THREAD_CREATED => $"{author} created thread \"{m.Content}\"",
-                    CALL => $"{author} started voice message",
-                    _ => $"{author}: {m.Content}",
-                };
-            }));
+            m.Type == MessageType.DEFAULT ? 
+                $"{m.GetBestAuthorName()}: {_client.GetMessageContent(m)}" :
+                _client.GetMessageContent(m)));
             _messagesListView.ScrollDown(1);
             _messagesListView.SetNeedsDisplay();
         };
