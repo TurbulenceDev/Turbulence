@@ -52,6 +52,7 @@ public class DesignMessagesViewModel : MessagesViewModel
         CurrentMessages.AddRange(new List<Message> {
             message1,
             CreateMessage("no", MessageType.DEFAULT, user2, now - new TimeSpan(0, 1, 0), message1),
+            CreateMessage("normal, ||spoiler|| *italic* ~~strike~~ **bold** **_mix_**\n```cs\ncodeblock```\n`inline`\nhttps://localhost.com\ne:weary: e<:salute:933778727547060234>\nu<@138397087229280257> c<#959372274299961344> r<@&985907053237268480>\n> quote1\n> quote2", MessageType.DEFAULT, user2, now - new TimeSpan(0, 2, 0), null)
         });
     }
 

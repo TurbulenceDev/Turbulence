@@ -4,6 +4,8 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using System.Globalization;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
+using Turbulence.Discord.Utils;
+using Turbulence.Discord.Utils.Parser;
 
 namespace Turbulence.Desktop.Converters;
 
@@ -16,10 +18,58 @@ public class MessageContentConverter : IValueConverter
         if (value is not Message message)
             return null;
 
-        var res = new InlineCollection
+        var res = new InlineCollection();
+        var content = _client.GetMessageContent(message);
+        var nodes = MessageParser.Parse(content);
+
+        // Recursive function that turns nodes into avalonia inlines (run/span)
+        static Inline FromNode(Node node)
         {
-            _client.GetMessageContent(message),
-        };
+            Inline ret;
+            switch (node.Type)
+            {
+                case NodeType.STRIKETHROUGH:
+                case NodeType.SPOILER:
+                case NodeType.BOLD:
+                case NodeType.UNDERLINE:
+                case NodeType.ITALIC:
+                case NodeType.CODE_INLINE:
+                case NodeType.CODE_BLOCK:
+                case NodeType.QUOTE_BLOCK:
+                    ret = new Span();
+                    ret.Classes.Add(node.Type.ToString());
+                    if (node.Children != null)
+                        foreach (var child in node.Children)
+                            ((Span)ret).Inlines.Add(FromNode(child));
+                    break;
+                case NodeType.URL_WITH_PREVIEW:
+                case NodeType.URL_WITHOUT_PREVIEW:
+                    ret = new Run(node.Url);
+                    ret.Classes.Add("Url");
+                    break;
+                case NodeType.USER:
+                case NodeType.CHANNEL:
+                case NodeType.ROLE:
+                    //TODO: mentions
+                    ret = new Run($"@{node.Id}");
+                    break;
+                case NodeType.EMOJI_UNICODE_ENCODED:
+                case NodeType.EMOJI_CUSTOM:
+                    //TODO: emojis
+                    ret = new Run($":{node.Emoji}:");
+                    break;
+                case NodeType.TEXT:
+                default:
+                    ret = new Run(node.Text);
+                    break;
+            }
+            return ret;
+        }
+        // Add nodes
+        foreach (var node in nodes)
+        {
+            res.Add(FromNode(node));
+        }
         if (message.EditedTimestamp != null)
         {
             var editRun = new Run(" [Edited]");
