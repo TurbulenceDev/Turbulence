@@ -51,9 +51,43 @@
             <Setter Property="CornerRadius" Value="0" />
             <Setter Property="Padding" Value="4" />
         </Style>
+        <!-- Message Parsing -->
         <Style Selector="Run.Edit">
             <Setter Property="Foreground" Value="#949BA4" />
             <Setter Property="FontSize" Value="10" />
+        </Style>
+        <Style Selector="Run.Url">
+            <Setter Property="TextDecorations" Value="Underline" />
+            <Setter Property="Foreground" Value="#00A8FC" />
+        </Style>
+        <Style Selector="Span.ITALIC">
+            <Setter Property="FontStyle" Value="Italic" />
+        </Style>
+        <Style Selector="Span.UNDERLINE">
+            <Setter Property="FontStyle" Value="Italic" />
+        </Style>
+        <Style Selector="Span.BOLD">
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style Selector="Span.UNDERLINE">
+            <Setter Property="FontStyle" Value="Italic" />
+        </Style>
+        <Style Selector="Span.STRIKETHROUGH">
+            <Setter Property="TextDecorations" Value="Strikethrough" />
+        </Style>
+        <Style Selector="Span.SPOILER">
+            <Setter Property="Background" Value="Gray" />
+        </Style>
+        <Style Selector="Span.QUOTE_BLOCK">
+            <!--TODO: make these indented-->
+        </Style>
+        <!--TODO: different fonts-->
+        <Style Selector="Span.CODE_BLOCK">
+            <!--TODO: make this one full size somehow-->
+            <Setter Property="Background" Value="Gray" />
+        </Style>
+        <Style Selector="Span.CODE_INLINE">
+            <Setter Property="Background" Value="Gray" />
         </Style>
     </UserControl.Styles>
     <Grid ColumnDefinitions="Auto,*" Classes="Message">
