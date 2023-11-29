@@ -62,7 +62,7 @@
             <Panel IsVisible="{Binding !!ReferencedMessage}" Height="20" DockPanel.Dock="Top">
                 <!--TODO: add weird spine border thingy here-->
             </Panel>
-            <Border CornerRadius="50" ClipToBounds="True" Width="40" Height="40" Margin="5 0 10 0">
+            <Border CornerRadius="50" ClipToBounds="True" Width="40" Height="40" Margin="5 0 10 0" VerticalAlignment="Top">
                 <Image Name="Image" UseLayoutRounding="False" Source="{Binding Author, Converter={StaticResource AvatarConverter}}" />
             </Border>
         </DockPanel>
