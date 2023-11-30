@@ -5,6 +5,7 @@ using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordGateway;
 using Turbulence.Discord.Models.DiscordUser;
 using Turbulence.Discord.Services;
+using Turbulence.Discord.Models.DiscordVoice;
 
 namespace Turbulence.Discord;
 
@@ -29,6 +30,7 @@ public partial class Client : IPlatformClient
     public event EventHandler<Event<MessageDeleteEvent>>? MessageDeleted;
     public event EventHandler<Event<ThreadListSyncEvent>>? ThreadListSync;
     public event EventHandler<Event<bool>>? OnConnectionStatusChanged;
+    public event EventHandler<Event<VoiceState>>? VoiceStateUpdated;
 
     public bool Connected => WebSocket.State == WebSocketState.Open;
     private HttpClient HttpClient { get; } = new();
@@ -38,6 +40,7 @@ public partial class Client : IPlatformClient
     private readonly ILogger? _logger = Ioc.Default.GetService<ILogger>();
 
     private ClientWebSocket WebSocket { get; set; }
+    private ClientWebSocket VoiceWebSocket { get; set; }
     private const string UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"; // idk where to move this
 
     public Client()
@@ -47,6 +50,7 @@ public partial class Client : IPlatformClient
         CdnClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
         // WS
         WebSocket = new();
+        VoiceWebSocket = new();
     }
 
     public async Task Start(string token)
@@ -57,6 +61,7 @@ public partial class Client : IPlatformClient
         HttpClient.DefaultRequestHeaders.Add("Authorization", token);
 
         SetWebsocketHeaders();
+        SetVoiceWebsocketHeaders();
         await WebSocket.ConnectAsync(new Uri($"{gateway.AbsoluteUri}/?encoding=json&v={Api.Version}"), default);
         OnConnectionStatusChanged?.Invoke(this, new(true));
         await SendIdentify(token);
@@ -64,6 +69,13 @@ public partial class Client : IPlatformClient
         _ = Task.Run(ReceiveTask);
         _ = Task.Run(HeartbeatTask);
         _ = Task.Run(SendTask);
+    }
+
+    public async Task ConnectVoice(string host)
+    {
+        if (VoiceWebSocket.State == WebSocketState.Connecting || VoiceWebSocket.State == WebSocketState.Open) // already connected?
+            return;
+        await VoiceWebSocket.ConnectAsync(new Uri($"{host}/?v={Api.VoiceVersion}"), default);
     }
 
     // Util functions

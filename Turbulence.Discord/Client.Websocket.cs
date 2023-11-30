@@ -2,9 +2,11 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using Turbulence.Discord.Models;
 using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Models.DiscordGateway;
 using Turbulence.Discord.Models.DiscordGatewayEvents;
+using Turbulence.Discord.Models.DiscordVoice;
 
 namespace Turbulence.Discord;
 
@@ -27,6 +29,20 @@ public partial class Client
 		WebSocket.Options.SetRequestHeader("Accept", "*/*");
 		WebSocket.Options.SetRequestHeader("Accept-Encoding", "gzip, deflate, br");
 		WebSocket.Options.SetRequestHeader("Sec-Fetch-Dest", "websocket");
+		WebSocket.Options.SetRequestHeader("Sec-Fetch-Mode", "websocket");
+		WebSocket.Options.SetRequestHeader("Sec-Fetch-Site", "cross-site");
+		WebSocket.Options.SetRequestHeader("Pragma", "no-cache");
+		WebSocket.Options.SetRequestHeader("Cache-Control", "no-cache");
+	}
+
+	public void SetVoiceWebsocketHeaders()
+	{
+		// TODO: Accept-Language, Connection: keep-alive, Sec-WebSocket-Extentions/Key/Version ?
+		WebSocket.Options.SetRequestHeader("User-Agent", UserAgent);
+		WebSocket.Options.SetRequestHeader("Origin", "https://discord.com");
+		WebSocket.Options.SetRequestHeader("Accept", "*/*");
+		WebSocket.Options.SetRequestHeader("Accept-Encoding", "gzip, deflate, br");
+		WebSocket.Options.SetRequestHeader("Sec-Fetch-Dest", "empty");
 		WebSocket.Options.SetRequestHeader("Sec-Fetch-Mode", "websocket");
 		WebSocket.Options.SetRequestHeader("Sec-Fetch-Site", "cross-site");
 		WebSocket.Options.SetRequestHeader("Pragma", "no-cache");
@@ -306,6 +322,35 @@ public partial class Client
 							MessageDeleted?.Invoke(this, new Event<MessageDeleteEvent>(messageDelete));
 							//TODO: listen to this
 							break;
+						case "VOICE_STATE_UPDATE":
+							if (msg.Data.Deserialize<VoiceState>() is not { } voiceState)
+							{
+								Console.WriteLine("Invalid message received on VOICE_STATE_UPDATE");
+								return;
+							}
+							VoiceStateUpdated?.Invoke(this, new Event<VoiceState>(voiceState));
+							break;
+						case "VOICE_SERVER_UPDATE":
+							if (msg.Data.Deserialize<VoiceServerUpdateEvent>() is not { } voiceServerEv)
+							{
+								Console.WriteLine("Invalid message received on MESSAGE_DELETE");
+								return;
+							}
+
+							if (voiceServerEv.Endpoint == null)
+							{
+								//TODO: handle this case
+								Console.WriteLine("VOICE_SERVER_UPDATE: Endpoint is null.");
+								return;
+							}
+
+							// Connect to the voice gateway
+							var host = voiceServerEv.Endpoint;
+							if (!host.Contains(Uri.SchemeDelimiter))
+								host = $"{Uri.UriSchemeWss}{Uri.SchemeDelimiter}{host}";
+							//TODO: do we need to remove the port?
+							ConnectVoice(host);
+							break;
 						default:
 							Console.WriteLine($"[Event: {msg.EventName}] Data: {msg.Data.ToJsonString(new JsonSerializerOptions { WriteIndented = true })}");
 							break;
@@ -342,5 +387,18 @@ public partial class Client
 			Data = JsonSerializer.SerializeToNode(data),
 		};
 		return _sendQueue.TryAdd(payload);
+	}
+
+	public void VoiceStateUpdate(Snowflake? guildId, Snowflake? channelId)
+	{
+		//TODO: mute, dead, video
+		SendGatewayMessage(GatewayOpcode.VOICE_STATE_UPDATE, new GatewayVoiceStateUpdate()
+		{
+			GuildId = guildId,
+			ChannelId = channelId,
+			SelfMute = false,
+			SelfDeaf = false,
+			SelfVideo = false,
+		});
 	}
 }

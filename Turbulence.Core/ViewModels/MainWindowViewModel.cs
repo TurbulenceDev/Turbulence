@@ -22,7 +22,7 @@ public partial class MainWindowViewModel : ViewModelBase,
     public static bool IsDebug { get; private set; }
     public static Guild? SelectedServer { get; private set; }
     public static Channel? SelectedChannel { get; private set; }
-    
+
     private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
 
     [ObservableProperty]
@@ -74,7 +74,13 @@ public partial class MainWindowViewModel : ViewModelBase,
         }
     }
 
-    public void Receive(ChannelSelectedMsg message) => SelectedChannel = message.Channel;
+    public void Receive(ChannelSelectedMsg message)
+    {
+        SelectedChannel = message.Channel;
+        //TODO: join vc?
+        //if (SelectedChannel.Type == ChannelType.GUILD_VOICE || SelectedChannel.Type == ChannelType.GUILD_STAGE_VOICE)
+        //  _client.VoiceStateUpdate(SelectedServer!.Id, SelectedChannel!.Id);
+    }
     public void Receive(ServerSelectedMsg message)
     {
         if (message.Server == SelectedServer) // probably not needed to do something then
@@ -82,7 +88,7 @@ public partial class MainWindowViewModel : ViewModelBase,
 
         SelectedServer = message.Server;
         //TODO: only send if not cached already
-        _client.SendGatewayMessage(GatewayOpcode.LAZY_REQUEST, new LazyRequest() 
+        _client.SendGatewayMessage(GatewayOpcode.LAZY_REQUEST, new LazyRequest()
         {
             Guild = message.Server.Id,
             Activities = false,
@@ -102,7 +108,7 @@ public partial class MainWindowViewModel : ViewModelBase,
 
     public async void Receive(EditMessageMsg message) =>
         await _client.EditMessage(message.Message, message.Original);
-    
+
     public async void Receive(DeleteMessageMsg message) =>
         await _client.DeleteMessage(message.Message);
 }

@@ -23,6 +23,7 @@ public partial class ChannelListViewModel : ViewModelBase, IRecipient<SetChannel
     {
         PropertyChanged += (_, args) =>
         {
+            //TODO: should we let vc's be selected? or should vc's not be selected and instead we send a VCSelectedMsg
             if (args.PropertyName == nameof(SelectedChannel) && SelectedChannel is { } channel)
                 Messenger.Send(new ChannelSelectedMsg(channel));
         };
