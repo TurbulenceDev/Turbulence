@@ -107,6 +107,7 @@
             <!-- Reply Message Preview -->
             <StackPanel Name="MessageReference" Height="20" Orientation="Horizontal" IsVisible="{Binding !!ReferencedMessage}">
                 <TextBlock FontWeight="SemiBold" Text="{Binding ReferencedMessage, Converter={StaticResource AuthorConverter}, StringFormat='@{0} '}" />
+                <!--TODO: maybe dont use the full blown parser for the reply?-->
                 <TextBlock Foreground="#B5BAC1" Inlines="{Binding ReferencedMessage, Converter={StaticResource MessageConverter}}" />
             </StackPanel>
             <!-- Author Name, Timestamp etc -->
