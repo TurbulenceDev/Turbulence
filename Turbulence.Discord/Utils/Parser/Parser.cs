@@ -21,7 +21,9 @@ public enum NodeType
     QUOTE_BLOCK,
     CODE_BLOCK,
     CODE_INLINE,
-    HEADER1
+    HEADER1,
+    HEADER2,
+    HEADER3
 }
 
 public record Node(
@@ -96,6 +98,7 @@ public static partial class Parser
     public static IEnumerable<Node> ParseTokensGenerator(Token[] tokens, bool inQuote = false)
     {
         var i = 0;
+        var newLine = true;
         while (i < tokens.Length)
         {
             Token current = tokens[i];
@@ -107,6 +110,7 @@ public static partial class Parser
             if (current.Type == TokenType.TEXT_INLINE)
             {
                 yield return new Node(NodeType.TEXT, Text: current.Value);
+                newLine = false;
                 i += 1;
                 continue;
             }
@@ -115,6 +119,7 @@ public static partial class Parser
             if (current.Type == TokenType.USER_MENTION)
             {
                 yield return new Node(NodeType.USER, Id: new(ulong.Parse(current.Groups![1].Value)));
+                newLine = false;
                 i += 1;
                 continue;
             }
@@ -123,6 +128,7 @@ public static partial class Parser
             if (current.Type == TokenType.ROLE_MENTION)
             {
                 yield return new Node(NodeType.ROLE, Id: new(ulong.Parse(current.Groups![1].Value)));
+                newLine = false;
                 i += 1;
                 continue;
             }
@@ -131,6 +137,7 @@ public static partial class Parser
             if (current.Type == TokenType.CHANNEL_MENTION)
             {
                 yield return new Node(NodeType.CHANNEL, Id: new(ulong.Parse(current.Groups![1].Value)));
+                newLine = false;
                 i += 1;
                 continue;
             }
@@ -143,6 +150,7 @@ public static partial class Parser
                     Id: new(ulong.Parse(current.Groups![2].Value)),
                     Emoji: current.Groups[1].Value
                 );
+                newLine = false;
                 i += 1;
                 continue;
             }
@@ -154,6 +162,7 @@ public static partial class Parser
                     NodeType.EMOJI_UNICODE_ENCODED,
                     Emoji: current.Groups![1].Value
                 );
+                newLine = false;
                 i += 1;
                 continue;
             }
@@ -164,6 +173,7 @@ public static partial class Parser
             if (current.Type == TokenType.URL_WITH_PREVIEW)
             {
                 yield return new Node(NodeType.URL_WITH_PREVIEW, Url: current.Value);
+                newLine = false;
                 i += 1;
                 continue;
             }
@@ -172,17 +182,24 @@ public static partial class Parser
             if (current.Type == TokenType.URL_WITHOUT_PREVIEW)
             {
                 yield return new Node(NodeType.URL_WITHOUT_PREVIEW, Url: current.Value[1..^1]);
+                newLine = false;
                 i += 1;
                 continue;
             }
 
-            // Header //FIXME: this doesnt check if its the first token in line
-            //TODO: add other header types
+            // Header
             //TODO: parse header content as markdown like quote blocks
-            if (current.Type == TokenType.HEADER1)
+            if (newLine && current.Type is TokenType.HEADER1 or TokenType.HEADER2 or TokenType.HEADER3)
             {
+                var nodeType = NodeType.HEADER1 + (current.Type - TokenType.HEADER1);
                 //TODO: we manually add on the new line if its there. can we use some avalonia control to not need to do that? (like a <p> element)
-                yield return new Node(NodeType.HEADER1, Text: $"{current.Groups![1].Value}{(current.Groups![2].Length > 0 ? "\n" : "")}");
+                yield return new Node(nodeType,
+                    Children: new Node[]
+                    {
+                        new(NodeType.TEXT,
+                            Text: $"{current.Groups![1].Value}{(current.Groups![2].Length > 0 ? "\n" : "")}")
+                    });
+                newLine = true;
                 i += 1;
                 continue;
             }
@@ -221,6 +238,7 @@ public static partial class Parser
                 {
                     i += consumedTokenCount!.Value;
                     yield return node;
+                    //TODO: reset newline depending on last token?
                     continue;
                 }
             }
@@ -292,7 +310,8 @@ public static partial class Parser
                     childrenContent = string.Join("\n", lines);
                     var child_node = new Node(NodeType.TEXT, Text: childrenContent);
                     yield return new Node(NodeType.CODE_BLOCK, CodeLanguage: lang,
-                        Children: new List<Node>() { child_node });
+                        Children: new[] { child_node });
+                    newLine = false; //TODO: new line after codeblock
                     i += 1 + consumedTokenCount!.Value;
                     continue;
                 }
@@ -311,8 +330,8 @@ public static partial class Parser
             // note that in_quote won't change during the while-loop, we're just reducing
             // the level of indentation here by including it in the condition instead of
             // making an additional if statement around the while loop
-            //FIXME: this doesnt check if its the first token in line
             while (
+                newLine &&
                 !inQuote &&
                 i < tokens.Length &&
                 tokens[i].Type == TokenType.QUOTE_LINE_PREFIX)
@@ -348,7 +367,13 @@ public static partial class Parser
                 // tell the inner parse function that it's now inside a quote block
                 var childrenNodes = ParseTokensGenerator(childrenTokenInQuoteBlock.ToArray(), inQuote = true);
                 yield return new Node(NodeType.QUOTE_BLOCK, Children: childrenNodes.ToList());
+                newLine = false;
                 continue;
+            }
+
+            if (current.Type == TokenType.NEWLINE)
+            {
+                newLine = true;
             }
 
             //if we get all the way here, than whatever token we're currently sitting on
@@ -373,7 +398,6 @@ public static partial class Parser
             i += 1;
         }
     }
-
 
     private static (Node?, int?) TryParseNodeWithChildren(
         Token[] tokens,
