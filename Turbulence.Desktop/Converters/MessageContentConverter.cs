@@ -37,6 +37,9 @@ public class MessageContentConverter : IValueConverter
                 case NodeType.CODE_INLINE:
                 case NodeType.CODE_BLOCK:
                 case NodeType.QUOTE_BLOCK:
+                case NodeType.HEADER1:
+                case NodeType.HEADER2:
+                case NodeType.HEADER3:
                     ret = new Span();
                     ret.Classes.Add(node.Type.ToString());
                     if (node.Children != null)
@@ -59,22 +62,21 @@ public class MessageContentConverter : IValueConverter
                     //TODO: emojis
                     ret = new Run($":{node.Emoji}:");
                     break;
-                case NodeType.HEADER1:
-                    ret = new Run(node.Text);
-                    ret.Classes.Add("Header1");
-                    break;
                 case NodeType.TEXT:
                 default:
                     ret = new Run(node.Text);
                     break;
             }
+
             return ret;
         }
+
         // Add nodes
         foreach (var node in nodes)
         {
             res.Add(FromNode(node));
         }
+
         if (message.EditedTimestamp != null)
         {
             var editRun = new Run(" [Edited]");
@@ -82,6 +84,7 @@ public class MessageContentConverter : IValueConverter
             editRun.Classes.Add("Edit");
             res.Add(editRun);
         }
+
         return res;
     }
 
