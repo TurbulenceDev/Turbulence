@@ -60,6 +60,9 @@
             <Setter Property="TextDecorations" Value="Underline" />
             <Setter Property="Foreground" Value="#00A8FC" />
         </Style>
+        <Style Selector="Run.Header1">
+            <Setter Property="FontSize" Value="20" />
+        </Style>
         <Style Selector="Span.ITALIC">
             <Setter Property="FontStyle" Value="Italic" />
         </Style>

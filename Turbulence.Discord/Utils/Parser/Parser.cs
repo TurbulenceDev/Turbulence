@@ -20,10 +20,18 @@ public enum NodeType
     URL_WITHOUT_PREVIEW,
     QUOTE_BLOCK,
     CODE_BLOCK,
-    CODE_INLINE
+    CODE_INLINE,
+    HEADER1
 }
 
-public record Node(NodeType Type, string? Text = null, Snowflake? Id = null, string? Emoji = null, string? CodeLanguage = null, string? Url = null, IEnumerable<Node>? Children = null)
+public record Node(
+    NodeType Type,
+    string? Text = null,
+    Snowflake? Id = null,
+    string? Emoji = null,
+    string? CodeLanguage = null,
+    string? Url = null,
+    IEnumerable<Node>? Children = null)
 {
     public string? Text { get; set; } = Text;
     public IEnumerable<Node>? Children { get; set; } = Children;
@@ -57,7 +65,6 @@ public static partial class Parser
             }
             else
             {
-
                 prevTextNode = null;
             }
 
@@ -68,21 +75,24 @@ public static partial class Parser
 
             compressedTree.Add(node);
         }
+
         return compressedTree;
     }
 
     private static readonly Dictionary<TokenType[], NodeType> _textModifiers = new()
-            {
-                { new TokenType[]{ TokenType.STAR, TokenType.STAR }, NodeType.BOLD },
-                { new TokenType[]{ TokenType.UNDERSCORE, TokenType.UNDERSCORE }, NodeType.UNDERLINE },
-                { new TokenType[]{ TokenType.TILDE, TokenType.TILDE }, NodeType.STRIKETHROUGH },
-                { new TokenType[]{ TokenType.STAR }, NodeType.ITALIC },
-                { new TokenType[]{ TokenType.UNDERSCORE }, NodeType.ITALIC },
-                { new TokenType[]{ TokenType.SPOILER_DELIMITER }, NodeType.SPOILER },
-                { new TokenType[]{ TokenType.CODE_INLINE_DELIMITER }, NodeType.CODE_INLINE },
-            };
+    {
+        { new TokenType[] { TokenType.STAR, TokenType.STAR }, NodeType.BOLD },
+        { new TokenType[] { TokenType.UNDERSCORE, TokenType.UNDERSCORE }, NodeType.UNDERLINE },
+        { new TokenType[] { TokenType.TILDE, TokenType.TILDE }, NodeType.STRIKETHROUGH },
+        { new TokenType[] { TokenType.STAR }, NodeType.ITALIC },
+        { new TokenType[] { TokenType.UNDERSCORE }, NodeType.ITALIC },
+        { new TokenType[] { TokenType.SPOILER_DELIMITER }, NodeType.SPOILER },
+        { new TokenType[] { TokenType.CODE_INLINE_DELIMITER }, NodeType.CODE_INLINE },
+    };
+
     [GeneratedRegex("^([a-zA-Z0-9-]*)(.*)$", RegexOptions.Compiled)]
     private static partial Regex CodeLanguageRegex();
+
     public static IEnumerable<Node> ParseTokensGenerator(Token[] tokens, bool inQuote = false)
     {
         var i = 0;
@@ -146,7 +156,9 @@ public static partial class Parser
                 );
                 i += 1;
                 continue;
-            };
+            }
+
+            ;
 
             // URL with preview
             if (current.Type == TokenType.URL_WITH_PREVIEW)
@@ -160,6 +172,17 @@ public static partial class Parser
             if (current.Type == TokenType.URL_WITHOUT_PREVIEW)
             {
                 yield return new Node(NodeType.URL_WITHOUT_PREVIEW, Url: current.Value[1..^1]);
+                i += 1;
+                continue;
+            }
+
+            // Header //FIXME: this doesnt check if its the first token in line
+            //TODO: add other header types
+            //TODO: parse header content as markdown like quote blocks
+            if (current.Type == TokenType.HEADER1)
+            {
+                //TODO: we manually add on the new line if its there. can we use some avalonia control to not need to do that? (like a <p> element)
+                yield return new Node(NodeType.HEADER1, Text: $"{current.Groups![1].Value}{(current.Groups![2].Length > 0 ? "\n" : "")}");
                 i += 1;
                 continue;
             }
@@ -248,6 +271,7 @@ public static partial class Parser
                             break;
                         }
                     }
+
                     if (nonEmptyLineFound)
                     {
                         var match = CodeLanguageRegex().Match(lines[0]);
@@ -256,7 +280,7 @@ public static partial class Parser
                         // displayed text) or it is empty (newline gets removed)
                         if (match.Groups[2].Length == 0)
                         {
-                            lines = lines[1..];  // remove first line from code block
+                            lines = lines[1..]; // remove first line from code block
                             if (match.Groups[1].Length > 0)
                             {
                                 lang = match.Groups[1].Value;
@@ -267,7 +291,8 @@ public static partial class Parser
 
                     childrenContent = string.Join("\n", lines);
                     var child_node = new Node(NodeType.TEXT, Text: childrenContent);
-                    yield return new Node(NodeType.CODE_BLOCK, CodeLanguage: lang, Children: new List<Node>() { child_node });
+                    yield return new Node(NodeType.CODE_BLOCK, CodeLanguage: lang,
+                        Children: new List<Node>() { child_node });
                     i += 1 + consumedTokenCount!.Value;
                     continue;
                 }
@@ -286,6 +311,7 @@ public static partial class Parser
             // note that in_quote won't change during the while-loop, we're just reducing
             // the level of indentation here by including it in the condition instead of
             // making an additional if statement around the while loop
+            //FIXME: this doesnt check if its the first token in line
             while (
                 !inQuote &&
                 i < tokens.Length &&
@@ -300,17 +326,18 @@ public static partial class Parser
                         // add everything from the quote line prefix (non-inclusive)
                         // to the newline (inclusive) as children token
                         childrenTokenInQuoteBlock.AddRange(tokens[(i + 1)..(j + 1)]);
-                        i = j + 1;  // move to the token after the newline
+                        i = j + 1; // move to the token after the newline
                         found = true;
                         break;
                     }
                 }
+
                 if (!found)
                 {
                     // this is the last line,
                     // all remaining tokens are part of the quote block
                     childrenTokenInQuoteBlock.AddRange(tokens[(i + 1)..]);
-                    i = tokens.Length;  // move to the end
+                    i = tokens.Length; // move to the end
                     break;
                 }
             }

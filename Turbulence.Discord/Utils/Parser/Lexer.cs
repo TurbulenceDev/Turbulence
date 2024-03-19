@@ -19,7 +19,8 @@ public enum TokenType
     URL_WITHOUT_PREVIEW,
     QUOTE_LINE_PREFIX,
     CODE_INLINE_DELIMITER,
-    CODE_BLOCK_DELIMITER
+    CODE_BLOCK_DELIMITER,
+    HEADER1,
 }
 
 public record Token(TokenType Type, string Value, GroupCollection? Groups = null);
@@ -99,6 +100,7 @@ public static partial class Lexer
         new(TokenType.CODE_BLOCK_DELIMITER, CodeBlockRegex()),
         new(TokenType.CODE_INLINE_DELIMITER, CodeInlineRegex()),
         new(TokenType.NEWLINE, NewlineRegex()),
+        new(TokenType.HEADER1, Header1Regex())
     };
 
     // https://discord.com/developers/docs/reference#message-formatting
@@ -147,4 +149,7 @@ public static partial class Lexer
 
     [GeneratedRegex("^\n", RegexOptions.Compiled)]
     private static partial Regex NewlineRegex();
+    
+    [GeneratedRegex("^# (.*)(\n)?", RegexOptions.Compiled)]
+    private static partial Regex Header1Regex();
 }
