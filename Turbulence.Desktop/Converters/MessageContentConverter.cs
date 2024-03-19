@@ -2,6 +2,7 @@
 using Avalonia.Data.Converters;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using System.Globalization;
+using Avalonia.Controls;
 using Turbulence.Discord;
 using Turbulence.Discord.Models.DiscordChannel;
 using Turbulence.Discord.Utils;
@@ -57,6 +58,10 @@ public class MessageContentConverter : IValueConverter
                 case NodeType.EMOJI_CUSTOM:
                     //TODO: emojis
                     ret = new Run($":{node.Emoji}:");
+                    break;
+                case NodeType.HEADER1:
+                    ret = new Run(node.Text);
+                    ret.Classes.Add("Header1");
                     break;
                 case NodeType.TEXT:
                 default:
