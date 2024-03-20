@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Turbulence.Core.ViewModels;
+using Turbulence.Desktop.Dialogs;
 
 namespace Turbulence.Desktop;
 
@@ -16,6 +17,17 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _vm = (MainWindowViewModel)DataContext!;
+        _vm.ErrorEvent += OnErrorEvent;
+    }
+
+    private async void OnErrorEvent(object? sender, string e)
+    {
+        OkWindow errorDialog = new()
+        {
+            Title = "Error",
+            Prompt = e
+        };
+        await errorDialog.ShowDialog(this);
     }
 
     // Menu Item Handlers //TODO: move them into the menu bar view + use it??

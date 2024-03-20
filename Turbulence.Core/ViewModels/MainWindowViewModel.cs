@@ -25,6 +25,8 @@ public partial class MainWindowViewModel : ViewModelBase,
     
     private readonly IPlatformClient _client = Ioc.Default.GetService<IPlatformClient>()!;
 
+    public event EventHandler<string>? ErrorEvent;
+
     [ObservableProperty]
     private bool _searchOpen = false;
 
@@ -51,7 +53,14 @@ public partial class MainWindowViewModel : ViewModelBase,
             return;
 
         // Get token
-        var token = new ConfigurationManager().AddUserSecrets<MainWindowViewModel>().Build()["token"]! ?? throw new Exception("No token set"); // TODO: use other storage
+        var token = new ConfigurationManager().AddUserSecrets<MainWindowViewModel>().Build()["token"]; //TODO: use other storage
+        if (token == null)
+        {
+            ErrorEvent?.Invoke(this, "No Token set.");
+            Messenger.Send(new SetStatusMsg("Error"));
+            return;
+        }
+
         Task.Run(() => _client.Start(token));
         Messenger.Send(new SetStatusMsg("Connecting..."));
     }
