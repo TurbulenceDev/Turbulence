@@ -72,7 +72,7 @@
                 <Button IsDefault="True" Name="SendButton" DockPanel.Dock="Right" Command="{Binding SendMessageCommand}">
                     Send
                 </Button>
-                <TextBox Name="TextInput" Watermark="Message" Text="{Binding Input}" />
+                <TextBox Name="TextInput" Watermark="Message" AcceptsReturn="True" Text="{Binding Input}" />
             </DockPanel>
             <TextBlock Classes="Status" Text="{Binding TypingStatus}" Grid.Row="1" />
         </Grid>
